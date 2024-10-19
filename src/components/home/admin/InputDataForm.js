@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { db } from "../../../firebaseConfig"; // Import your db instance
-import { ref, set } from "firebase/database"; // Import Realtime Database functions
-import { getAuth } from "firebase/auth"; // Import Firebase Auth to get the current user's email
-import "../../../style.css"; // Import the CSS file
+import { db, storage } from "../../../firebaseConfig";
+import { ref, set } from "firebase/database";
+import { getAuth } from "firebase/auth";
+import { ref as storageRef, uploadBytes } from "firebase/storage"; // Import for file upload
+import { FaBolt, FaGasPump, FaRecycle, FaPeopleCarry } from "react-icons/fa"; // Import FontAwesome icons
+import "../../../style.css";
 
 const InputDataForm = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +14,16 @@ const InputDataForm = () => {
     communityEngagement: "",
   });
 
-  const auth = getAuth(); // Get the authentication instance
-  const user = auth.currentUser; // Get the currently logged-in user
+  const [files, setFiles] = useState({
+    energyBill: null,
+    fuelBill: null,
+    wasteBill: null,
+    communityEngagementBill: null,
+  });
 
-  // Handle input changes
+  const auth = getAuth();
+  const user = auth.currentUser;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -24,86 +32,143 @@ const InputDataForm = () => {
     }));
   };
 
-  // Handle form submission
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setFiles((prevFiles) => ({
+      ...prevFiles,
+      [name]: files[0],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if the user is logged in
     if (!user) {
       console.error("User is not logged in!");
       return;
     }
 
-    // Get the user's email and sanitize it (replace '.' with '_')
+    // Get the user's email and sanitize it
     const userEmail = user.email;
-    const sanitizedEmail = userEmail.replace(/\./g, "_");
-
-    console.log("Form data:", formData); // Debugging: Check form data
+    const sanitizedEmail = userEmail.replace(/\./g, "_"); // Correct definition of sanitizedEmail
 
     try {
-      // Create a reference for the user's data under their email node
+      // Save form data to Firebase Database
       const userRef = ref(db, `postOfficeData/${sanitizedEmail}`);
-
-      // Save the form data under the user's email node in Firebase
       await set(userRef, formData);
-      console.log("Data stored successfully under email node:", sanitizedEmail);
 
-      // Reset the form data
+      // Upload files to Firebase Storage
+      for (const key in files) {
+        if (files[key]) {
+          const fileRef = storageRef(storage, `bills/${sanitizedEmail}/${key}`);
+          await uploadBytes(fileRef, files[key]);
+        }
+      }
+
       setFormData({
         energyConsumption: "",
         fuelUsage: "",
         wasteGeneration: "",
         communityEngagement: "",
       });
+      setFiles({
+        energyBill: null,
+        fuelBill: null,
+        wasteBill: null,
+        communityEngagementBill: null,
+      });
+      console.log("Data stored successfully");
     } catch (error) {
       console.error("Error adding document: ", error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="input-data-form">
-      <div>
-        <label>Energy Consumption:</label>
-        <input
-          type="text"
-          name="energyConsumption"
-          value={formData.energyConsumption}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Fuel Usage:</label>
-        <input
-          type="text"
-          name="fuelUsage"
-          value={formData.fuelUsage}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Waste Generation:</label>
-        <input
-          type="text"
-          name="wasteGeneration"
-          value={formData.wasteGeneration}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Community Engagement:</label>
-        <input
-          type="text"
-          name="communityEngagement"
-          value={formData.communityEngagement}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <button type="submit">Submit</button>
-    </form>
+    <div className="form-container">
+      <form onSubmit={handleSubmit} className="input-data-form">
+        <div className="form-group">
+          <label>
+            <FaBolt /> Energy Consumption:
+          </label>
+          <input
+            type="text"
+            name="energyConsumption"
+            value={formData.energyConsumption}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="file"
+            name="energyBill"
+            accept="image/*,application/pdf"
+            onChange={handleFileChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>
+            <FaGasPump /> Fuel Usage:
+          </label>
+          <input
+            type="text"
+            name="fuelUsage"
+            value={formData.fuelUsage}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="file"
+            name="fuelBill"
+            accept="image/*,application/pdf"
+            onChange={handleFileChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>
+            <FaRecycle /> Waste Generation:
+          </label>
+          <input
+            type="text"
+            name="wasteGeneration"
+            value={formData.wasteGeneration}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="file"
+            name="wasteBill"
+            accept="image/*,application/pdf"
+            onChange={handleFileChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>
+            <FaPeopleCarry /> Community Engagement:
+          </label>
+          <input
+            type="text"
+            name="communityEngagement"
+            value={formData.communityEngagement}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="file"
+            name="communityEngagementBill"
+            accept="image/*,application/pdf"
+            onChange={handleFileChange}
+            required
+          />
+        </div>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
   );
 };
 

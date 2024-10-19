@@ -37,10 +37,14 @@ const Leaderboard = () => {
           const score = calculateScore(formData);
           const badge = assignBadge(score);
 
+          // Include city data if available in the fetched data
+          const city = formData.city ? formData.city : ""; // Replace with your city property name in the data
+
           leaderboardArray.push({
             email: email.replace(/_/g, "."),
             score: score,
             badge: badge,
+            city: city,
           });
         }
 
@@ -55,7 +59,7 @@ const Leaderboard = () => {
   return (
     <div className="leaderboard-container">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <img src="../../../images/trophy.png" alt="trophy" className="leaderboard-decoration" /> 
+        <img src="../../../images/trophy.png" alt="trophy" className="leaderboard-decoration" />
         <h1
           style={{
             fontWeight: "bold",
@@ -76,17 +80,12 @@ const Leaderboard = () => {
       {/* Leaderboard table */}
       <table className="leaderboard-table">
         <thead>
-          <tr style={{
-            fontWeight: "bold",
-            textAlign: "center",
-            background: "linear-gradient(90deg, rgba(255,0,150,1) 0%, rgba(0,204,255,1) 100%)",
-            WebkitBackgroundClip: "text",
-            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
-          }}>
+          <tr style={{ fontWeight: "bold", textAlign: "center", background: "linear-gradient(90deg, rgba(255,0,150,1) 0%, rgba(0,204,255,1) 100%)", WebkitBackgroundClip: "text", textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)" }}>
             <th>Rank</th>
             <th>Post Office Email</th>
+            <th>City</th>
             <th>Score</th>
-            <th>Badge</th>
+            <th>Badges</th>
           </tr>
         </thead>
         <tbody>
@@ -95,6 +94,8 @@ const Leaderboard = () => {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>{entry.email}</td>
+                {/* Display city data if available */}
+                <td>{entry.city}</td>
                 <td>{entry.score}</td>
                 <td>
                   <img

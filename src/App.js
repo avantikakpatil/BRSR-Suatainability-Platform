@@ -7,6 +7,7 @@ import Home from "./components/home/index.jsx";
 import Sidebar from "./components/sidebar/Sidebar";
 import Leaderboard from "./components/home/admin/leaderboard";
 import Challenges from "./components/home/admin/challenges"; // Ensure correct import path
+import Report from "./components/home/admin/report"; // Import the Report component
 import AdminPanel from "./components/home/admin/AdminPanel"; // Import AdminPanel
 import BaselineParametersForm from "./components/home/admin/BaselineParametersForm"; // Import Baseline component
 import AdminForm from "./components/home/admin/AdminForm"; // Import AdminForm

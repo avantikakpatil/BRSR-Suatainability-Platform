@@ -3,6 +3,7 @@ import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage"; // Import Firebase Storage
 import { getAuth } from 'firebase/auth';
 
+
 const firebaseConfig = {
     apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
     authDomain: "brsr-9b56a.firebaseapp.com",
@@ -14,9 +15,9 @@ const firebaseConfig = {
   };
 
   const app = initializeApp(firebaseConfig);
-
-  // Initialize Firebase Realtime Database and Storage
   const db = getDatabase(app);
-  const storage = getStorage(app); // Initialize Firebase Storage
+  const storage = getStorage(app);
+  const auth = getAuth(app); // Initialize the auth module
   
-  export { db, storage }; // Export both db and storage
+  // Export the db, storage, and auth objects
+  export { db, storage, auth };

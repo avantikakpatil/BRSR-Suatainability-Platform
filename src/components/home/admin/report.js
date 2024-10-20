@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+/*import React, { useState } from 'react';
 import { Button, Table, Modal, Form } from 'react-bootstrap';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -158,4 +158,4 @@ const PostOffices = () => {
   );
 };
 
-export default PostOffices;
+export default PostOffices;*/

@@ -1,42 +1,109 @@
 import React, { useState } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set } from 'firebase/database';
+
+// Initialize Firebase (replace with your Firebase configuration)
+const firebaseConfig = {
+  apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
+  authDomain: "brsr-9b56a.firebaseapp.com",
+  projectId: "brsr-9b56a",
+  storageBucket: "brsr-9b56a.appspot.com",
+  messagingSenderId: "548279958491",
+  appId: "1:548279958491:web:19199e42e0d796ad4185fe",
+  measurementId: "G-7SYPSVZR9H"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
 const WasteManagementForm = () => {
   const [formData, setFormData] = useState({
-    currentPlasticWaste: '',
-    previousPlasticWaste: '',
-    currentEWaste: '',
-    previousEWaste: '',
-    currentBioMedicalWaste: '',
-    previousBioMedicalWaste: '',
-    currentConstructionWaste: '',
-    previousConstructionWaste: '',
-    currentBatteryWaste: '',
-    previousBatteryWaste: '',
-    currentRadioactiveWaste: '',
-    previousRadioactiveWaste: '',
-    otherHazardousWaste: '',
-    otherNonHazardousWaste: '',
-    recycledWaste: '',
-    reusedWaste: '',
-    otherRecoveryOperationsWaste: '',
-    incinerationWaste: '',
-    landfillWaste: '',
-    otherDisposalWaste: '',
+    wasteData: {
+      currentPlasticWaste: '',
+      previousPlasticWaste: '',
+      currentEWaste: '',
+      previousEWaste: '',
+      currentBioMedicalWaste: '',
+      previousBioMedicalWaste: '',
+      currentConstructionWaste: '',
+      previousConstructionWaste: '',
+      currentBatteryWaste: '',
+      previousBatteryWaste: '',
+      currentRadioactiveWaste: '',
+      previousRadioactiveWaste: '',
+      otherHazardousWaste: '',
+      otherNonHazardousWaste: '',
+      recycledWaste: '',
+      reusedWaste: '',
+      otherRecoveryOperationsWaste: '',
+      incinerationWaste: '',
+      landfillWaste: '',
+      otherDisposalWaste: '',
+    },
     externalAssessment: '',
     externalAgencyName: '',
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    const isWasteDataField = name.startsWith('current') || name.startsWith('previous') || name.startsWith('other') || name === 'recycledWaste' || name === 'reusedWaste' || name === 'otherRecoveryOperationsWaste' || name === 'incinerationWaste' || name === 'landfillWaste' || name === 'otherDisposalWaste';
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [isWasteDataField ? 'wasteData' : name]: {
+        ...prevData.wasteData,
+        ...(isWasteDataField ? { [name]: value } : {}),
+      },
+      ...(isWasteDataField ? {} : { [name]: value }),
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submitted Data:', formData);
-  };
+    console.log('Submitted Data:', formData); // Check submitted data in console
+
+    // Structure the data correctly
+    const structuredData = {
+        currentPlasticWaste: formData.wasteData.currentPlasticWaste,
+        previousPlasticWaste: formData.wasteData.previousPlasticWaste,
+        currentEWaste: formData.wasteData.currentEWaste,
+        previousEWaste: formData.wasteData.previousEWaste,
+        currentBioMedicalWaste: formData.wasteData.currentBioMedicalWaste,
+        previousBioMedicalWaste: formData.wasteData.previousBioMedicalWaste,
+        currentConstructionWaste: formData.wasteData.currentConstructionWaste,
+        previousConstructionWaste: formData.wasteData.previousConstructionWaste,
+        currentBatteryWaste: formData.wasteData.currentBatteryWaste,
+        previousBatteryWaste: formData.wasteData.previousBatteryWaste,
+        currentRadioactiveWaste: formData.wasteData.currentRadioactiveWaste,
+        previousRadioactiveWaste: formData.wasteData.previousRadioactiveWaste,
+        otherHazardousWaste: formData.wasteData.otherHazardousWaste,
+        otherNonHazardousWaste: formData.wasteData.otherNonHazardousWaste,
+        recycledWaste: formData.wasteData.recycledWaste,
+        reusedWaste: formData.wasteData.reusedWaste,
+        otherRecoveryOperationsWaste: formData.wasteData.otherRecoveryOperationsWaste,
+        incinerationWaste: formData.wasteData.incinerationWaste,
+        landfillWaste: formData.wasteData.landfillWaste,
+        otherDisposalWaste: formData.wasteData.otherDisposalWaste,
+    };
+
+    // Write structured data to Firebase Realtime Database under the inputData/wasteData node
+    const uniqueKey = Date.now(); // Use a unique key for each entry
+    const dataRef = ref(database, 'inputData/wasteData/' + uniqueKey); // Reference under wasteData with unique key
+
+    set(dataRef, structuredData)
+        .then(() => {
+            console.log('Data submitted successfully!'); // Log success
+            alert('Data submitted successfully!'); // Show alert on success
+        })
+        .catch((error) => {
+            console.error('Error submitting data:', error); // Log error
+            alert('Error submitting data: ' + error.message); // Show alert on error
+        });
+};
+
+
+  
 
   return (
     <div style={styles.container}>
@@ -65,7 +132,7 @@ const WasteManagementForm = () => {
                   <input
                     type="number"
                     name={`current${item.field}`}
-                    value={formData[`current${item.field}`]}
+                    value={formData.wasteData[`current${item.field}`]}
                     onChange={handleChange}
                     style={styles.input}
                   />
@@ -74,7 +141,7 @@ const WasteManagementForm = () => {
                   <input
                     type="number"
                     name={`previous${item.field}`}
-                    value={formData[`previous${item.field}`]}
+                    value={formData.wasteData[`previous${item.field}`]}
                     onChange={handleChange}
                     style={styles.input}
                   />
@@ -88,7 +155,7 @@ const WasteManagementForm = () => {
                 <input
                   type="text"
                   name="otherHazardousWaste"
-                  value={formData.otherHazardousWaste}
+                  value={formData.wasteData.otherHazardousWaste}
                   onChange={handleChange}
                   style={styles.inputLong}
                 />
@@ -101,7 +168,7 @@ const WasteManagementForm = () => {
                 <input
                   type="text"
                   name="otherNonHazardousWaste"
-                  value={formData.otherNonHazardousWaste}
+                  value={formData.wasteData.otherNonHazardousWaste}
                   onChange={handleChange}
                   style={styles.inputLong}
                 />
@@ -119,7 +186,7 @@ const WasteManagementForm = () => {
                   <input
                     type="number"
                     name={item.field}
-                    value={formData[item.field]}
+                    value={formData.wasteData[item.field]}
                     onChange={handleChange}
                     style={styles.input}
                   />
@@ -138,7 +205,7 @@ const WasteManagementForm = () => {
                   <input
                     type="number"
                     name={item.field}
-                    value={formData[item.field]}
+                    value={formData.wasteData[item.field]}
                     onChange={handleChange}
                     style={styles.input}
                   />
@@ -210,51 +277,48 @@ const styles = {
     padding: '10px',
     backgroundColor: '#f9f9f9',
     textAlign: 'left',
-    width: '33%',
   },
   td: {
     border: '1px solid #ccc',
-    padding: '8px',
+    padding: '10px',
   },
   input: {
-    width: '90%',
+    width: '100%',
     padding: '6px',
     borderRadius: '4px',
     border: '1px solid #ccc',
-    fontSize: '0.85rem',
+    fontSize: '14px',
   },
   inputLong: {
-    width: '95%',
+    width: '100%',
     padding: '6px',
     borderRadius: '4px',
     border: '1px solid #ccc',
-    fontSize: '0.85rem',
+    fontSize: '14px',
   },
   assessmentSection: {
-    marginBottom: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
+    margin: '20px 0',
     width: '100%',
   },
   label: {
-    display: 'block',
-    marginBottom: '8px',
+    marginRight: '10px',
   },
   inputAssessment: {
-    width: '50%',
+    width: '30%',
     padding: '6px',
     borderRadius: '4px',
     border: '1px solid #ccc',
+    fontSize: '14px',
     marginBottom: '10px',
   },
   button: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    padding: '10px 20px',
-    borderRadius: '4px',
+    padding: '10px 15px',
+    borderRadius: '5px',
     border: 'none',
+    backgroundColor: '#007BFF',
+    color: '#fff',
     cursor: 'pointer',
+    fontSize: '16px',
   },
 };
 

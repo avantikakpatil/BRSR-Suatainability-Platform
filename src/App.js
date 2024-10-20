@@ -13,6 +13,7 @@ import BaselineParametersForm from "./components/home/admin/BaselineParametersFo
 import AdminForm from "./components/home/admin/AdminForm"; // Import AdminForm
 
 
+
 import { AuthProvider, useAuth } from "./contexts/authContext";
 
 function App() {
@@ -30,6 +31,8 @@ function App() {
     { path: "/admin/inputdata", element: <AdminPanel /> },
     { path: "/admin/baseline", element: <BaselineParametersForm /> }, // Add route for Baseline
     { path: "/admin/profile", element: <AdminForm /> }, // Add route for AdminForm
+    { path: "/admin/reports", element: <Report /> } // Add the Report route
+
 
   ];
 
@@ -48,6 +51,8 @@ function App() {
           onInputDataClick={() => navigate("/admin/inputdata")}
           onBaselineClick={() => navigate("/admin/baseline")} // Handle Baseline navigation
           onProfileClick={() => navigate("/admin/profile")} // Handle AdminForm navigation
+          onReportClick={() => navigate("/admin/reports")} // Add onReportClick handler
+
 
         />
       )}

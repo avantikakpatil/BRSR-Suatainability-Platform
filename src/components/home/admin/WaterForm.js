@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getDatabase, ref, set } from "firebase/database"; // Import Firebase functions
 
 const WaterForm = () => {
   const [formData, setFormData] = useState({
@@ -23,8 +24,37 @@ const WaterForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Process the formData or send it to the server
-    console.log(formData);
+    
+    // Get a reference to the database
+    const db = getDatabase();
+    const newDataRef = ref(db, 'inputData/waterData/' + Date.now());
+
+    // Set the data in the database
+    set(newDataRef, {
+      ...formData,
+      createdAt: new Date().toISOString(), // Optionally add a timestamp
+    })
+      .then(() => {
+        console.log("Data stored successfully");
+        // Clear the form after submission
+        setFormData({
+          fyCurrent: "",
+          fyPrevious: "",
+          surfaceWater: "",
+          groundwater: "",
+          thirdPartyWater: "",
+          seawater: "",
+          others: "",
+          totalWithdrawal: "",
+          totalConsumption: "",
+          waterIntensity: "",
+          externalAssessment: "N",
+          externalAgencyName: "",
+        });
+      })
+      .catch((error) => {
+        console.error("Error storing data: ", error);
+      });
   };
 
   return (
@@ -130,105 +160,104 @@ const WaterForm = () => {
 };
 
 const styles = {
-    container: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "20px",
-      backgroundColor: "#f0f0f0",
-      minHeight: "100vh",
-    },
-    form: {
-      backgroundColor: "#fff",
-      padding: "30px",
-      borderRadius: "10px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      width: "100%",
-      maxWidth: "700px",
-    },
-    title: {
-      textAlign: "center",
-      marginBottom: "30px",
-      fontSize: "1.8em",
-      color: "#333",
-      fontWeight: "600",
-    },
-    inputGroup: {
-      display: "flex",
-      flexDirection: "column", // Stack items vertically
-      marginBottom: "20px",
-    },
-    label: {
-      margin: "10px 0",
-      fontSize: "1em",
-      color: "#333",
-      fontWeight: "500",
-    },
-    input: {
-      width: "100%",
-      padding: "12px",
-      marginTop: "5px",
-      borderRadius: "5px",
-      border: "1px solid #ccc",
-      fontSize: "1em",
-      outline: "none",
-      boxSizing: "border-box",
-      transition: "border-color 0.3s ease",
-    },
-    table: {
-      width: "100%",
-      borderCollapse: "collapse",
-      marginBottom: "20px",
-    },
-    tableHeader: {
-      textAlign: "left",
-      padding: "12px",
-      backgroundColor: "#4CAF50",
-      color: "#fff",
-      fontWeight: "600",
-    },
-    tableCell: {
-      padding: "12px",
-      borderBottom: "1px solid #ccc",
-    },
-    tableInput: {
-      width: "100%",
-      padding: "10px",
-      borderRadius: "5px",
-      border: "1px solid #ccc",
-      fontSize: "1em",
-      outline: "none",
-      transition: "border-color 0.3s ease",
-    },
-    optionalTitle: {
-      fontSize: "1.4em",
-      color: "#333",
-      fontWeight: "600",
-      marginTop: "30px",
-      marginBottom: "10px",
-    },
-    optionalText: {
-      fontSize: "0.9em",
-      color: "#555",
-      marginBottom: "20px",
-    },
-    submitButton: {
-      display: "block",
-      width: "100%",
-      padding: "15px",
-      backgroundColor: "#4CAF50",
-      color: "#fff",
-      border: "none",
-      borderRadius: "5px",
-      fontSize: "1.1em",
-      fontWeight: "600",
-      cursor: "pointer",
-      transition: "background-color 0.3s ease",
-    },
-    submitButtonHover: {
-      backgroundColor: "#45a049",
-    },
-  };
-  
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "20px",
+    backgroundColor: "#f0f0f0",
+    minHeight: "100vh",
+  },
+  form: {
+    backgroundColor: "#fff",
+    padding: "30px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    width: "100%",
+    maxWidth: "700px",
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: "30px",
+    fontSize: "1.8em",
+    color: "#333",
+    fontWeight: "600",
+  },
+  inputGroup: {
+    display: "flex",
+    flexDirection: "column",
+    marginBottom: "20px",
+  },
+  label: {
+    margin: "10px 0",
+    fontSize: "1em",
+    color: "#333",
+    fontWeight: "500",
+  },
+  input: {
+    width: "100%",
+    padding: "12px",
+    marginTop: "5px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "1em",
+    outline: "none",
+    boxSizing: "border-box",
+    transition: "border-color 0.3s ease",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginBottom: "20px",
+  },
+  tableHeader: {
+    textAlign: "left",
+    padding: "12px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    fontWeight: "600",
+  },
+  tableCell: {
+    padding: "12px",
+    borderBottom: "1px solid #ccc",
+  },
+  tableInput: {
+    width: "100%",
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "1em",
+    outline: "none",
+    transition: "border-color 0.3s ease",
+  },
+  optionalTitle: {
+    fontSize: "1.4em",
+    color: "#333",
+    fontWeight: "600",
+    marginTop: "30px",
+    marginBottom: "10px",
+  },
+  optionalText: {
+    fontSize: "0.9em",
+    color: "#555",
+    marginBottom: "20px",
+  },
+  submitButton: {
+    display: "block",
+    width: "100%",
+    padding: "15px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    fontSize: "1.1em",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+  },
+  submitButtonHover: {
+    backgroundColor: "#45a049",
+  },
+};
 
 export default WaterForm;

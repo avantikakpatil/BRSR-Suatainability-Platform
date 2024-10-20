@@ -1,5 +1,8 @@
 // EnergyForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { db } from '../../../firebaseConfig'; // Adjust the path as needed
+import { ref, set } from 'firebase/database';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const EnergyForm = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +19,20 @@ const EnergyForm = () => {
     externalAgencyName: ''
   });
 
+  const [userEmail, setUserEmail] = useState('');
+
+  // Get the currently logged-in user's email
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email); // Set the user's email if logged in
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,10 +40,36 @@ const EnergyForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitted Data:', formData);
-    // Handle form submission logic here (e.g., send data to API)
+    console.log('Submitted Data:', { ...formData, email: userEmail });
+
+    try {
+      // Create a reference in the Realtime Database under inputData/energyData
+      const newDataRef = ref(db, 'inputData/energyData/' + Date.now()); // Use timestamp as a unique ID
+      await set(newDataRef, {
+        ...formData,
+        email: userEmail // Include the user's email
+      });
+
+      console.log("Data stored successfully.");
+      // Clear the form or provide success feedback
+      setFormData({
+        currentYearElectricity: '',
+        previousYearElectricity: '',
+        currentYearFuel: '',
+        previousYearFuel: '',
+        currentYearOtherSources: '',
+        previousYearOtherSources: '',
+        currentYearEnergyIntensity: '',
+        previousYearEnergyIntensity: '',
+        optionalEnergyIntensity: '',
+        externalAssessment: '',
+        externalAgencyName: ''
+      });
+    } catch (error) {
+      console.error("Error storing data: ", error);
+    }
   };
 
   return (
@@ -254,24 +297,25 @@ const styles = {
     border: '1px solid #ccc',
   },
   inputReadOnly: {
-    width: '100%',
-    padding: '8px',
+    width: '80%',
+    padding: '6px',
     fontSize: '14px',
     borderRadius: '4px',
     border: '1px solid #ccc',
-    backgroundColor: '#eaeaea',
+    backgroundColor: '#e9ecef',
   },
   assessmentSection: {
-    marginBottom: '0px',
+    marginTop: '20px',
   },
   label: {
+    display: 'block',
+    marginBottom: '8px',
+    fontSize: '16px',
     fontWeight: 'bold',
-    marginRight: '10px',
   },
   inputAssessment: {
-    width: '200px',
-    padding: '8px',
-    marginLeft: '10px',
+    width: '80%',
+    padding: '6px',
     fontSize: '14px',
     borderRadius: '4px',
     border: '1px solid #ccc',
@@ -280,14 +324,14 @@ const styles = {
   button: {
     display: 'block',
     width: '100%',
-    padding: '12px',
+    padding: '10px',
     fontSize: '16px',
-    backgroundColor: '#2c3e50',
     color: '#fff',
+    backgroundColor: '#007bff',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
-  },
+  }
 };
 
 export default EnergyForm;

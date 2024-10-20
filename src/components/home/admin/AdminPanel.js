@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-
+import EnergyForm from './EnergyForm';
+import WasteForm from './WasteForm';
+import WaterForm from './WaterForm';
 
 const AdminPanel = () => {
   const [selectedOption, setSelectedOption] = useState(null); // To track the selected option
@@ -8,13 +10,16 @@ const AdminPanel = () => {
     setSelectedOption(option);
   };
 
+  const goBack = () => {
+    setSelectedOption(null);
+  };
+
   return (
-    <div className="admin-panel p-8" style={{ marginLeft: '50px' }}> {/* Adjust margin to prevent overlap with sidebar */}
+    <div className="admin-panel p-8" style={{ marginLeft: '50px' }}>
       <h1 className="text-2xl font-bold mb-6">Admin Panel - Input Data</h1>
 
-      {/* Show options if no form is selected */}
       {!selectedOption && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8"> {/* Adjust grid for proper layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           <div className="flex flex-col items-center bg-blue-100 p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-bold mb-4">Energy</h2>
             <button 
@@ -47,7 +52,10 @@ const AdminPanel = () => {
         </div>
       )}
 
-      
+      {/* Conditionally render forms based on selected option */}
+      {selectedOption === 'Energy' && <EnergyForm goBack={goBack} />}
+      {selectedOption === 'Waste' && <WasteForm goBack={goBack} />}
+      {selectedOption === 'Water' && <WaterForm goBack={goBack} />}
     </div>
   );
 };

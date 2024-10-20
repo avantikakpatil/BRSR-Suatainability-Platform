@@ -8,6 +8,9 @@ import Sidebar from "./components/sidebar/Sidebar";
 import Leaderboard from "./components/home/admin/leaderboard";
 import Challenges from "./components/home/admin/challenges"; // Ensure correct import path
 import AdminPanel from "./components/home/admin/AdminPanel"; // Import AdminPanel
+import BaselineParametersForm from "./components/home/admin/BaselineParametersForm"; // Import Baseline component
+import AdminForm from "./components/home/admin/AdminForm"; // Import AdminForm
+
 
 import { AuthProvider, useAuth } from "./contexts/authContext";
 
@@ -23,7 +26,9 @@ function App() {
     { path: "/home", element: <Home /> },
     { path: "/admin/leaderboard", element: <Leaderboard /> },
     { path: "/admin/challenges", element: <Challenges /> },
-    { path: "/admin/inputdata", element: <AdminPanel /> } // Add route for AdminPanel
+    { path: "/admin/inputdata", element: <AdminPanel /> },
+    { path: "/admin/baseline", element: <BaselineParametersForm /> }, // Add route for Baseline
+    { path: "/admin/profile", element: <AdminForm /> }, // Add route for AdminForm
 
   ];
 
@@ -33,13 +38,16 @@ function App() {
     <div className="admin-panel flex">
       {/* Render Header unless on login or register pages */}
       {!["/login", "/register"].includes(location.pathname) && <Header />}
-      
+
       {/* Show Sidebar if user is logged in and not on login/register pages */}
       {userLoggedIn && !["/login", "/register"].includes(location.pathname) && (
         <Sidebar
           onLeaderboardClick={() => navigate("/admin/leaderboard")}
           onChallengesClick={() => navigate("/admin/challenges")}
-          onInputDataClick={() => navigate("/admin/inputdata")} // Add onClick handler for Input Data
+          onInputDataClick={() => navigate("/admin/inputdata")}
+          onBaselineClick={() => navigate("/admin/baseline")} // Handle Baseline navigation
+          onProfileClick={() => navigate("/admin/profile")} // Handle AdminForm navigation
+
         />
       )}
 

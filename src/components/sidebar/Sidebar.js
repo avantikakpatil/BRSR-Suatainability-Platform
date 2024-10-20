@@ -5,11 +5,11 @@ const Sidebar = ({ onInputDataClick, onLeaderboardClick, onChallengesClick, onRe
   const navigate = useNavigate();
 
   return (
-    <div className="sidebar w-64 bg-gray-800 text-white h-full" style={{ marginTop: '60px', height: '650px' }}>
+    <div className="sidebar w-48 bg-gray-800 text-white h-full" style={{ marginTop: '60px', height: '650px' }}>
       <h2 className="text-lg font-bold p-4">Admin Menu</h2>
       <ul className="flex flex-col p-4">
         <li className="mb-2">
-          <button onClick={onInputDataClick} className="hover:underline">
+          <button onClick={() => navigate("/admin/inputdata")} className="hover:underline">
             Input Data
           </button>
         </li>

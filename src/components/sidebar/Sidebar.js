@@ -1,7 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Sidebar = ({ onInputDataClick, onLeaderboardClick, onChallengesClick }) => { // Include onChallengesClick as a prop
+const Sidebar = ({ onInputDataClick, onLeaderboardClick, onChallengesClick, onReportClick }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="sidebar w-64 bg-gray-800 text-white h-full" style={{ marginTop: '60px', height: '650px' }}>
       <h2 className="text-lg font-bold p-4">Admin Menu</h2>
@@ -12,7 +14,7 @@ const Sidebar = ({ onInputDataClick, onLeaderboardClick, onChallengesClick }) =>
           </button>
         </li>
         <li className="mb-2">
-          <button onClick={onChallengesClick} className="hover:underline"> {/* Use the prop here */}
+          <button onClick={onChallengesClick} className="hover:underline">
             Challenges
           </button>
         </li>
@@ -22,9 +24,9 @@ const Sidebar = ({ onInputDataClick, onLeaderboardClick, onChallengesClick }) =>
           </button>
         </li>
         <li className="mb-2">
-          <Link to="/admin/reports" className="hover:underline">
-            Reports
-          </Link>
+          <button onClick={() => navigate("/admin/reports")} className="hover:underline">
+            Report
+          </button>
         </li>
         <li className="mb-2">
           <Link to="/admin/analytics" className="hover:underline">

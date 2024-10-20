@@ -8,6 +8,7 @@ import InputDataForm from "./components/home/admin/InputDataForm";
 import Sidebar from "./components/sidebar/Sidebar";
 import Leaderboard from "./components/home/admin/leaderboard";
 import Challenges from "./components/home/admin/challenges"; // Ensure correct import path
+import Report from "./components/home/admin/report"; // Import the Report component
 import { AuthProvider, useAuth } from "./contexts/authContext";
 
 function App() {
@@ -22,7 +23,8 @@ function App() {
     { path: "/register", element: <Register /> },
     { path: "/home", element: <Home /> },
     { path: "/admin/leaderboard", element: <Leaderboard /> },
-    { path: "/admin/challenges", element: <Challenges /> }
+    { path: "/admin/challenges", element: <Challenges /> },
+    { path: "/admin/reports", element: <Report /> } // Add the Report route
   ];
 
   let routesElement = useRoutes(routesArray);
@@ -34,7 +36,8 @@ function App() {
         <Sidebar
           onInputDataClick={() => setShowInputForm(true)}
           onLeaderboardClick={() => navigate("/admin/leaderboard")}
-          onChallengesClick={() => navigate("/admin/challenges")} // Pass onChallengesClick here
+          onChallengesClick={() => navigate("/admin/challenges")}
+          onReportClick={() => navigate("/admin/reports")} // Add onReportClick handler
         />
       )}
       <div

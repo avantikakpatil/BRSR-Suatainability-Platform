@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Navigate, Link } from 'react-router-dom'
 import { doSignInWithEmailAndPassword, doSignInWithGoogle } from '../../../firebase/auth'
 import { useAuth } from '../../../contexts/authContext'
+import { Container } from 'postcss'
 
 const Login = () => {
     const { userLoggedIn } = useAuth()
@@ -45,7 +46,9 @@ const Login = () => {
                         onSubmit={onSubmit}
                         className="space-y-5"
                     >
-                        <div>
+                        <div style={{width:'310px'}} >
+                            <div>
+                            
                             <label className="text-sm text-gray-600 font-bold">
                                 Email
                             </label>
@@ -54,12 +57,12 @@ const Login = () => {
                                 autoComplete='email'
                                 required
                                 value={email} onChange={(e) => { setEmail(e.target.value) }}
-                                className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
+                                className="w-full mt-3 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
                             />
-                        </div>
+                       </div>
 
-
-                        <div>
+                            <div>
+                        
                             <label className="text-sm text-gray-600 font-bold">
                                 Password
                             </label>
@@ -68,8 +71,9 @@ const Login = () => {
                                 autoComplete='current-password'
                                 required
                                 value={password} onChange={(e) => { setPassword(e.target.value) }}
-                                className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
+                                className="w-full mt-2 px-1 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
                             />
+                            </div>
                         </div>
 
                         {errorMessage && (
@@ -89,6 +93,7 @@ const Login = () => {
                         <div className='border-b-2 mb-2.5 mr-2 w-full'></div><div className='text-sm font-bold w-fit'>OR</div><div className='border-b-2 mb-2.5 ml-2 w-full'></div>
                     </div>
                     <button
+                    style={{ backgroundColor: 'white', color: 'black', borderWidth: '2px' }}
                         disabled={isSigningIn}
                         onClick={(e) => { onGoogleSignIn(e) }}
                         className={`w-full flex items-center justify-center gap-x-3 py-2.5 border rounded-lg text-sm font-medium  ${isSigningIn ? 'cursor-not-allowed' : 'hover:bg-gray-100 transition duration-300 active:bg-gray-100'}`}>

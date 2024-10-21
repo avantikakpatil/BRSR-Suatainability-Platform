@@ -27,7 +27,7 @@ const AdminForm = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Check for user authentication
+    // Che1lck for user authentication
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);

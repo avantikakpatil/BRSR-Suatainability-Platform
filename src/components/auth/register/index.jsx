@@ -85,6 +85,7 @@ const Register = () => {
             </div>
           </div>
           <form onSubmit={onSubmit} className="space-y-4">
+          <div style={{width:'310px'}} >
             <div>
               <label className="text-sm text-gray-600 font-bold">Email</label>
               <input
@@ -138,7 +139,7 @@ const Register = () => {
                 ))}
               </select>
             </div>
-
+</div>
             {errorMessage && (
               <span className="text-red-600 font-bold">{errorMessage}</span>
             )}

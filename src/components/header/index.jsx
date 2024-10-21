@@ -10,7 +10,7 @@ const Header = () => {
 
   return (
     <nav className="flex justify-between items-center bg-gray-800 text-white p-4 fixed w-full z-20" style={{ height: '60px' }}>
-      <div className="text-lg font-bold">Admin Panel</div>
+      <div className="text-lg font-bold">BRSR Suatainability Platform</div>
       <div className="flex space-x-4">
         {userLoggedIn ? (
           <button

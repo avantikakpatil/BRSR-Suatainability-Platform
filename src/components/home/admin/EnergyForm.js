@@ -1,4 +1,3 @@
-// EnergyForm.js
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../firebaseConfig'; // Adjust the path as needed
 import { ref, set } from 'firebase/database';
@@ -16,7 +15,7 @@ const EnergyForm = () => {
     previousYearEnergyIntensity: '',
     optionalEnergyIntensity: '',
     externalAssessment: '',
-    externalAgencyName: ''
+    externalAgencyName: '',
   });
 
   const [userEmail, setUserEmail] = useState('');
@@ -36,7 +35,7 @@ const EnergyForm = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -49,7 +48,7 @@ const EnergyForm = () => {
       const newDataRef = ref(db, 'inputData/energyData/' + Date.now()); // Use timestamp as a unique ID
       await set(newDataRef, {
         ...formData,
-        email: userEmail // Include the user's email
+        email: userEmail, // Include the user's email
       });
 
       console.log("Data stored successfully.");
@@ -65,7 +64,7 @@ const EnergyForm = () => {
         previousYearEnergyIntensity: '',
         optionalEnergyIntensity: '',
         externalAssessment: '',
-        externalAgencyName: ''
+        externalAgencyName: '',
       });
     } catch (error) {
       console.error("Error storing data: ", error);
@@ -74,7 +73,9 @@ const EnergyForm = () => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.heading}>Energy Consumption Form</h1>
+      <div style={styles.headingContainer}>
+        <h1 style={styles.heading}><b>Energy Consumption Form</b></h1>
+      </div>
       <form onSubmit={handleSubmit} style={styles.form}>
         <table style={styles.table}>
           <thead>
@@ -251,87 +252,114 @@ const EnergyForm = () => {
 
 const styles = {
   container: {
-    maxWidth: '1100px',
-    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column', // Main container uses column layout
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: '20px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#f0f0f0',
+    minHeight: '100vh',
   },
-  heading: {
-    textAlign: 'center',
-    marginBottom: '30px',
-    fontSize: '28px',
-    color: '#2c3e50',
+  headingContainer: {
+    display: 'flex', // Heading container uses flex for alignment
+    justifyContent: 'center',
+    marginBottom: '20px', // Add some margin below the heading
   },
   form: {
-    width: '100%',
+    backgroundColor: "#fff",
+    padding: "30px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    width: "100%",
+    maxWidth: "700px",
+    display: "flex",
+    flexDirection: "column",
   },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    marginBottom: '30px',
+  title: {
+    textAlign: "center",
+    marginBottom: "30px",
+    fontSize: "1.8em",
+    color: "#333",
+    fontWeight: "600",
   },
-  th: {
-    border: '1px solid #ddd',
-    padding: '8px',
-    backgroundColor: '#f4f4f4',
-    fontWeight: 'bold',
-  },
-  td: {
-    border: '1px solid #ddd',
-    padding: '8px',
-  },
-  inputSmall: {
-    width: '80%',
-    padding: '6px',
-    fontSize: '14px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-  },
-  inputLarge: {
-    width: '90%',
-    padding: '8px',
-    fontSize: '14px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-  },
-  inputReadOnly: {
-    width: '80%',
-    padding: '6px',
-    fontSize: '14px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-    backgroundColor: '#e9ecef',
-  },
-  assessmentSection: {
-    marginTop: '20px',
+  inputGroup: {
+    display: "flex",
+    flexDirection: "column", // Ensures vertical stacking
+    marginBottom: "20px",
+    width: "100%", // Makes sure it spans the form width
   },
   label: {
-    display: 'block',
-    marginBottom: '8px',
-    fontSize: '16px',
-    fontWeight: 'bold',
+    margin: "10px 0",
+    fontSize: "1em",
+    color: "#333",
+    fontWeight: "500",
+    width: "100%",
   },
-  inputAssessment: {
-    width: '80%',
-    padding: '6px',
-    fontSize: '14px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-    marginBottom: '10px',
+  input: {
+    width: "100%",
+    padding: "12px",
+    marginTop: "5px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "1em",
+    outline: "none",
+    boxSizing: "border-box",
+    transition: "border-color 0.3s ease",
   },
-  button: {
-    display: 'block',
-    width: '100%',
-    padding: '10px',
-    fontSize: '16px',
-    color: '#fff',
-    backgroundColor: '#007bff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  }
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginBottom: "20px",
+  },
+  tableHeader: {
+    textAlign: "left",
+    padding: "12px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    fontWeight: "600",
+  },
+  tableCell: {
+    padding: "12px",
+    borderBottom: "1px solid #ccc",
+  },
+  tableInput: {
+    width: "100%",
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "1em",
+    outline: "none",
+    transition: "border-color 0.3s ease",
+  },
+  optionalTitle: {
+    fontSize: "1.4em",
+    color: "#333",
+    fontWeight: "600",
+    marginTop: "30px",
+    marginBottom: "10px",
+  },
+  optionalText: {
+    fontSize: "0.9em",
+    color: "#555",
+    marginBottom: "20px",
+  },
+  submitButton: {
+    display: "block",
+    width: "100%",
+    padding: "15px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    fontSize: "1.1em",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+  },
+  submitButtonHover: {
+    backgroundColor: "#45a049",
+  },
 };
 
 export default EnergyForm;
+

@@ -1,17 +1,67 @@
-import React, { useState } from 'react';
-import { Button, Table } from 'react-bootstrap';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import React, { useState } from "react";
+import { Button, Table } from "react-bootstrap";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const PostOffices = () => {
   const postOffices = [
-    { id: 1, postOffice: 'Post Office 1', city: 'Mumbai', address: '123 Main St.', state: 'Maharashtra', pincode: '400001', year: 2023 },
-    { id: 2, postOffice: 'Post Office 2', city: 'Delhi', address: '456 Central Rd.', state: 'Delhi', pincode: '110001', year: 2022 },
-    { id: 3, postOffice: 'Post Office 3', city: 'Chennai', address: '789 South St.', state: 'Tamil Nadu', pincode: '600002', year: 2023 },
-    // Add more post offices with year information
+    {
+      id: 1,
+      postOffice: "Post Office 1",
+      city: "Mumbai",
+      address: "123 Main St.",
+      state: "Maharashtra",
+      pincode: "400001",
+      year: 2023,
+    },
+    {
+      id: 2,
+      postOffice: "Post Office 2",
+      city: "Delhi",
+      address: "456 Central Rd.",
+      state: "Delhi",
+      pincode: "110001",
+      year: 2022,
+    },
+    {
+      id: 3,
+      postOffice: "Post Office 3",
+      city: "Chennai",
+      address: "789 South St.",
+      state: "Tamil Nadu",
+      pincode: "600002",
+      year: 2023,
+    },
+    {
+      id: 4,
+      postOffice: "Post Office 4",
+      city: "Kolkata",
+      address: "101 East St.",
+      state: "West Bengal",
+      pincode: "700001",
+      year: 2021,
+    },
+    {
+      id: 5,
+      postOffice: "Post Office 5",
+      city: "Bangalore",
+      address: "234 North St.",
+      state: "Karnataka",
+      pincode: "560001",
+      year: 2022,
+    },
+    {
+      id: 6,
+      postOffice: "Post Office 6",
+      city: "Hyderabad",
+      address: "567 West St.",
+      state: "Telangana",
+      pincode: "500001",
+      year: 2023,
+    },
   ];
 
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
 
   const filteredPostOffices = searchText
     ? postOffices.filter((office) => {
@@ -30,56 +80,78 @@ const PostOffices = () => {
 
     // Title and Post Office Info
     doc.setFontSize(18);
-    doc.text('Business Responsibility and Sustainability Report', 14, 22);
+    doc.text("Business Responsibility and Sustainability Report", 14, 22);
     doc.setFontSize(14);
     doc.text(`Post Office Name: ${postOffice.postOffice}`, 14, 30);
-    doc.text(`Address: ${postOffice.address}, ${postOffice.city}, ${postOffice.state} - ${postOffice.pincode}`, 14, 36);
+    doc.text(
+      `Address: ${postOffice.address}, ${postOffice.city}, ${postOffice.state} - ${postOffice.pincode}`,
+      14,
+      36
+    );
 
     // Section A: General Disclosures
     doc.setFontSize(16);
-    doc.text('SECTION A: GENERAL DISCLOSURES', 14, 46);
+    doc.text("SECTION A: GENERAL DISCLOSURES", 14, 46);
 
     autoTable(doc, {
       startY: 52,
-      head: [['Details', 'Information']],
+      head: [["Details", "Information"]],
       body: [
-        ['CIN', 'L12345ABC98765'],
-        ['Name of the Listed Entity', postOffice.postOffice],
-        ['Year of Incorporation', '2001'],
-        ['Registered Office Address', postOffice.address],
-        ['Corporate Office Address', postOffice.address],
-        ['Email', 'postoffice@domain.com'],
-        ['Telephone', '+91 12345 67890'],
-        ['Website', 'www.postoffice.com'],
-        ['Financial Year for Reporting', '2023-2024'],
-        ['Paid-up Capital', '₹100 Crore'],
+        ["CIN", "L12345ABC98765"],
+        ["Name of the Listed Entity", postOffice.postOffice],
+        ["Year of Incorporation", "2001"],
+        ["Registered Office Address", postOffice.address],
+        ["Corporate Office Address", postOffice.address],
+        ["Email", "postoffice@domain.com"],
+        ["Telephone", "+91 12345 67890"],
+        ["Website", "www.postoffice.com"],
+        ["Financial Year for Reporting", "2023-2024"],
+        ["Paid-up Capital", "₹100 Crore"],
       ],
     });
 
     // Section B: Sustainability Information
     doc.setFontSize(16);
-    doc.text('SECTION B: SUSTAINABILITY INFORMATION', 14, doc.lastAutoTable.finalY + 10);
+    doc.text(
+      "SECTION B: SUSTAINABILITY INFORMATION",
+      14,
+      doc.lastAutoTable.finalY + 10
+    );
 
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 15,
-      head: [['Metric', 'Details']],
+      head: [["Metric", "Details"]],
       body: [
-        ['CSR Activities', 'Clean Energy Projects, Education Programs'],
-        ['Energy Consumption', '2000 KWh per year'],
-        ['Water Usage', '5000 liters per month'],
-        ['Waste Management', 'Recycling and proper disposal of hazardous materials'],
-        ['Employee Health & Safety', '100% Health Coverage, Regular Safety Audits'],
+        ["CSR Activities", "Clean Energy Projects, Education Programs"],
+        ["Energy Consumption", "2000 KWh per year"],
+        ["Water Usage", "5000 liters per month"],
+        [
+          "Waste Management",
+          "Recycling and proper disposal of hazardous materials",
+        ],
+        [
+          "Employee Health & Safety",
+          "100% Health Coverage, Regular Safety Audits",
+        ],
       ],
     });
 
     // Final touches for official formatting
     doc.setFontSize(12);
-    doc.text('Report Generated by Post Office', 14, doc.lastAutoTable.finalY + 20);
-    doc.text('Contact Information: postoffice@domain.com | +91 12345 67890', 14, doc.lastAutoTable.finalY + 26);
+    doc.text(
+      "Report Generated by Post Office",
+      14,
+      doc.lastAutoTable.finalY + 20
+    );
+    doc.text(
+      "Contact Information: postoffice@domain.com | +91 12345 67890",
+      14,
+      doc.lastAutoTable.finalY + 26
+    );
 
     if (isForView) {
-      const string = doc.output('bloburl');  // Get the PDF as a Blob URL
-      window.open(string);  // Open the PDF in a new tab
+      const string = doc.output("bloburl"); // Get the PDF as a Blob URL
+      window.open(string); // Open the PDF in a new tab
     } else {
       // Save the PDF
       doc.save(`${postOffice.postOffice}_BRSR_Report.pdf`);
@@ -93,20 +165,27 @@ const PostOffices = () => {
 
   return (
     <div className="post-office-container">
-      <h1>Post Office Yearly Reports</h1>
+      <h1>
+        <b>Post Office Yearly Reports</b>
+      </h1>
       <div className="search-bar">
-        <input type="text" placeholder="Search by year, post office, or city" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+        <input
+          type="text"
+          placeholder="Search by year, post office, or city"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
       </div>
       <div className="table-container">
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>#</th>
-              <th>Post Office</th>
-              <th>City</th>
-              <th>Year</th>
-              <th>View</th>
-              <th>Download PDF</th>
+              <th style={{ color: "black" }}>Sr No.</th>
+              <th style={{ color: "black" }}>Post Office</th>
+              <th style={{ color: "black" }}>City</th>
+              <th style={{ color: "black" }}>Year</th>
+              <th style={{ color: "black" }}>View</th>
+              <th style={{ color: "black" }}>Download PDF</th>
             </tr>
           </thead>
           <tbody>
@@ -117,12 +196,20 @@ const PostOffices = () => {
                 <td>{postOffice.city}</td>
                 <td>{postOffice.year}</td>
                 <td>
-                  <Button variant="primary" onClick={() => handleViewReport(postOffice)}>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleViewReport(postOffice)}
+                    style={{ backgroundColor: "#3d89da" }}
+                  >
                     View
                   </Button>
                 </td>
                 <td>
-                  <Button variant="success" onClick={() => generatePDF(postOffice)}>
+                  <Button
+                    variant="success"
+                    onClick={() => generatePDF(postOffice)}
+                    style={{ backgroundColor: "#3d89da" }}
+                  >
                     Download PDF
                   </Button>
                 </td>

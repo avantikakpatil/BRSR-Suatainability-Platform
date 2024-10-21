@@ -107,7 +107,7 @@ const WasteManagementForm = () => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.heading}>Waste Management Form</h1>
+      <h1 style={styles.heading}><b>Waste Management Form</b></h1>
       <form onSubmit={handleSubmit} style={styles.form}>
         <table style={styles.table}>
           <thead>

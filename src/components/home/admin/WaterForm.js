@@ -59,6 +59,9 @@ const WaterForm = () => {
 
   return (
     <div style={styles.container}>
+      {/* <div style={styles.headingContainer}>
+        <h1 style={styles.heading}><b>Water Consumption Form</b></h1>
+      </div> */}
       <form onSubmit={handleSubmit} style={styles.form}>
         <h3 style={styles.title}>Water withdrawal by source (in kilolitres)</h3>
 
@@ -167,6 +170,7 @@ const styles = {
     backgroundColor: "#f0f0f0",
     minHeight: "100vh",
   },
+  
   form: {
     backgroundColor: "#fff",
     padding: "30px",

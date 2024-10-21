@@ -6,7 +6,7 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
   const navigate = useNavigate();
 
   return (
-    <div className="sidebar bg-blue-80 text-white w-60 h-full flex flex-col p-4" style={{ marginTop: '60px', height: '1000px',backgroundColor:'#5fa6f2' }}>
+    <div className="sidebar bg-blue-80 text-white w-60 h-full flex flex-col p-4" style={{ marginTop: '60px', height: '2000px',backgroundColor:'#5fa6f2' }}>
       <h2 className="text-xl font-bold mb-6 text-center">Admin Panel</h2>
 
       <ul className="flex flex-col space-y-4" >

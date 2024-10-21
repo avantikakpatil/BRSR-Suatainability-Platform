@@ -31,9 +31,7 @@ function App() {
     { path: "/admin/inputdata", element: <AdminPanel /> },
     { path: "/admin/baseline", element: <BaselineParametersForm /> }, // Add route for Baseline
     { path: "/admin/profile", element: <AdminForm /> }, // Add route for AdminForm
-    { path: "/admin/reports", element: <Report /> } // Add the Report route
-
-
+    {path: "/admin/report",element:<Report/>}
   ];
 
   let routesElement = useRoutes(routesArray);
@@ -49,11 +47,9 @@ function App() {
           onLeaderboardClick={() => navigate("/admin/leaderboard")}
           onChallengesClick={() => navigate("/admin/challenges")}
           onInputDataClick={() => navigate("/admin/inputdata")}
-          onBaselineClick={() => navigate("/admin/baseline")} // Handle Baseline navigation
-          onProfileClick={() => navigate("/admin/profile")} // Handle AdminForm navigation
-          onReportClick={() => navigate("/admin/reports")} // Add onReportClick handler
-
-
+          onBaselineClick={() => navigate("/admin/baseline")} 
+          onProfileClick={() => navigate("/admin/profile")} 
+          onReportClick={()=>navigate('/admin/report')}
         />
       )}
 

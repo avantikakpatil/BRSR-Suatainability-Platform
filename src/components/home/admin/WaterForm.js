@@ -158,7 +158,6 @@ const WaterForm = () => {
     </div>
   );
 };
-
 const styles = {
   container: {
     display: "flex",
@@ -175,6 +174,8 @@ const styles = {
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
     width: "100%",
     maxWidth: "700px",
+    display: "flex",
+    flexDirection: "column",
   },
   title: {
     textAlign: "center",
@@ -185,14 +186,16 @@ const styles = {
   },
   inputGroup: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column", // Ensures vertical stacking
     marginBottom: "20px",
+    width: "100%", // Makes sure it spans the form width
   },
   label: {
     margin: "10px 0",
     fontSize: "1em",
     color: "#333",
     fontWeight: "500",
+    width: "100%",
   },
   input: {
     width: "100%",
@@ -259,5 +262,7 @@ const styles = {
     backgroundColor: "#45a049",
   },
 };
+
+  
 
 export default WaterForm;

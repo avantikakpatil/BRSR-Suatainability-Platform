@@ -11,7 +11,7 @@ import Report from "./components/home/admin/report"; // Import the Report compon
 import AdminPanel from "./components/home/admin/AdminPanel"; // Import AdminPanel
 import BaselineParametersForm from "./components/home/admin/BaselineParametersForm"; // Import Baseline component
 import AdminForm from "./components/home/admin/AdminForm"; // Import AdminForm
-
+import HeadquarterDashboard from "./components/home/admin/HeadquarterDashboard.js";
 
 
 import { AuthProvider, useAuth } from "./contexts/authContext";
@@ -31,7 +31,8 @@ function App() {
     { path: "/admin/inputdata", element: <AdminPanel /> },
     { path: "/admin/baseline", element: <BaselineParametersForm /> }, // Add route for Baseline
     { path: "/admin/profile", element: <AdminForm /> }, // Add route for AdminForm
-    {path: "/admin/report",element:<Report/>}
+    {path: "/admin/report",element:<Report/>},
+    {path: "/admin/headquarterdashboard",element:<HeadquarterDashboard/>}
   ];
 
   let routesElement = useRoutes(routesArray);
@@ -50,6 +51,7 @@ function App() {
           onBaselineClick={() => navigate("/admin/baseline")} 
           onProfileClick={() => navigate("/admin/profile")} 
           onReportClick={()=>navigate('/admin/report')}
+          onHeadquarterDashboard={()=>navigate('/admin/headquarterdashboard')}
         />
       )}
 

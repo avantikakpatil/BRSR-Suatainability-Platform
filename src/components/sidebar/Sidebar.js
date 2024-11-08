@@ -2,11 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf } from "react-icons/fa";
 
-const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick }) => {
+const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick , onHeadquarterDashboard }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="sidebar bg-blue-80 text-white w-60 h-full flex flex-col p-4" style={{ marginTop: '60px', height: '2000px',backgroundColor:'grey' }}>
+    <div className="sidebar bg-blue-80 text-white w-60 h-full flex flex-col p-4" style={{ marginTop: '60px', height: '2000px',backgroundColor:'#5fa6f2' }}>
       <h2 className="text-xl font-bold mb-6 text-center">Admin Panel</h2>
 
       <ul className="flex flex-col space-y-4" >
@@ -69,6 +69,16 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
             <span>Report</span>
           </button>
         </li>
+
+        <li>
+          <button style={{backgroundColor:'#5fa6f2'}}
+            onClick={onHeadquarterDashboard}
+            className="flex items-center space-x-2 p-3 w-full text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
+            <FaUser className="text-lg" />
+            <span>Headquarter Dashboard</span>
+          </button>
+        </li>
+
       </ul>
     </div>
   );

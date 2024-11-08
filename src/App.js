@@ -12,6 +12,7 @@ import AdminPanel from "./components/home/admin/AdminPanel"; // Import AdminPane
 import BaselineParametersForm from "./components/home/admin/BaselineParametersForm"; // Import Baseline component
 import AdminForm from "./components/home/admin/AdminForm"; // Import AdminForm
 import HeadquarterDashboard from "./components/home/admin/HeadquarterDashboard.js";
+import CreatePO from "./components/home/admin/CreatePO.js";
 
 
 import { AuthProvider, useAuth } from "./contexts/authContext";
@@ -32,7 +33,8 @@ function App() {
     { path: "/admin/baseline", element: <BaselineParametersForm /> }, // Add route for Baseline
     { path: "/admin/profile", element: <AdminForm /> }, // Add route for AdminForm
     {path: "/admin/report",element:<Report/>},
-    {path: "/admin/headquarterdashboard",element:<HeadquarterDashboard/>}
+    {path: "/admin/headquarterdashboard",element:<HeadquarterDashboard/>},
+    {path: "/admin/createpo",element:<CreatePO/>}
   ];
 
   let routesElement = useRoutes(routesArray);
@@ -52,6 +54,7 @@ function App() {
           onProfileClick={() => navigate("/admin/profile")} 
           onReportClick={()=>navigate('/admin/report')}
           onHeadquarterDashboard={()=>navigate('/admin/headquarterdashboard')}
+          onCreatePO={()=>navigate("/admin/createpo")}
         />
       )}
 

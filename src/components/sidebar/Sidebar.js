@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf } from "react-icons/fa";
 
-const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick , onHeadquarterDashboard }) => {
+const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick , onHeadquarterDashboard,onCreatePO }) => {
   const navigate = useNavigate();
 
   return (
@@ -78,7 +78,22 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
             <span>Headquarter Dashboard</span>
           </button>
         </li>
-
+        <li>
+          <button style={{backgroundColor:'#5fa6f2'}}
+            onClick={onCreatePO}
+            className="flex items-center space-x-2 p-3 w-full text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
+            <FaUser className="text-lg" />
+            <span>Create Post Office profile </span>
+          </button>
+        </li>
+        <li>
+          <button style={{backgroundColor:'#5fa6f2'}}
+            onClick={onHeadquarterDashboard}
+            className="flex items-center space-x-2 p-3 w-full text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
+            <FaUser className="text-lg" />
+            <span>Assign Role to Post Office</span>
+          </button>
+        </li>
       </ul>
     </div>
   );

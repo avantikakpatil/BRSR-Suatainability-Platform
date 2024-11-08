@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf } from "react-icons/fa";
 
-const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick }) => {
+const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick , onHeadquarterDashboard }) => {
   const navigate = useNavigate();
 
   return (
@@ -69,6 +69,16 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
             <span>Report</span>
           </button>
         </li>
+
+        <li>
+          <button style={{backgroundColor:'#5fa6f2'}}
+            onClick={onHeadquarterDashboard}
+            className="flex items-center space-x-2 p-3 w-full text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
+            <FaUser className="text-lg" />
+            <span>Headquarter Dashboard</span>
+          </button>
+        </li>
+
       </ul>
     </div>
   );

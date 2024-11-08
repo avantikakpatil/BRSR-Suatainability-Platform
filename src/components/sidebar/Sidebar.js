@@ -20,7 +20,6 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
             <span>Dashboard</span>
           </button>
         </li>
-        
         <li>
           <button
             onClick={() => navigate("/admin/profile")}

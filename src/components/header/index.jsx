@@ -67,13 +67,13 @@ const Header = () => {
                 className="block px-4 py-2 text-sm hover:bg-gray-200"
                 onClick={() => setDropdownOpen(false)}
               >
-                Profile
-              </Link>
-              <Link
-                to="/settings"
-                className="block px-4 py-2 text-sm hover:bg-gray-200"
-                onClick={() => setDropdownOpen(false)}
-              >
+              <button
+            onClick={() => navigate("/admin/profile")}
+            className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+          >
+            <span>Profile</span>
+          </button>
+
                 Settings
               </Link>
               <button

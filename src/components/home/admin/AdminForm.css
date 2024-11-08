@@ -79,3 +79,11 @@ form {
     }
   }
   
+  .button-container button {
+    margin-left: 10px; /* Adjust as needed */
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: space-between; /* Evenly distribute space */
+  }

@@ -180,12 +180,12 @@ const PostOffices = () => {
         <Table striped bordered hover style={{fontSize:'13px'}}>
           <thead>
             <tr>
-              <th style={{ color: "black" }}>Sr No.</th>
-              <th style={{ color: "black" }}>Post Office</th>
-              <th style={{ color: "black" }}>City</th>
-              <th style={{ color: "black" }}>Year</th>
-              <th style={{ color: "black" }}>View</th>
-              <th style={{ color: "black" }}>Download PDF</th>
+              <th >Sr No.</th>
+              <th >Post Office</th>
+              <th >City</th>
+              <th >Year</th>
+              <th >View</th>
+              <th >Download PDF</th>
             </tr>
           </thead>
           <tbody>

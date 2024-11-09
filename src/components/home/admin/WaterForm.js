@@ -29,10 +29,16 @@ const WaterForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const db = getDatabase();
+<<<<<<< HEAD
     const newDataRef = ref(db, "inputData/waterData/" + Date.now());
 
+=======
+    // Update the reference to include the full path to PostalManager/inputData/waterData
+    const newDataRef = ref(db, 'PostalManager/inputData/waterData/' + Date.now());
+  
+>>>>>>> 0485f9c66870e33571e6d3d045716d37ffb7ca35
     set(newDataRef, {
       ...formData,
       createdAt: new Date().toISOString(),
@@ -60,6 +66,7 @@ const WaterForm = () => {
         console.error("Error storing data: ", error);
       });
   };
+  
 
   return (
     <div style={styles.container}>

@@ -80,7 +80,7 @@ const EnergyForm = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Parameter</th>
+              <th style={styles.th}>Parameter (Total energy consumption (in Joules or multiples))</th>
               <th style={styles.th}>FY ____ (Current Financial Year)</th>
               <th style={styles.th}>FY ____ (Previous Financial Year)</th>
             </tr>
@@ -256,17 +256,17 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '10px',
+    padding: '20px',
     backgroundColor: '#f0f0f0',
     minHeight: '100vh',
   },
   headingContainer: {
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: '10px',
+    marginBottom: '15px',
   },
   heading: {
-    fontSize: '24px',
+    fontSize: '1.2em', // Increased font size
     color: '#333',
   },
   form: {
@@ -274,8 +274,8 @@ const styles = {
     padding: "20px",
     borderRadius: "10px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    width: "100%",
-    maxWidth: "800px",
+    width: "90%", // Adjusted to take up more width
+    maxWidth: "900px", // Larger max width
     display: "flex",
     flexDirection: "column",
     alignItems: "stretch",
@@ -283,71 +283,66 @@ const styles = {
   table: {
     width: "100%",
     tableLayout: "auto",
-    marginBottom: "10px",
-    fontSize: "0.9em",
+    marginBottom: "15px",
+    fontSize: "1em", // Increased font size
   },
   th: {
     padding: "10px",
     backgroundColor: "#4CAF50",
     color: "#fff",
     textAlign: "left",
-    fontSize: "0.9em",
+    fontSize: "1em", // Increased font size
   },
   td: {
-    padding: "8px",
-    border: "1px solid #ddd",
-    fontSize: "0.9em",
+    padding: "10px",
+    borderBottom: "1px solid #ddd",
+    fontSize: "1em", // Increased font size
   },
   inputSmall: {
-    width: "100%",
-    padding: "8px",
-    fontSize: "0.9em",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
+    width: '100%',
+    padding: '8px',
+    fontSize: '1em',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
   },
   inputReadOnly: {
-    width: "100%",
-    padding: "8px",
-    fontSize: "0.9em",
-    borderRadius: "4px",
-    backgroundColor: "#e9e9e9",
-    border: "1px solid #ccc",
-    color: "#555",
+    width: '100%',
+    padding: '8px',
+    fontSize: '1em',
+    borderRadius: '5px',
+    backgroundColor: '#e9e9e9',
+    border: '1px solid #ccc',
   },
   inputLarge: {
-    width: "100%",
-    padding: "8px",
-    fontSize: "0.9em",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
+    width: '100%',
+    padding: '8px',
+    fontSize: '1em',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
   },
   assessmentSection: {
-    display: "flex",
-    flexDirection: "column",
-    marginTop: "20px",
+    marginTop: '15px',
   },
   label: {
-    fontSize: "0.9em",
-    color: "#333",
-    marginBottom: "4px",
+    fontSize: '1em',
+    marginBottom: '8px',
   },
   inputAssessment: {
-    width: "100%",
-    padding: "8px",
-    fontSize: "0.9em",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
-    marginBottom: "10px",
+    width: '100%',
+    padding: '8px',
+    fontSize: '1em',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+    marginBottom: '15px',
   },
   button: {
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    padding: "10px 15px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "1em",
-    marginTop: "20px",
+    padding: '10px',
+    backgroundColor: '#4CAF50',
+    color: '#fff',
+    fontSize: '1em',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
   },
 };
 

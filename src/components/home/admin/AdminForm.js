@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './AdminForm.css';
-import { db, auth } from '../../../firebaseConfig'; // Ensure auth is imported
-import { ref, set } from 'firebase/database';
+import { db, auth } from '../../../firebaseConfig';
+import { ref, set, get, child } from 'firebase/database';
 import { onAuthStateChanged } from "firebase/auth";
 
 const AdminForm = () => {
@@ -25,20 +24,34 @@ const AdminForm = () => {
   });
 
   const [currentUser, setCurrentUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    // Che1lck for user authentication
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);
+        fetchProfileData(user.uid);  // Fetch data if user is signed in
       } else {
         console.log('No user is signed in.');
       }
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+
+  const fetchProfileData = async (userId) => {
+    const dbRef = ref(db);
+    try {
+      const snapshot = await get(child(dbRef, `profile/${userId}`));
+      if (snapshot.exists()) {
+        setFormData({ profile: snapshot.val() });
+      } else {
+        console.log("No data available");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,114 +64,102 @@ const AdminForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitted data:', formData);
-
-    // Check if a user is authenticated before submitting data
     if (!currentUser) {
       alert("You must be signed in to submit data.");
       return;
     }
 
-    // Generate a unique key for the profile data
-    const profileKey = Date.now(); // Using timestamp as unique key
+    const profileRef = ref(db, `profile/${currentUser.uid}`);
+    try {
+      await set(profileRef, { ...formData.profile, userId: currentUser.uid });
+      console.log('Data stored successfully!');
+      setIsEditing(false); // Disable edit mode after saving
+      fetchProfileData(currentUser.uid); // Refresh data display
+    } catch (error) {
+      console.error('Error storing data:', error);
+    }
+  };
 
-    // Reference the database path to the "profile" node
-    const profileRef = ref(db, `profile/${profileKey}`); // Change this line
+  const toggleEdit = () => {
+    setIsEditing(!isEditing); // Toggle edit mode
+  };
 
-    // Store data in Firebase
-    set(profileRef, { ...formData.profile, userId: currentUser.uid })
-      .then(() => {
-        console.log('Data stored successfully!');
-        // Optionally, reset the form or show a success message
-        setFormData({
-          profile: {
-            cin: '',
-            name: '',
-            yearOfIncorporation: '',
-            registeredOffice: '',
-            corporateAddress: '',
-            email: '',
-            telephone: '',
-            website: '',
-            financialYear: '',
-            stockExchange: '',
-            paidUpCapital: '',
-            contactName: '',
-            contactDetails: '',
-            reportingBoundary: '',
-          }
-        });
-      })
-      .catch((error) => {
-        console.error('Error storing data:', error);
-      });
+  const formContainerStyle = {
+    maxWidth: '90vw',
+    margin: '0 auto',
+    padding: '20px',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Transparent background
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '15px',
+  };
+
+  const labelStyle = {
+    fontWeight: 'bold',
+    marginBottom: '5px',
+    fontSize: '13px',
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '8px',
+    fontSize: '14px',
+    borderRadius: '4px',
+    border: '1px solid #ddd',
+    backgroundColor: isEditing ? '#ffffff' : 'transparent',
+  };
+
+  const buttonContainerStyle = {
+    gridColumn: '1 / -1',
+    display: 'flex',
+    justifyContent: 'center',
+  };
+
+  const buttonStyle = {
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '15px',
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Corporate Identity Number (CIN): </label>
-        <input type="text" name="cin" value={formData.profile.cin} onChange={handleChange} required />
+    <form onSubmit={handleSubmit} style={formContainerStyle}>
+      {Object.keys(formData.profile).map((key) => (
+        <div key={key}>
+          <label style={labelStyle}>{key.replace(/([A-Z])/g, ' $1')}:</label>
+          {isEditing ? (
+            <input
+              type="text"
+              name={key}
+              value={formData.profile[key]}
+              onChange={handleChange}
+              style={inputStyle}
+              required
+            />
+          ) : (
+            <p>{formData.profile[key] || 'Not provided'}</p>
+          )}
+        </div>
+      ))}
+
+      <div style={buttonContainerStyle}>
+        <button type="button" onClick={toggleEdit} style={{ ...buttonStyle, backgroundColor: '#007BFF' }}>
+          {isEditing ? 'Cancel' : 'Edit'}
+        </button>
+        {isEditing && (
+          <button type="submit" style={buttonStyle}>
+            Save
+          </button>
+        )}
       </div>
-      <div>
-        <label>Name of the Listed Entity: </label>
-        <input type="text" name="name" value={formData.profile.name} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Year of Incorporation: </label>
-        <input type="text" name="yearOfIncorporation" value={formData.profile.yearOfIncorporation} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Registered Office Address: </label>
-        <input type="text" name="registeredOffice" value={formData.profile.registeredOffice} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Corporate Address: </label>
-        <input type="text" name="corporateAddress" value={formData.profile.corporateAddress} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Email: </label>
-        <input type="email" name="email" value={formData.profile.email} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Telephone: </label>
-        <input type="text" name="telephone" value={formData.profile.telephone} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Website: </label>
-        <input type="url" name="website" value={formData.profile.website} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Financial Year: </label>
-        <input type="text" name="financialYear" value={formData.profile.financialYear} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Name of Stock Exchange(s): </label>
-        <input type="text" name="stockExchange" value={formData.profile.stockExchange} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Paid-up Capital: </label>
-        <input type="text" name="paidUpCapital" value={formData.profile.paidUpCapital} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Contact Name: </label>
-        <input type="text" name="contactName" value={formData.profile.contactName} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Contact Details (Phone/Email): </label>
-        <input type="text" name="contactDetails" value={formData.profile.contactDetails} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Reporting Boundary (Standalone/Consolidated): </label>
-        <select name="reportingBoundary" value={formData.profile.reportingBoundary} onChange={handleChange} required>
-          <option value="">Select</option>
-          <option value="standalone">Standalone</option>
-          <option value="consolidated">Consolidated</option>
-        </select>
-      </div>
-      <button type="submit">Submit</button>
     </form>
   );
 };

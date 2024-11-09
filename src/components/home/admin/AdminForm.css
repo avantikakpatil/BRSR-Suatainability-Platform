@@ -3,9 +3,6 @@ form {
     max-width: 1000px; /* Increase the max-width to allow two columns */
     margin: 0 auto;
     padding: 10px; /* Reduced padding */
-    background-color: #f7f7f7;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two-column layout */
     gap: 20px; /* Space between columns */
@@ -77,13 +74,4 @@ form {
       font-size: 14px; /* Smaller text for small screens */
       padding: 8px; /* Reduced padding */
     }
-  }
-  
-  .button-container button {
-    margin-left: 10px; /* Adjust as needed */
-  }
-
-  .button-container {
-    display: flex;
-    justify-content: space-between; /* Evenly distribute space */
-  }
+  }  

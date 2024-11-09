@@ -16,7 +16,7 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
       className="sidebar bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white w-64 h-full p-4 rounded-xl shadow-lg flex flex-col"
       style={{
         position: 'fixed', // Make the sidebar fixed on the page
-        top: '10', // Stick it to the top
+        top: '0', // Stick it to the top
         left: '0', // Stick it to the left
         width: '17%',
         height: '100vh', // Ensure the sidebar takes up the full height of the viewport

@@ -62,10 +62,10 @@ const WasteManagementForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Submitted Data:', formData);
-
+  
     const uniqueKey = Date.now(); // Unique key for each entry
-    const dataRef = ref(database, 'inputData/wasteData/' + uniqueKey);
-
+    const dataRef = ref(database, 'PostalManager/inputData/wasteData/' + uniqueKey); // Updated path
+  
     set(dataRef, formData.wasteData)
       .then(() => {
         console.log('Data submitted successfully!');
@@ -76,6 +76,7 @@ const WasteManagementForm = () => {
         alert('Error submitting data: ' + error.message);
       });
   };
+  
 
   return (
     <div style={styles.container}>

@@ -21,17 +21,11 @@ const WasteManagementForm = () => {
   const [formData, setFormData] = useState({
     wasteData: {
       currentPlasticWaste: '',
-      previousPlasticWaste: '',
       currentEWaste: '',
-      previousEWaste: '',
       currentBioMedicalWaste: '',
-      previousBioMedicalWaste: '',
       currentConstructionWaste: '',
-      previousConstructionWaste: '',
       currentBatteryWaste: '',
-      previousBatteryWaste: '',
       currentRadioactiveWaste: '',
-      previousRadioactiveWaste: '',
       otherHazardousWaste: '',
       otherNonHazardousWaste: '',
     },
@@ -86,17 +80,16 @@ const WasteManagementForm = () => {
             <tr>
               <th style={styles.th}>PARAMETER (TOTAL WASTE GENERATED IN METRIC TONNES)</th>
               <th style={styles.th}>FY (CURRENT YEAR)</th>
-              <th style={styles.th}>FY (PREVIOUS YEAR)</th>
             </tr>
           </thead>
           <tbody>
             {[
-              { label: 'Plastic waste (A)', current: 'currentPlasticWaste', previous: 'previousPlasticWaste' },
-              { label: 'E-waste (B)', current: 'currentEWaste', previous: 'previousEWaste' },
-              { label: 'Bio-medical waste (C)', current: 'currentBioMedicalWaste', previous: 'previousBioMedicalWaste' },
-              { label: 'Construction and demolition waste (D)', current: 'currentConstructionWaste', previous: 'previousConstructionWaste' },
-              { label: 'Battery waste (E)', current: 'currentBatteryWaste', previous: 'previousBatteryWaste' },
-              { label: 'Radioactive waste (F)', current: 'currentRadioactiveWaste', previous: 'previousRadioactiveWaste' },
+              { label: 'Plastic waste (A)', current: 'currentPlasticWaste' },
+              { label: 'E-waste (B)', current: 'currentEWaste' },
+              { label: 'Bio-medical waste (C)', current: 'currentBioMedicalWaste' },
+              { label: 'Construction and demolition waste (D)', current: 'currentConstructionWaste' },
+              { label: 'Battery waste (E)', current: 'currentBatteryWaste' },
+              { label: 'Radioactive waste (F)', current: 'currentRadioactiveWaste' },
             ].map((item) => (
               <tr key={item.label}>
                 <td style={styles.td}>{item.label}</td>
@@ -105,15 +98,6 @@ const WasteManagementForm = () => {
                     type="number"
                     name={item.current}
                     value={formData.wasteData[item.current]}
-                    onChange={handleChange}
-                    style={styles.input}
-                  />
-                </td>
-                <td style={styles.td}>
-                  <input
-                    type="number"
-                    name={item.previous}
-                    value={formData.wasteData[item.previous]}
                     onChange={handleChange}
                     style={styles.input}
                   />
@@ -147,7 +131,8 @@ const WasteManagementForm = () => {
           </tbody>
         </table>
         <div style={styles.additionalInputs}>
-          <label>External Assessment (Y/N):<br />
+          <label style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            External Assessment (Y/N):<br />
             <input
               type="text"
               name="externalAssessment"
@@ -156,7 +141,8 @@ const WasteManagementForm = () => {
               style={styles.extraInput}
             />
           </label>
-          <label>Upload Bill((PDF, DOC, Image files)):<br />
+          <label style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            Upload Bill (PDF, DOC, Image files):<br />
             <input
               type="file"
               name="billFile"
@@ -173,8 +159,8 @@ const WasteManagementForm = () => {
 
 const styles = {
   container: {
-    width: '100%', // Full width of the screen
-    maxWidth: '1200px', // Increase max width for larger screens
+    width: '100%', 
+    maxWidth: '1200px', 
     margin: '0 auto',
     padding: '10px',
     backgroundColor: '#f9f9f9',
@@ -182,7 +168,7 @@ const styles = {
   },
   heading: {
     textAlign: 'center',
-    fontSize: '18px',
+    fontSize: '24px', 
     marginBottom: '10px',
   },
   form: {
@@ -196,31 +182,31 @@ const styles = {
   th: {
     backgroundColor: '#4CAF50',
     color: 'white',
-    padding: '5px',
+    padding: '8px', 
     textAlign: 'center',
-    fontSize: '12px',
-    width: '33%', // Each column fills a third of the full width
+    fontSize: '14px',
+    width: '50%',
   },
   td: {
     border: '1px solid #ccc',
-    padding: '5px',
+    padding: '8px',
     textAlign: 'center',
-    fontSize: '12px',
+    fontSize: '14px',
   },
   fullWidthTd: {
     border: '1px solid #ccc',
-    padding: '5px',
+    padding: '8px',
     textAlign: 'center',
   },
   input: {
-    width: '100%', // Full-width inputs
+    width: '100%', 
     padding: '4px',
-    fontSize: '12px',
+    fontSize: '14px',
   },
   fullWidthInput: {
-    width: '100%', // Full-width input fields for 'Other' rows
+    width: '100%', 
     padding: '4px',
-    fontSize: '12px',
+    fontSize: '14px',
   },
   additionalInputs: {
     display: 'flex',
@@ -231,16 +217,16 @@ const styles = {
   extraInput: {
     width: '100%',
     padding: '5px',
-    fontSize: '12px',
+    fontSize: '14px',
   },
   button: {
     marginTop: '10px',
-    padding: '8px 16px',
+    padding: '10px 20px',
     backgroundColor: '#4CAF50',
     color: '#fff',
     border: 'none',
     borderRadius: '5px',
-    fontSize: '14px',
+    fontSize: '16px',
     cursor: 'pointer',
   },
 };

@@ -6,13 +6,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 const EnergyForm = () => {
   const [formData, setFormData] = useState({
     currentYearElectricity: '',
-    previousYearElectricity: '',
     currentYearFuel: '',
-    previousYearFuel: '',
     currentYearOtherSources: '',
-    previousYearOtherSources: '',
     currentYearEnergyIntensity: '',
-    previousYearEnergyIntensity: '',
     optionalEnergyIntensity: '',
     externalAssessment: '',
     externalAgencyName: '',
@@ -63,13 +59,9 @@ const EnergyForm = () => {
       // Clear the form or provide success feedback
       setFormData({
         currentYearElectricity: '',
-        previousYearElectricity: '',
         currentYearFuel: '',
-        previousYearFuel: '',
         currentYearOtherSources: '',
-        previousYearOtherSources: '',
         currentYearEnergyIntensity: '',
-        previousYearEnergyIntensity: '',
         optionalEnergyIntensity: '',
         externalAssessment: '',
         externalAgencyName: '',
@@ -83,7 +75,7 @@ const EnergyForm = () => {
   return (
     <div style={styles.container}>
       <div style={styles.headingContainer}>
-        <h1 style={styles.heading}><b>Energy Consumption Form</b></h1>
+        <h1 style={styles.heading}>Energy Consumption Form</h1>
       </div>
       <form onSubmit={handleSubmit} style={styles.form}>
         <table style={styles.table}>
@@ -91,7 +83,6 @@ const EnergyForm = () => {
             <tr>
               <th style={styles.th}>Parameter (Total energy consumption in Joules or multiples)</th>
               <th style={styles.th}>FY ____ (Current Financial Year)</th>
-              <th style={styles.th}>FY ____ (Previous Financial Year)</th>
             </tr>
           </thead>
           <tbody>
@@ -103,15 +94,6 @@ const EnergyForm = () => {
                   type="number"
                   name="currentYearElectricity"
                   value={formData.currentYearElectricity}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearElectricity"
-                  value={formData.previousYearElectricity}
                   onChange={handleChange}
                   style={styles.inputSmall}
                 />
@@ -129,15 +111,6 @@ const EnergyForm = () => {
                   style={styles.inputSmall}
                 />
               </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearFuel"
-                  value={formData.previousYearFuel}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
             </tr>
             {/* Energy consumption through other sources */}
             <tr>
@@ -147,15 +120,6 @@ const EnergyForm = () => {
                   type="number"
                   name="currentYearOtherSources"
                   value={formData.currentYearOtherSources}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearOtherSources"
-                  value={formData.previousYearOtherSources}
                   onChange={handleChange}
                   style={styles.inputSmall}
                 />
@@ -176,38 +140,15 @@ const EnergyForm = () => {
                   style={styles.inputReadOnly}
                 />
               </td>
-              <td style={styles.td}>
-                <input
-                  type="text"
-                  value={(
-                    Number(formData.previousYearElectricity) +
-                    Number(formData.previousYearFuel) +
-                    Number(formData.previousYearOtherSources)
-                  ).toFixed(2)}
-                  readOnly
-                  style={styles.inputReadOnly}
-                />
-              </td>
             </tr>
             {/* Energy intensity per rupee of turnover */}
             <tr>
-              <td style={styles.td}>
-                Energy intensity per rupee of turnover (Total energy consumption/turnover)
-              </td>
+              <td style={styles.td}>Energy intensity per rupee of turnover (Total energy consumption/turnover)</td>
               <td style={styles.td}>
                 <input
                   type="number"
                   name="currentYearEnergyIntensity"
                   value={formData.currentYearEnergyIntensity}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearEnergyIntensity"
-                  value={formData.previousYearEnergyIntensity}
                   onChange={handleChange}
                   style={styles.inputSmall}
                 />
@@ -230,17 +171,6 @@ const EnergyForm = () => {
             </tr>
           </tbody>
         </table>
-
-        {/* File Upload Section */}
-        <div style={styles.uploadSection}>
-          <label style={styles.label}>Upload Bill (PDF, DOC, Image files):</label>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            accept=".pdf, .doc, .docx, .jpg, .jpeg, .png"
-            style={styles.uploadInput}
-          />
-        </div>
 
         {/* External assessment and evaluation */}
         <div style={styles.assessmentSection}>
@@ -266,6 +196,17 @@ const EnergyForm = () => {
           )}
         </div>
 
+        {/* File Upload Section */}
+        <div style={styles.uploadSection}>
+          <label style={styles.label}>Upload Bill (PDF, DOC, Image files):</label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept=".pdf, .doc, .docx, .jpg, .jpeg, .png"
+            style={styles.uploadInput}
+          />
+        </div>
+
         <button type="submit" style={styles.button}>Submit</button>
       </form>
     </div>
@@ -286,8 +227,9 @@ const styles = {
     marginBottom: '20px',
   },
   heading: {
-    fontSize: '1.2em',
-    color: '#333',
+    fontSize: '1.5em', // Adjusted font size
+    color: '#4CAF50', // Matches the button's green color
+    marginBottom: '10px',
   },
   form: {
     backgroundColor: "#fff",
@@ -302,73 +244,72 @@ const styles = {
   },
   table: {
     width: "100%",
-    tableLayout: "fixed",
     marginBottom: "20px",
-    fontSize: "0.8em", // Slightly increased for readability
+    fontSize: "0.9em",
   },
   th: {
-    padding: "10px",
+    padding: "8px",
     backgroundColor: "#4CAF50",
     color: "#fff",
     textAlign: "left",
+    width: '50%',
   },
   td: {
-    padding: "10px",
+    padding: "8px",
     borderBottom: "1px solid #ddd",
+    width: '50%',
   },
   inputSmall: {
     width: '100%',
-    padding: '8px',
-    fontSize: '0.8em', // Slightly increased font size
+    padding: '6px',
+    fontSize: '0.9em',
     borderRadius: '5px',
     border: '1px solid #ccc',
   },
   inputReadOnly: {
     width: '100%',
-    padding: '8px',
-    fontSize: '0.8em',
+    padding: '6px',
+    fontSize: '0.9em',
     borderRadius: '5px',
     backgroundColor: '#e9e9e9',
     border: '1px solid #ccc',
   },
   inputLarge: {
     width: '100%',
-    padding: '8px',
-    fontSize: '0.8em',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
-  },
-  uploadSection: {
-    marginTop: '10px',
-  },
-  uploadInput: {
-    padding: '8px',
-    fontSize: '0.8em',
+    padding: '6px',
+    fontSize: '0.9em',
     borderRadius: '5px',
     border: '1px solid #ccc',
   },
   assessmentSection: {
-    marginTop: '15px',
+    marginTop: '8px',
+    marginBottom: '8px',
   },
   label: {
-    fontSize: '0.8em', // Slightly increased font size
+    fontSize: '0.9em',
     marginBottom: '6px',
   },
   inputAssessment: {
     width: '100%',
     padding: '8px',
-    fontSize: '0.8em',
+    fontSize: '0.9em',
     borderRadius: '5px',
     border: '1px solid #ccc',
-    marginBottom: '10px',
+  },
+  uploadSection: {
+    marginTop: '12px',
+    marginBottom: '12px',
+  },
+  uploadInput: {
+    marginTop: '6px',
   },
   button: {
-    padding: '10px',
+    padding: '10px 15px',
     backgroundColor: '#4CAF50',
     color: '#fff',
-    fontSize: '0.9em', // Slightly increased font size
     border: 'none',
     borderRadius: '5px',
+    fontSize: '1em',
     cursor: 'pointer',
   },
 };

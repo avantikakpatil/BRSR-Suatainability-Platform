@@ -31,7 +31,7 @@ const WaterForm = () => {
     e.preventDefault();
 
     const db = getDatabase();
-    const newDataRef = ref(db, 'inputData/waterData/' + Date.now());
+    const newDataRef = ref(db, "inputData/waterData/" + Date.now());
 
     set(newDataRef, {
       ...formData,
@@ -66,34 +66,12 @@ const WaterForm = () => {
       <form onSubmit={handleSubmit} style={styles.form}>
         <h3 style={styles.title}>Water Management Form</h3>
 
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>
-            FY (Current):
-            <input
-              type="text"
-              name="fyCurrent"
-              value={formData.fyCurrent}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </label>
-
-          <label style={styles.label}>
-            FY (Previous):
-            <input
-              type="text"
-              name="fyPrevious"
-              value={formData.fyPrevious}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </label>
-        </div>
-
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.tableHeader}>Source(Water withdrawal by source (in kilolitres))</th>
+              <th style={styles.tableHeader}>
+                Source (Water withdrawal by source (in kilolitres))
+              </th>
               <th style={styles.tableHeader}>Value (kl)</th>
             </tr>
           </thead>
@@ -123,9 +101,6 @@ const WaterForm = () => {
             ))}
           </tbody>
         </table>
-
-        <h4 style={styles.optionalTitle}>Water Intensity (Optional)</h4>
-        <p style={styles.optionalText}>Relevant metric may be selected</p>
 
         <div style={styles.singleInputGroup}>
           <label style={styles.singleLabel}>
@@ -159,7 +134,7 @@ const WaterForm = () => {
 
         <div style={styles.singleInputGroup}>
           <label style={styles.singleLabel}>
-            Upload Bill((PDF, DOC, Image files)):
+            Upload Bill (PDF, DOC, Image files):
             <input
               type="file"
               name="billFile"
@@ -199,16 +174,9 @@ const styles = {
   title: {
     textAlign: "center",
     marginBottom: "8px",
-    fontSize: "1.1em",
+    fontSize: "1.5em", // Increased font size of the heading
     color: "#333",
     fontWeight: "bold",
-  },
-  inputGroup: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: "10px",
-    gap: "10px",
   },
   singleInputGroup: {
     display: "flex",
@@ -216,32 +184,25 @@ const styles = {
     alignItems: "flex-start",
     marginBottom: "10px",
   },
-  label: {
-    display: "flex",
-    flexDirection: "column",
-    fontSize: "0.85em",
-    color: "#333",
-    fontWeight: "500",
-    width: "48%",
-  },
   singleLabel: {
-    fontSize: "0.85em",
+    fontSize: "1em", // Slightly decreased font size
     color: "#333",
-    fontWeight: "500",
+    fontWeight: "bold",
+    marginBottom: "5px",
   },
   input: {
     padding: "6px",
     marginTop: "4px",
     borderRadius: "3px",
     border: "1px solid #ccc",
-    fontSize: "0.85em",
+    fontSize: "0.8em",
     outline: "none",
   },
   fileInput: {
     padding: "6px",
     marginTop: "4px",
     borderRadius: "3px",
-    fontSize: "0.85em",
+    fontSize: "0.8em",
     outline: "none",
   },
   table: {
@@ -256,32 +217,20 @@ const styles = {
     backgroundColor: "#4CAF50",
     color: "#fff",
     fontWeight: "600",
-    fontSize: "0.85em",
+    fontSize: "0.8em",
   },
   tableCell: {
     padding: "10px",
     borderBottom: "1px solid #ddd",
-    fontSize: "0.85em",
+    fontSize: "0.8em",
   },
   tableInput: {
     width: "100%",
     padding: "6px",
     borderRadius: "3px",
     border: "1px solid #ccc",
-    fontSize: "0.85em",
-    outline: "none",
-  },
-  optionalTitle: {
-    fontSize: "1em",
-    color: "#333",
-    fontWeight: "600",
-    marginTop: "15px",
-    marginBottom: "8px",
-  },
-  optionalText: {
     fontSize: "0.8em",
-    color: "#555",
-    marginBottom: "10px",
+    outline: "none",
   },
   submitButton: {
     padding: "10px",
@@ -289,7 +238,7 @@ const styles = {
     color: "#fff",
     border: "none",
     borderRadius: "3px",
-    fontSize: "1em",
+    fontSize: "0.9em",
     fontWeight: "600",
     cursor: "pointer",
     width: "100%",

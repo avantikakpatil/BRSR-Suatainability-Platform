@@ -156,7 +156,7 @@ const WasteManagementForm = () => {
               style={styles.extraInput}
             />
           </label>
-          <label>Upload Bill:<br />
+          <label>Upload Bill((PDF, DOC, Image files)):<br />
             <input
               type="file"
               name="billFile"

@@ -16,6 +16,7 @@ const EnergyForm = () => {
     optionalEnergyIntensity: '',
     externalAssessment: '',
     externalAgencyName: '',
+    bill: null, // New state for file upload
   });
 
   const [userEmail, setUserEmail] = useState('');
@@ -36,6 +37,13 @@ const EnergyForm = () => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleFileChange = (e) => {
+    setFormData({
+      ...formData,
+      bill: e.target.files[0], // Handle file upload
     });
   };
 
@@ -65,6 +73,7 @@ const EnergyForm = () => {
         optionalEnergyIntensity: '',
         externalAssessment: '',
         externalAgencyName: '',
+        bill: null, // Clear uploaded file
       });
     } catch (error) {
       console.error("Error storing data: ", error);
@@ -80,7 +89,7 @@ const EnergyForm = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Parameter (Total energy consumption (in Joules or multiples))</th>
+              <th style={styles.th}>Parameter (Total energy consumption in Joules or multiples)</th>
               <th style={styles.th}>FY ____ (Current Financial Year)</th>
               <th style={styles.th}>FY ____ (Previous Financial Year)</th>
             </tr>
@@ -221,6 +230,18 @@ const EnergyForm = () => {
             </tr>
           </tbody>
         </table>
+
+        {/* File Upload Section */}
+        <div style={styles.uploadSection}>
+          <label style={styles.label}>Upload Bill (PDF, DOC, Image files):</label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept=".pdf, .doc, .docx, .jpg, .jpeg, .png"
+            style={styles.uploadInput}
+          />
+        </div>
+
         {/* External assessment and evaluation */}
         <div style={styles.assessmentSection}>
           <label style={styles.label}>External Assessment (Y/N):</label>
@@ -244,6 +265,7 @@ const EnergyForm = () => {
             </>
           )}
         </div>
+
         <button type="submit" style={styles.button}>Submit</button>
       </form>
     </div>
@@ -256,59 +278,55 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '20px',
-    backgroundColor: '#f0f0f0',
-    minHeight: '100vh',
+    marginTop: '20px',
+    padding: '10px',
   },
   headingContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginBottom: '15px',
+    textAlign: 'center',
+    marginBottom: '20px',
   },
   heading: {
-    fontSize: '1.2em', // Increased font size
+    fontSize: '1.2em',
     color: '#333',
   },
   form: {
     backgroundColor: "#fff",
     padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    width: "90%", // Adjusted to take up more width
-    maxWidth: "900px", // Larger max width
+    borderRadius: "15px",
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.1)",
+    width: "95%",
+    maxWidth: "1200px",
     display: "flex",
     flexDirection: "column",
     alignItems: "stretch",
   },
   table: {
     width: "100%",
-    tableLayout: "auto",
-    marginBottom: "15px",
-    fontSize: "1em", // Increased font size
+    tableLayout: "fixed",
+    marginBottom: "20px",
+    fontSize: "0.8em", // Slightly increased for readability
   },
   th: {
     padding: "10px",
     backgroundColor: "#4CAF50",
     color: "#fff",
     textAlign: "left",
-    fontSize: "1em", // Increased font size
   },
   td: {
     padding: "10px",
     borderBottom: "1px solid #ddd",
-    fontSize: "1em", // Increased font size
   },
   inputSmall: {
     width: '100%',
     padding: '8px',
-    fontSize: '1em',
+    fontSize: '0.8em', // Slightly increased font size
     borderRadius: '5px',
     border: '1px solid #ccc',
   },
   inputReadOnly: {
     width: '100%',
     padding: '8px',
-    fontSize: '1em',
+    fontSize: '0.8em',
     borderRadius: '5px',
     backgroundColor: '#e9e9e9',
     border: '1px solid #ccc',
@@ -316,7 +334,16 @@ const styles = {
   inputLarge: {
     width: '100%',
     padding: '8px',
-    fontSize: '1em',
+    fontSize: '0.8em',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+  },
+  uploadSection: {
+    marginTop: '10px',
+  },
+  uploadInput: {
+    padding: '8px',
+    fontSize: '0.8em',
     borderRadius: '5px',
     border: '1px solid #ccc',
   },
@@ -324,22 +351,22 @@ const styles = {
     marginTop: '15px',
   },
   label: {
-    fontSize: '1em',
-    marginBottom: '8px',
+    fontSize: '0.8em', // Slightly increased font size
+    marginBottom: '6px',
   },
   inputAssessment: {
     width: '100%',
     padding: '8px',
-    fontSize: '1em',
+    fontSize: '0.8em',
     borderRadius: '5px',
     border: '1px solid #ccc',
-    marginBottom: '15px',
+    marginBottom: '10px',
   },
   button: {
     padding: '10px',
     backgroundColor: '#4CAF50',
     color: '#fff',
-    fontSize: '1em',
+    fontSize: '0.9em', // Slightly increased font size
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',

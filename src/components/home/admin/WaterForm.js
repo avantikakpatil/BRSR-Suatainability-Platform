@@ -159,7 +159,7 @@ const WaterForm = () => {
 
         <div style={styles.singleInputGroup}>
           <label style={styles.singleLabel}>
-            Upload Bill:
+            Upload Bill((PDF, DOC, Image files)):
             <input
               type="file"
               name="billFile"

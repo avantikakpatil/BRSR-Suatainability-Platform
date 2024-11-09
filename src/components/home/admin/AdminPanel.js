@@ -17,7 +17,6 @@ const AdminPanel = () => {
 
   return (
     <div className="admin-panel p-8" style={{ marginLeft: '50px' }}>
-      <h1 className="text-2xl font-bold mb-6">Admin Panel - Input Data</h1>
 
       {!selectedOption && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">

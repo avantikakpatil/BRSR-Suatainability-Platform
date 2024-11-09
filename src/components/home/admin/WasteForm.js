@@ -34,62 +34,39 @@ const WasteManagementForm = () => {
       previousRadioactiveWaste: '',
       otherHazardousWaste: '',
       otherNonHazardousWaste: '',
-      recycledWaste: '',
-      reusedWaste: '',
-      otherRecoveryOperationsWaste: '',
-      incinerationWaste: '',
-      landfillWaste: '',
-      otherDisposalWaste: '',
     },
     externalAssessment: '',
     externalAgencyName: '',
+    billFile: null,
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    const isWasteDataField = name.startsWith('current') || name.startsWith('previous') || name.startsWith('other') || name === 'recycledWaste' || name === 'reusedWaste' || name === 'otherRecoveryOperationsWaste' || name === 'incinerationWaste' || name === 'landfillWaste' || name === 'otherDisposalWaste';
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [isWasteDataField ? 'wasteData' : name]: {
-        ...prevData.wasteData,
-        ...(isWasteDataField ? { [name]: value } : {}),
-      },
-      ...(isWasteDataField ? {} : { [name]: value }),
-    }));
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData((prevData) => ({
+        ...prevData,
+        billFile: files[0],
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        wasteData: {
+          ...prevData.wasteData,
+          [name]: value,
+        },
+        ...(name === 'externalAssessment' || name === 'externalAgencyName' ? { [name]: value } : {}),
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submitted Data:', formData); // Check submitted data in console
+    console.log('Submitted Data:', formData);
 
-    const structuredData = {
-      currentPlasticWaste: formData.wasteData.currentPlasticWaste,
-      previousPlasticWaste: formData.wasteData.previousPlasticWaste,
-      currentEWaste: formData.wasteData.currentEWaste,
-      previousEWaste: formData.wasteData.previousEWaste,
-      currentBioMedicalWaste: formData.wasteData.currentBioMedicalWaste,
-      previousBioMedicalWaste: formData.wasteData.previousBioMedicalWaste,
-      currentConstructionWaste: formData.wasteData.currentConstructionWaste,
-      previousConstructionWaste: formData.wasteData.previousConstructionWaste,
-      currentBatteryWaste: formData.wasteData.currentBatteryWaste,
-      previousBatteryWaste: formData.wasteData.previousBatteryWaste,
-      currentRadioactiveWaste: formData.wasteData.currentRadioactiveWaste,
-      previousRadioactiveWaste: formData.wasteData.previousRadioactiveWaste,
-      otherHazardousWaste: formData.wasteData.otherHazardousWaste,
-      otherNonHazardousWaste: formData.wasteData.otherNonHazardousWaste,
-      recycledWaste: formData.wasteData.recycledWaste,
-      reusedWaste: formData.wasteData.reusedWaste,
-      otherRecoveryOperationsWaste: formData.wasteData.otherRecoveryOperationsWaste,
-      incinerationWaste: formData.wasteData.incinerationWaste,
-      landfillWaste: formData.wasteData.landfillWaste,
-      otherDisposalWaste: formData.wasteData.otherDisposalWaste,
-    };
+    const uniqueKey = Date.now(); // Unique key for each entry
+    const dataRef = ref(database, 'inputData/wasteData/' + uniqueKey);
 
-    const uniqueKey = Date.now(); // Use a unique key for each entry
-    const dataRef = ref(database, 'inputData/wasteData/' + uniqueKey); // Reference under wasteData with unique key
-
-    set(dataRef, structuredData)
+    set(dataRef, formData.wasteData)
       .then(() => {
         console.log('Data submitted successfully!');
         alert('Data submitted successfully!');
@@ -107,27 +84,27 @@ const WasteManagementForm = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Parameter</th>
-              <th style={styles.th}>FY ____ (Current Year)</th>
-              <th style={styles.th}>FY ____ (Previous Year)</th>
+              <th style={styles.th}>PARAMETER (TOTAL WASTE GENERATED IN METRIC TONNES)</th>
+              <th style={styles.th}>FY (CURRENT YEAR)</th>
+              <th style={styles.th}>FY (PREVIOUS YEAR)</th>
             </tr>
           </thead>
           <tbody>
             {[
-              { label: 'Plastic waste (A)', field: 'PlasticWaste' },
-              { label: 'E-waste (B)', field: 'EWaste' },
-              { label: 'Bio-medical waste (C)', field: 'BioMedicalWaste' },
-              { label: 'Construction and demolition waste (D)', field: 'ConstructionWaste' },
-              { label: 'Battery waste (E)', field: 'BatteryWaste' },
-              { label: 'Radioactive waste (F)', field: 'RadioactiveWaste' },
+              { label: 'Plastic waste (A)', current: 'currentPlasticWaste', previous: 'previousPlasticWaste' },
+              { label: 'E-waste (B)', current: 'currentEWaste', previous: 'previousEWaste' },
+              { label: 'Bio-medical waste (C)', current: 'currentBioMedicalWaste', previous: 'previousBioMedicalWaste' },
+              { label: 'Construction and demolition waste (D)', current: 'currentConstructionWaste', previous: 'previousConstructionWaste' },
+              { label: 'Battery waste (E)', current: 'currentBatteryWaste', previous: 'previousBatteryWaste' },
+              { label: 'Radioactive waste (F)', current: 'currentRadioactiveWaste', previous: 'previousRadioactiveWaste' },
             ].map((item) => (
-              <tr key={item.field}>
+              <tr key={item.label}>
                 <td style={styles.td}>{item.label}</td>
                 <td style={styles.td}>
                   <input
                     type="number"
-                    name={`current${item.field}`}
-                    value={formData.wasteData[`current${item.field}`]}
+                    name={item.current}
+                    value={formData.wasteData[item.current]}
                     onChange={handleChange}
                     style={styles.input}
                   />
@@ -135,8 +112,8 @@ const WasteManagementForm = () => {
                 <td style={styles.td}>
                   <input
                     type="number"
-                    name={`previous${item.field}`}
-                    value={formData.wasteData[`previous${item.field}`]}
+                    name={item.previous}
+                    value={formData.wasteData[item.previous]}
                     onChange={handleChange}
                     style={styles.input}
                   />
@@ -144,56 +121,51 @@ const WasteManagementForm = () => {
               </tr>
             ))}
             <tr>
-              <td style={styles.td}>Other Hazardous waste (G)</td>
-              <td colSpan="2" style={styles.td}>
+              <td style={styles.td}>Other hazardous waste (G)</td>
+              <td colSpan="2" style={styles.fullWidthTd}>
                 <input
-                  type="text"
+                  type="number"
                   name="otherHazardousWaste"
                   value={formData.wasteData.otherHazardousWaste}
                   onChange={handleChange}
-                  style={styles.inputLong}
+                  style={styles.fullWidthInput}
                 />
               </td>
             </tr>
             <tr>
-              <td style={styles.td}>Other Non-hazardous waste (H)</td>
-              <td colSpan="2" style={styles.td}>
+              <td style={styles.td}>Other non-hazardous waste (H)</td>
+              <td colSpan="2" style={styles.fullWidthTd}>
                 <input
-                  type="text"
+                  type="number"
                   name="otherNonHazardousWaste"
                   value={formData.wasteData.otherNonHazardousWaste}
                   onChange={handleChange}
-                  style={styles.inputLong}
+                  style={styles.fullWidthInput}
                 />
               </td>
             </tr>
           </tbody>
         </table>
-        <div style={styles.assessmentSection}>
-          <label style={styles.label}>External Assessment (Y/N):</label>
-          <input
-            type="text"
-            name="externalAssessment"
-            value={formData.externalAssessment}
-            onChange={handleChange}
-            style={styles.inputAssessment}
-          />
-          {formData.externalAssessment.toLowerCase() === 'y' && (
-            <>
-              <label style={styles.label}>External Agency Name:</label>
-              <input
-                type="text"
-                name="externalAgencyName"
-                value={formData.externalAgencyName}
-                onChange={handleChange}
-                style={styles.inputAssessment}
-              />
-            </>
-          )}
+        <div style={styles.additionalInputs}>
+          <label>External Assessment (Y/N):<br />
+            <input
+              type="text"
+              name="externalAssessment"
+              value={formData.externalAssessment}
+              onChange={handleChange}
+              style={styles.extraInput}
+            />
+          </label>
+          <label>Upload Bill((PDF, DOC, Image files)):<br />
+            <input
+              type="file"
+              name="billFile"
+              onChange={handleChange}
+              style={styles.extraInput}
+            />
+          </label>
         </div>
-        <button type="submit" style={styles.button}>
-          Submit
-        </button>
+        <button type="submit" style={styles.button}>Submit</button>
       </form>
     </div>
   );
@@ -201,72 +173,75 @@ const WasteManagementForm = () => {
 
 const styles = {
   container: {
-    maxWidth: '1200px',  // increase the container width for a wider form
+    width: '100%', // Full width of the screen
+    maxWidth: '1200px', // Increase max width for larger screens
     margin: '0 auto',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    padding: '10px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '10px',
   },
   heading: {
     textAlign: 'center',
-    marginBottom: '20px',
+    fontSize: '18px',
+    marginBottom: '10px',
   },
   form: {
-    border: '1px solid #ccc',
-    padding: '20px',
-    borderRadius: '10px',
-    width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    marginBottom: '20px',
   },
   th: {
-    border: '1px solid #ccc',
-    padding: '8px',
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    padding: '5px',
     textAlign: 'center',
+    fontSize: '12px',
+    width: '33%', // Each column fills a third of the full width
   },
   td: {
     border: '1px solid #ccc',
-    padding: '8px',
+    padding: '5px',
+    textAlign: 'center',
+    fontSize: '12px',
+  },
+  fullWidthTd: {
+    border: '1px solid #ccc',
+    padding: '5px',
     textAlign: 'center',
   },
   input: {
-    width: '80%',  // shorter input fields for better spacing
-    padding: '6px',
+    width: '100%', // Full-width inputs
+    padding: '4px',
+    fontSize: '12px',
   },
-  inputLong: {
-    width: '95%', // longer input field for text entries
-    padding: '6px',
+  fullWidthInput: {
+    width: '100%', // Full-width input fields for 'Other' rows
+    padding: '4px',
+    fontSize: '12px',
   },
-  assessmentSection: {
+  additionalInputs: {
     display: 'flex',
     flexDirection: 'column',
+    gap: '8px',
+    marginTop: '8px',
+  },
+  extraInput: {
     width: '100%',
-    alignItems: 'center',
-  },
-  label: {
-    marginRight: '10px',
-  },
-  inputAssessment: {
-    padding: '6px',
-    margin: '10px 0',
-    width: '50%',  // adjust the width as per requirement
+    padding: '5px',
+    fontSize: '12px',
   },
   button: {
-    padding: '10px 20px',
-    backgroundColor: '#007bff',
+    marginTop: '10px',
+    padding: '8px 16px',
+    backgroundColor: '#4CAF50',
     color: '#fff',
     border: 'none',
     borderRadius: '5px',
+    fontSize: '14px',
     cursor: 'pointer',
-    marginTop: '20px',
   },
 };
 

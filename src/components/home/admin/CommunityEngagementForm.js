@@ -36,15 +36,14 @@ const CommunityEngagementForm = ({ goBack }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle submission of community engagement data here
     console.log('Challenges:', challenges);
-    goBack(); // Go back to the main admin panel
+    goBack();
   };
 
   return (
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.form}>
-        <h1 style={styles.title}>Community Engagement Form</h1> {/* Bolded heading outside the table */}
+        <h1 style={styles.title}>Community Engagement Form</h1>
 
         <table style={styles.table}>
           <thead>
@@ -121,78 +120,81 @@ const styles = {
   container: {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start', // Aligned to the top of the container
     minHeight: '100vh',
     backgroundColor: '#f7f7f7',
-    padding: '10px', // Reduced padding for better layout
+    padding: '10px',
   },
   form: {
     width: '100%',
-    maxWidth: '1000px', // Max width for better space utilization
+    maxWidth: '1200px',
     backgroundColor: '#fff',
-    padding: '20px', // Consistent padding inside the form
+    padding: '20px',
     borderRadius: '8px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     display: 'flex',
     flexDirection: 'column',
+    marginTop: '20px', // Added margin at the top
   },
   title: {
     textAlign: 'center',
-    fontSize: '24px',
-    fontWeight: 'bold', // Made the title bold
-    marginBottom: '15px', // Reduced space between title and table
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '15px',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    marginBottom: '20px', // Reduced margin to bring table closer to title
+    marginBottom: '20px',
   },
   tableHeader: {
     textAlign: 'left',
-    padding: '10px',
+    padding: '8px',
     backgroundColor: '#4CAF50',
     color: '#fff',
     fontWeight: '600',
+    fontSize: '0.85em',
   },
   tableCell: {
-    padding: '8px',
+    padding: '6px',
     borderBottom: '1px solid #ccc',
+    fontSize: '0.85em',
   },
   inputTitle: {
     width: '100%',
-    padding: '8px',
+    padding: '6px',
     borderRadius: '4px',
     border: '1px solid #ccc',
-    fontSize: '1em',
-    marginBottom: '8px', // Space between fields for better layout
+    fontSize: '0.85em',
+    marginBottom: '6px',
   },
   inputDate: {
     width: '100%',
-    padding: '8px',
+    padding: '6px',
     borderRadius: '4px',
     border: '1px solid #ccc',
-    fontSize: '1em',
+    fontSize: '0.85em',
   },
   inputDescription: {
     width: '100%',
-    padding: '8px',
+    padding: '6px',
     borderRadius: '4px',
     border: '1px solid #ccc',
-    fontSize: '1em',
-    minHeight: '80px',
+    fontSize: '0.85em',
+    minHeight: '60px',
   },
   buttonsContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    marginTop: '20px',
+    marginTop: '15px',
   },
   addButton: {
     backgroundColor: '#ff9800',
     color: '#fff',
     border: 'none',
-    padding: '10px 20px',
+    padding: '8px 18px',
     borderRadius: '4px',
-    fontSize: '1em',
+    fontSize: '0.9em',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
   },
@@ -200,9 +202,9 @@ const styles = {
     backgroundColor: '#4CAF50',
     color: '#fff',
     border: 'none',
-    padding: '10px 20px',
+    padding: '8px 18px',
     borderRadius: '4px',
-    fontSize: '1em',
+    fontSize: '0.9em',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
   },
@@ -210,10 +212,10 @@ const styles = {
     backgroundColor: '#f44336',
     color: '#fff',
     border: 'none',
-    padding: '8px 16px',
+    padding: '6px 12px',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '0.9em',
+    fontSize: '0.8em',
   },
 };
 

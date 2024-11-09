@@ -253,7 +253,7 @@ const EnergyForm = () => {
 const styles = {
   container: {
     display: 'flex',
-    flexDirection: 'column', // Main container uses column layout
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     padding: '20px',
@@ -261,9 +261,9 @@ const styles = {
     minHeight: '100vh',
   },
   headingContainer: {
-    display: 'flex', // Heading container uses flex for alignment
+    display: 'flex',
     justifyContent: 'center',
-    marginBottom: '20px', // Add some margin below the heading
+    marginBottom: '20px',
   },
   form: {
     backgroundColor: "#fff",
@@ -271,22 +271,57 @@ const styles = {
     borderRadius: "10px",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
     width: "100%",
-    maxWidth: "700px",
+    maxWidth: "1200px", // Increased max width for more horizontal space
     display: "flex",
     flexDirection: "column",
+    alignItems: "stretch", // Ensure it stretches to the width
   },
-  title: {
-    textAlign: "center",
-    marginBottom: "30px",
-    fontSize: "1.8em",
-    color: "#333",
-    fontWeight: "600",
-  },
-  inputGroup: {
-    display: "flex",
-    flexDirection: "column", // Ensures vertical stacking
+  table: {
+    width: "100%", // Ensures the table takes up full width
+    tableLayout: "auto", // Auto adjust based on content
     marginBottom: "20px",
-    width: "100%", // Makes sure it spans the form width
+  },
+  th: {
+    padding: "12px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    textAlign: "left",
+    fontSize: "1em",
+  },
+  td: {
+    padding: "12px",
+    border: "1px solid #ddd",
+    fontSize: "1em",
+  },
+  inputSmall: {
+    width: "100%",
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "1em",
+    outline: "none",
+  },
+  inputLarge: {
+    width: "100%",
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "1em",
+    outline: "none",
+  },
+  inputReadOnly: {
+    width: "100%",
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "1em",
+    outline: "none",
+    backgroundColor: "#f5f5f5",
+  },
+  assessmentSection: {
+    display: "flex",
+    flexDirection: "column",
+    marginTop: "20px",
   },
   label: {
     margin: "10px 0",
@@ -295,55 +330,15 @@ const styles = {
     fontWeight: "500",
     width: "100%",
   },
-  input: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "5px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "1em",
-    outline: "none",
-    boxSizing: "border-box",
-    transition: "border-color 0.3s ease",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginBottom: "20px",
-  },
-  tableHeader: {
-    textAlign: "left",
-    padding: "12px",
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    fontWeight: "600",
-  },
-  tableCell: {
-    padding: "12px",
-    borderBottom: "1px solid #ccc",
-  },
-  tableInput: {
-    width: "100%",
+  inputAssessment: {
     padding: "10px",
     borderRadius: "5px",
     border: "1px solid #ccc",
     fontSize: "1em",
     outline: "none",
-    transition: "border-color 0.3s ease",
+    width: "100%",
   },
-  optionalTitle: {
-    fontSize: "1.4em",
-    color: "#333",
-    fontWeight: "600",
-    marginTop: "30px",
-    marginBottom: "10px",
-  },
-  optionalText: {
-    fontSize: "0.9em",
-    color: "#555",
-    marginBottom: "20px",
-  },
-  submitButton: {
+  button: {
     display: "block",
     width: "100%",
     padding: "15px",
@@ -356,10 +351,6 @@ const styles = {
     cursor: "pointer",
     transition: "background-color 0.3s ease",
   },
-  submitButtonHover: {
-    backgroundColor: "#45a049",
-  },
 };
 
 export default EnergyForm;
-

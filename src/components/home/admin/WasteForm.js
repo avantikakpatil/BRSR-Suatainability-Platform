@@ -63,47 +63,42 @@ const WasteManagementForm = () => {
     e.preventDefault();
     console.log('Submitted Data:', formData); // Check submitted data in console
 
-    // Structure the data correctly
     const structuredData = {
-        currentPlasticWaste: formData.wasteData.currentPlasticWaste,
-        previousPlasticWaste: formData.wasteData.previousPlasticWaste,
-        currentEWaste: formData.wasteData.currentEWaste,
-        previousEWaste: formData.wasteData.previousEWaste,
-        currentBioMedicalWaste: formData.wasteData.currentBioMedicalWaste,
-        previousBioMedicalWaste: formData.wasteData.previousBioMedicalWaste,
-        currentConstructionWaste: formData.wasteData.currentConstructionWaste,
-        previousConstructionWaste: formData.wasteData.previousConstructionWaste,
-        currentBatteryWaste: formData.wasteData.currentBatteryWaste,
-        previousBatteryWaste: formData.wasteData.previousBatteryWaste,
-        currentRadioactiveWaste: formData.wasteData.currentRadioactiveWaste,
-        previousRadioactiveWaste: formData.wasteData.previousRadioactiveWaste,
-        otherHazardousWaste: formData.wasteData.otherHazardousWaste,
-        otherNonHazardousWaste: formData.wasteData.otherNonHazardousWaste,
-        recycledWaste: formData.wasteData.recycledWaste,
-        reusedWaste: formData.wasteData.reusedWaste,
-        otherRecoveryOperationsWaste: formData.wasteData.otherRecoveryOperationsWaste,
-        incinerationWaste: formData.wasteData.incinerationWaste,
-        landfillWaste: formData.wasteData.landfillWaste,
-        otherDisposalWaste: formData.wasteData.otherDisposalWaste,
+      currentPlasticWaste: formData.wasteData.currentPlasticWaste,
+      previousPlasticWaste: formData.wasteData.previousPlasticWaste,
+      currentEWaste: formData.wasteData.currentEWaste,
+      previousEWaste: formData.wasteData.previousEWaste,
+      currentBioMedicalWaste: formData.wasteData.currentBioMedicalWaste,
+      previousBioMedicalWaste: formData.wasteData.previousBioMedicalWaste,
+      currentConstructionWaste: formData.wasteData.currentConstructionWaste,
+      previousConstructionWaste: formData.wasteData.previousConstructionWaste,
+      currentBatteryWaste: formData.wasteData.currentBatteryWaste,
+      previousBatteryWaste: formData.wasteData.previousBatteryWaste,
+      currentRadioactiveWaste: formData.wasteData.currentRadioactiveWaste,
+      previousRadioactiveWaste: formData.wasteData.previousRadioactiveWaste,
+      otherHazardousWaste: formData.wasteData.otherHazardousWaste,
+      otherNonHazardousWaste: formData.wasteData.otherNonHazardousWaste,
+      recycledWaste: formData.wasteData.recycledWaste,
+      reusedWaste: formData.wasteData.reusedWaste,
+      otherRecoveryOperationsWaste: formData.wasteData.otherRecoveryOperationsWaste,
+      incinerationWaste: formData.wasteData.incinerationWaste,
+      landfillWaste: formData.wasteData.landfillWaste,
+      otherDisposalWaste: formData.wasteData.otherDisposalWaste,
     };
 
-    // Write structured data to Firebase Realtime Database under the inputData/wasteData node
     const uniqueKey = Date.now(); // Use a unique key for each entry
     const dataRef = ref(database, 'inputData/wasteData/' + uniqueKey); // Reference under wasteData with unique key
 
     set(dataRef, structuredData)
-        .then(() => {
-            console.log('Data submitted successfully!'); // Log success
-            alert('Data submitted successfully!'); // Show alert on success
-        })
-        .catch((error) => {
-            console.error('Error submitting data:', error); // Log error
-            alert('Error submitting data: ' + error.message); // Show alert on error
-        });
-};
-
-
-  
+      .then(() => {
+        console.log('Data submitted successfully!');
+        alert('Data submitted successfully!');
+      })
+      .catch((error) => {
+        console.error('Error submitting data:', error);
+        alert('Error submitting data: ' + error.message);
+      });
+  };
 
   return (
     <div style={styles.container}>
@@ -148,7 +143,6 @@ const WasteManagementForm = () => {
                 </td>
               </tr>
             ))}
-            {/* Other Hazardous Waste */}
             <tr>
               <td style={styles.td}>Other Hazardous waste (G)</td>
               <td colSpan="2" style={styles.td}>
@@ -161,7 +155,6 @@ const WasteManagementForm = () => {
                 />
               </td>
             </tr>
-            {/* Other Non-hazardous Waste */}
             <tr>
               <td style={styles.td}>Other Non-hazardous waste (H)</td>
               <td colSpan="2" style={styles.td}>
@@ -174,47 +167,8 @@ const WasteManagementForm = () => {
                 />
               </td>
             </tr>
-            {/* Waste Recovery Operations */}
-            {[
-              { label: 'Recycled waste', field: 'recycledWaste' },
-              { label: 'Re-used waste', field: 'reusedWaste' },
-              { label: 'Other recovery operations waste', field: 'otherRecoveryOperationsWaste' },
-            ].map((item) => (
-              <tr key={item.field}>
-                <td style={styles.td}>{item.label}</td>
-                <td colSpan="2" style={styles.td}>
-                  <input
-                    type="number"
-                    name={item.field}
-                    value={formData.wasteData[item.field]}
-                    onChange={handleChange}
-                    style={styles.input}
-                  />
-                </td>
-              </tr>
-            ))}
-            {/* Waste Disposal Operations */}
-            {[
-              { label: 'Incineration waste', field: 'incinerationWaste' },
-              { label: 'Landfill waste', field: 'landfillWaste' },
-              { label: 'Other disposal operations waste', field: 'otherDisposalWaste' },
-            ].map((item) => (
-              <tr key={item.field}>
-                <td style={styles.td}>{item.label}</td>
-                <td colSpan="2" style={styles.td}>
-                  <input
-                    type="number"
-                    name={item.field}
-                    value={formData.wasteData[item.field]}
-                    onChange={handleChange}
-                    style={styles.input}
-                  />
-                </td>
-              </tr>
-            ))}
           </tbody>
         </table>
-        {/* External Assessment */}
         <div style={styles.assessmentSection}>
           <label style={styles.label}>External Assessment (Y/N):</label>
           <input
@@ -247,10 +201,10 @@ const WasteManagementForm = () => {
 
 const styles = {
   container: {
-    maxWidth: '100%',
+    maxWidth: '1200px',  // increase the container width for a wider form
+    margin: '0 auto',
     padding: '20px',
     display: 'flex',
-    justifyContent: 'center',
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -262,7 +216,7 @@ const styles = {
     border: '1px solid #ccc',
     padding: '20px',
     borderRadius: '10px',
-    width: '90%',
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -274,51 +228,45 @@ const styles = {
   },
   th: {
     border: '1px solid #ccc',
-    padding: '10px',
-    backgroundColor: '#f9f9f9',
-    textAlign: 'left',
+    padding: '8px',
+    backgroundColor: '#f1f1f1',
+    textAlign: 'center',
   },
   td: {
     border: '1px solid #ccc',
-    padding: '10px',
+    padding: '8px',
+    textAlign: 'center',
   },
   input: {
-    width: '100%',
+    width: '80%',  // shorter input fields for better spacing
     padding: '6px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-    fontSize: '14px',
   },
   inputLong: {
-    width: '100%',
+    width: '95%', // longer input field for text entries
     padding: '6px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-    fontSize: '14px',
   },
   assessmentSection: {
-    margin: '20px 0',
+    display: 'flex',
+    flexDirection: 'column',
     width: '100%',
+    alignItems: 'center',
   },
   label: {
     marginRight: '10px',
   },
   inputAssessment: {
-    width: '30%',
     padding: '6px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-    fontSize: '14px',
-    marginBottom: '10px',
+    margin: '10px 0',
+    width: '50%',  // adjust the width as per requirement
   },
   button: {
-    padding: '10px 15px',
-    borderRadius: '5px',
-    border: 'none',
-    backgroundColor: '#007BFF',
+    padding: '10px 20px',
+    backgroundColor: '#007bff',
     color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '16px',
+    marginTop: '20px',
   },
 };
 

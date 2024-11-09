@@ -59,9 +59,6 @@ const WaterForm = () => {
 
   return (
     <div style={styles.container}>
-      {/* <div style={styles.headingContainer}>
-        <h1 style={styles.heading}><b>Water Consumption Form</b></h1>
-      </div> */}
       <form onSubmit={handleSubmit} style={styles.form}>
         <h3 style={styles.title}>Water withdrawal by source (in kilolitres)</h3>
 
@@ -161,6 +158,7 @@ const WaterForm = () => {
     </div>
   );
 };
+
 const styles = {
   container: {
     display: "flex",
@@ -170,14 +168,13 @@ const styles = {
     backgroundColor: "#f0f0f0",
     minHeight: "100vh",
   },
-  
   form: {
     backgroundColor: "#fff",
     padding: "30px",
     borderRadius: "10px",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
     width: "100%",
-    maxWidth: "700px",
+    maxWidth: "1000px", // increased width for a more horizontal layout
     display: "flex",
     flexDirection: "column",
   },
@@ -190,19 +187,20 @@ const styles = {
   },
   inputGroup: {
     display: "flex",
-    flexDirection: "column", // Ensures vertical stacking
+    flexDirection: "row", // horizontal layout for the input fields
+    justifyContent: "space-between",
     marginBottom: "20px",
-    width: "100%", // Makes sure it spans the form width
+    gap: "20px",
   },
   label: {
-    margin: "10px 0",
+    display: "flex",
+    flexDirection: "column",
     fontSize: "1em",
     color: "#333",
     fontWeight: "500",
-    width: "100%",
+    width: "48%",
   },
   input: {
-    width: "100%",
     padding: "12px",
     marginTop: "5px",
     borderRadius: "5px",
@@ -250,8 +248,6 @@ const styles = {
     marginBottom: "20px",
   },
   submitButton: {
-    display: "block",
-    width: "100%",
     padding: "15px",
     backgroundColor: "#4CAF50",
     color: "#fff",
@@ -261,12 +257,8 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     transition: "background-color 0.3s ease",
-  },
-  submitButtonHover: {
-    backgroundColor: "#45a049",
+    width: "100%",
   },
 };
-
-  
 
 export default WaterForm;

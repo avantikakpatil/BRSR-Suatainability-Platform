@@ -73,8 +73,7 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
         <li>
           <button
             onClick={onReportClick}
-            className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-          >
+            className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md">
             <FaFilePdf className="text-lg mr-3" />
             <span>Report</span>
           </button>
@@ -83,28 +82,28 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
         
 
         <li>
-          <button style={{ backgroundColor: '#5fa6f2' }}
+          <button 
             onClick={onHeadquarterDashboard}
-            className="flex items-center space-x-2 p-3 w-full text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
-            <FaUser className="text-lg" />
+            className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md">
+            <FaUser className="text-lg mr-3" />
             <span>Headquarter Dashboard</span>
           </button>
         </li>
 
         <li>
-          <button style={{ backgroundColor: '#5fa6f2' }}
+          <button 
             onClick={onCreatePO}
-            className="flex items-center space-x-2 p-3 w-full text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
-            <FaUser className="text-lg" />
+            className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md">
+            <FaUser className="text-lg mr-3" />
             <span>Create Post Office Profile</span>
           </button>
         </li>
 
         <li>
-          <button style={{ backgroundColor: '#5fa6f2' }}
+          <button 
             onClick={onHeadquarterDashboard}
-            className="flex items-center space-x-2 p-3 w-full text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
-            <FaUser className="text-lg" />
+            className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md">
+            <FaUser className="text-lg mr-3" />
             <span>Assign Role to Post Office</span>
           </button>
         </li>

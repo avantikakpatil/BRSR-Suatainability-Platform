@@ -11,8 +11,8 @@ const HeadquarterDashboard = () => {
   return (
     <div className="headquarters-dashboard">
       <div className="button-container">
-        <button>Create Post Office</button>
-        <button style={{ marginLeft: 10 }}>Assign Role</button> </div>
+        <button style={{width:'45%',marginRight:'100px'}}>Create Post Office</button>
+        <button style={{width:'45%',marginRight:'0px'}}>Assign Role</button> </div>
       <div className="view-selection">
       <label>Report</label>
         <label>View By:</label>

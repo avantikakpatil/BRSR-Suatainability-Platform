@@ -22,7 +22,7 @@ const Header = () => {
       {/* Left Side - Logo and Title */}
       <div className="flex items-center space-x-4">
         <img src={logo} alt="Logo" className="w-10 h-10 rounded-full shadow-md" />
-        <div className="text-2xl font-bold text-black tracking-wider shadow-md drop-shadow-md">
+        <div className="text-2xl font-bold text-black tracking-wider">
           BRSR Sustainability Platform
         </div>
       </div>

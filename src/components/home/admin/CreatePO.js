@@ -108,19 +108,19 @@ const CreatePO = () => {
   return (
     <form onSubmit={handleSubmit} style={{
       maxWidth: '1500px',
-      margin: '0 auto',
-      padding: '20px',
+      margin: '0px',
+      padding: '10px',
       backgroundColor: 'rgba(255, 255, 255, 0.8)', // Transparent background
       borderRadius: '8px',
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
       display: 'grid',
       gridTemplateColumns: 'repeat(3, 1fr)',
-      gap: '15px',
+      gap: '10px',
     }}
     >
       <h2 style={{ fontWeight: 'bold', fontSize: '24px' }}>Create Post Office</h2>
       <div></div><div></div>
-      <div style={{ marginTop: '15px',width:'370px' }}>
+      <div style={{ marginTop: '25px',marginLeft:'5px',width:'370px',height:'30px'}}>
         <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
           Corporate Identity Number (CIN):
         </label>
@@ -134,11 +134,11 @@ const CreatePO = () => {
         />
       </div>
 
-      <div style={{ marginTop: '15px',marginLeft:'10px',width:'370px',height:'40px'}}>
+      <div style={{ marginTop: '25px',marginLeft:'15px',width:'370px',height:'30px'}}>
         <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
           Post Office Type:
         </label>
-        <select style={{ width:'370px',height:'30px'}}
+        <select style={{ width:'370px',height:'45px'}}
           className="input-field"
           type='text'
           value={poType}
@@ -148,7 +148,7 @@ const CreatePO = () => {
         </select>
         </div>
       
-      <div style={{ marginTop: '15px',width:'370px' }}>
+      <div style={{ marginTop: '25px',marginLeft:'5px',width:'370px',height:'30px'}}>
         <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
           Post Office Name:
         </label>
@@ -161,7 +161,7 @@ const CreatePO = () => {
           required
         />
       </div>
-      <div style={{ marginTop: '15px',width:'370px' }}>
+      <div style={{ marginTop: '25px',marginLeft:'5px',width:'370px',height:'30px'}}>
         <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
           Email:
         </label>
@@ -174,7 +174,7 @@ const CreatePO = () => {
           required
         />
       </div>
-      <div style={{ marginTop: '15px',width:'370px' }}>
+      <div style={{ marginTop: '25px',marginLeft:'5px',width:'370px',height:'30px'}}>
         <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
           Contact Number:
         </label>
@@ -187,7 +187,7 @@ const CreatePO = () => {
           required
         />
       </div>
-      <div style={{ marginTop: '15px',width:'370px' }}>
+      <div style={{ marginTop: '25px',marginLeft:'5px',width:'370px',height:'30px'}}>
         <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
           Telephone:
         </label>
@@ -200,7 +200,7 @@ const CreatePO = () => {
           required
         />
       </div>
-      <div style={{ marginTop: '15px',width:'370px' }}>
+      <div style={{ marginTop: '25px',marginLeft:'5px',width:'370px',height:'30px'}}>
         <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
           Website:
         </label>
@@ -213,51 +213,51 @@ const CreatePO = () => {
           required
         />
       </div><div></div><div></div>
-      <div style={{ marginTop: '20px', marginLeft: '0px',width:'370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '20px' }}>
+      <div style={{ marginTop: '20px', marginLeft: '0px', width: '370px' }}>
+        <label style={{ fontWeight: 'bold', fontSize: '20px', marginTop: '20px' }}>
           Address:
         </label>
-        <div style={{ marginTop: '15px' }}>
-          <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
-            Country:
-          </label>
-          <input
-            className="input-field"
-            type="text"
-            name="address.country"
-            value={formData.details.address.country}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
-          <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
-            State:
-          </label>
-          <input
-            className="input-field"
-            type="text"
-            name="address.state"
-            value={formData.details.address.state}
-            onChange={handleChange}
-            required
-          />
-    
-        <div style={{marginLeft:'500px'}}>
-        <div>
-          <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
-            City:
-          </label>
-          <input
-            className="input-field"
-            type="text"
-            name="address.city"
-            value={formData.details.address.city}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
+        <div style={{ display: 'flex',width: '1000px' }}>
+          <div style={{ marginRight: '10px',width: '1000px' }}>
+            <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
+              Country:
+            </label>
+            <input
+              className="input-field"
+              type="text"
+              name="address.country"
+              value={formData.details.address.country}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div style={{ marginRight: '10px',width: '1000px' }}>
+            <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
+              State:
+            </label>
+            <input
+              className="input-field"
+              type="text"
+              name="address.state"
+              value={formData.details.address.state}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div style={{ marginRight: '10px',width: '1000px' }}>
+            <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
+              City:
+            </label>
+            <input
+              className="input-field"
+              type="text"
+              name="address.city"
+              value={formData.details.address.city}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        <div style={{ marginRight: '10px',width: '1000px' }}>
           <label style={{ fontWeight: 'bold', fontSize: '13px' }}>
             Pincode:
           </label>
@@ -281,8 +281,8 @@ const CreatePO = () => {
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
-        marginTop: '250px',
-        marginLeft:'200px',
+        marginTop: '160px',
+        marginLeft:'10%',
       }} type="submit">Submit</button>
     </form>
   );

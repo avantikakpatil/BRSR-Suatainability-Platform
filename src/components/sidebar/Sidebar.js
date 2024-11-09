@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf, FaChartPie } from "react-icons/fa"; // Import FaChartPie for the Dashboard icon
 
-const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick, onHeadquarterDashboard, onCreatePO }) => {
+const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick, onHeadquarterDashboard, onCreatePO,onListPO }) => {
   const navigate = useNavigate();
 
   return (
@@ -101,10 +101,10 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
 
         <li>
           <button 
-            onClick={onHeadquarterDashboard}
+            onClick={onListPO}
             className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md">
             <FaUser className="text-lg mr-3" />
-            <span>Assign Role to Post Office</span>
+            <span>Post Offices List</span>
           </button>
         </li>
       </ul>

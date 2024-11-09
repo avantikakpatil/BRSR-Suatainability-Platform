@@ -176,8 +176,8 @@ const PostOffices = () => {
           onChange={(e) => setSearchText(e.target.value)}
         />
       </div>
-      <div className="table-container">
-        <Table striped bordered hover>
+      <div className="table-container" >
+        <Table striped bordered hover style={{fontSize:'13px'}}>
           <thead>
             <tr>
               <th style={{ color: "black" }}>Sr No.</th>

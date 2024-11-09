@@ -44,8 +44,8 @@ const EnergyForm = () => {
     console.log('Submitted Data:', { ...formData, email: userEmail });
 
     try {
-      // Create a reference in the Realtime Database under inputData/energyData
-      const newDataRef = ref(db, 'inputData/energyData/' + Date.now()); // Use timestamp as a unique ID
+      // Create a reference in the Realtime Database under PostalManager/inputData/energyData
+      const newDataRef = ref(db, 'PostalManager/inputData/energyData/' + Date.now()); // Use timestamp as a unique ID
       await set(newDataRef, {
         ...formData,
         email: userEmail, // Include the user's email
@@ -256,67 +256,70 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '20px',
+    padding: '10px',
     backgroundColor: '#f0f0f0',
     minHeight: '100vh',
   },
   headingContainer: {
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: '20px',
+    marginBottom: '10px',
+  },
+  heading: {
+    fontSize: '24px',
+    color: '#333',
   },
   form: {
     backgroundColor: "#fff",
-    padding: "30px",
+    padding: "20px",
     borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     width: "100%",
-    maxWidth: "1200px", // Increased max width for more horizontal space
+    maxWidth: "800px",
     display: "flex",
     flexDirection: "column",
-    alignItems: "stretch", // Ensure it stretches to the width
+    alignItems: "stretch",
   },
   table: {
-    width: "100%", // Ensures the table takes up full width
-    tableLayout: "auto", // Auto adjust based on content
-    marginBottom: "20px",
+    width: "100%",
+    tableLayout: "auto",
+    marginBottom: "10px",
+    fontSize: "0.9em",
   },
   th: {
-    padding: "12px",
+    padding: "10px",
     backgroundColor: "#4CAF50",
     color: "#fff",
     textAlign: "left",
-    fontSize: "1em",
+    fontSize: "0.9em",
   },
   td: {
-    padding: "12px",
+    padding: "8px",
     border: "1px solid #ddd",
-    fontSize: "1em",
+    fontSize: "0.9em",
   },
   inputSmall: {
     width: "100%",
-    padding: "10px",
-    borderRadius: "5px",
+    padding: "8px",
+    fontSize: "0.9em",
+    borderRadius: "4px",
     border: "1px solid #ccc",
-    fontSize: "1em",
-    outline: "none",
-  },
-  inputLarge: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "1em",
-    outline: "none",
   },
   inputReadOnly: {
     width: "100%",
-    padding: "10px",
-    borderRadius: "5px",
+    padding: "8px",
+    fontSize: "0.9em",
+    borderRadius: "4px",
+    backgroundColor: "#e9e9e9",
     border: "1px solid #ccc",
-    fontSize: "1em",
-    outline: "none",
-    backgroundColor: "#f5f5f5",
+    color: "#555",
+  },
+  inputLarge: {
+    width: "100%",
+    padding: "8px",
+    fontSize: "0.9em",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
   },
   assessmentSection: {
     display: "flex",
@@ -324,32 +327,27 @@ const styles = {
     marginTop: "20px",
   },
   label: {
-    margin: "10px 0",
-    fontSize: "1em",
+    fontSize: "0.9em",
     color: "#333",
-    fontWeight: "500",
-    width: "100%",
+    marginBottom: "4px",
   },
   inputAssessment: {
-    padding: "10px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "1em",
-    outline: "none",
     width: "100%",
+    padding: "8px",
+    fontSize: "0.9em",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    marginBottom: "10px",
   },
   button: {
-    display: "block",
-    width: "100%",
-    padding: "15px",
     backgroundColor: "#4CAF50",
     color: "#fff",
+    padding: "10px 15px",
     border: "none",
     borderRadius: "5px",
-    fontSize: "1.1em",
-    fontWeight: "600",
     cursor: "pointer",
-    transition: "background-color 0.3s ease",
+    fontSize: "1em",
+    marginTop: "20px",
   },
 };
 

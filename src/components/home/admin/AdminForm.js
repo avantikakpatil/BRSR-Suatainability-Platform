@@ -42,7 +42,7 @@ const AdminForm = () => {
   const fetchProfileData = async (userId) => {
     const dbRef = ref(db);
     try {
-      const snapshot = await get(child(dbRef, `profile/${userId}`));
+      const snapshot = await get(child(dbRef, `PostalManager/profile/${userId}`)); // Updated path
       if (snapshot.exists()) {
         setFormData({ profile: snapshot.val() });
       } else {
@@ -71,7 +71,7 @@ const AdminForm = () => {
       return;
     }
 
-    const profileRef = ref(db, `profile/${currentUser.uid}`);
+    const profileRef = ref(db, `PostalManager/profile/${currentUser.uid}`); // Updated path
     try {
       await set(profileRef, { ...formData.profile, userId: currentUser.uid });
       console.log('Data stored successfully!');

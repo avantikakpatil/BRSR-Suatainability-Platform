@@ -216,102 +216,104 @@ const EnergyForm = () => {
 const styles = {
   container: {
     display: 'flex',
+    width: '100%',
+    height:'600px',
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '20px',
-    padding: '10px',
+    margin: '0', // Remove margin from all sides
+    padding: '0', // Remove padding from all sides
   },
   headingContainer: {
     textAlign: 'center',
-    marginBottom: '20px',
+    marginBottom: '3px', // Reduced margin for compactness
   },
   heading: {
-    fontSize: '1.5em', // Adjusted font size
-    color: '#4CAF50', // Matches the button's green color
-    marginBottom: '10px',
+    fontSize: '1.2em', // Slightly smaller font size
+    color: '#4CAF50',
+    marginBottom: '5px',
   },
   form: {
     backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "15px",
-    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.1)",
-    width: "95%",
-    maxWidth: "1200px",
+    padding: "10px", // Reduced padding for compactness
+    borderRadius: "8px", // Smaller border radius
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    width: "100%",
+    maxWidth: "900px", // Adjusted max width to make it more compact
     display: "flex",
     flexDirection: "column",
     alignItems: "stretch",
   },
   table: {
     width: "100%",
-    marginBottom: "20px",
-    fontSize: "0.9em",
+    marginBottom: "10px", // Reduced margin for compactness
+    fontSize: "0.85em", // Slightly smaller font size
   },
   th: {
-    padding: "8px",
+    padding: "6px", // Reduced padding
     backgroundColor: "#4CAF50",
     color: "#fff",
     textAlign: "left",
     width: '50%',
   },
   td: {
-    padding: "8px",
+    padding: "6px", // Reduced padding
     borderBottom: "1px solid #ddd",
     width: '50%',
   },
   inputSmall: {
     width: '100%',
-    padding: '6px',
-    fontSize: '0.9em',
-    borderRadius: '5px',
+    padding: '4px', // Reduced padding for compactness
+    fontSize: '0.85em',
+    borderRadius: '4px',
     border: '1px solid #ccc',
   },
   inputReadOnly: {
     width: '100%',
-    padding: '6px',
-    fontSize: '0.9em',
-    borderRadius: '5px',
+    padding: '4px',
+    fontSize: '0.85em',
+    borderRadius: '4px',
     backgroundColor: '#e9e9e9',
     border: '1px solid #ccc',
   },
   inputLarge: {
     width: '100%',
-    padding: '6px',
-    fontSize: '0.9em',
-    borderRadius: '5px',
+    padding: '4px',
+    fontSize: '0.85em',
+    borderRadius: '4px',
     border: '1px solid #ccc',
   },
   assessmentSection: {
-    marginTop: '8px',
-    marginBottom: '8px',
+    marginTop: '4px',
+    marginBottom: '4px',
   },
   label: {
-    fontSize: '0.9em',
-    marginBottom: '6px',
+    fontSize: '0.85em',
+    marginBottom: '4px',
   },
   inputAssessment: {
     width: '100%',
-    padding: '8px',
-    fontSize: '0.9em',
-    borderRadius: '5px',
+    padding: '4px',
+    fontSize: '0.85em',
+    borderRadius: '4px',
     border: '1px solid #ccc',
   },
   uploadSection: {
-    marginTop: '12px',
-    marginBottom: '12px',
+    marginTop: '6px',
+    marginBottom: '6px',
   },
   uploadInput: {
-    marginTop: '6px',
+    marginTop: '4px',
   },
   button: {
-    padding: '10px 15px',
+    padding: '8px 10px',
     backgroundColor: '#4CAF50',
     color: '#fff',
     border: 'none',
-    borderRadius: '5px',
-    fontSize: '1em',
+    borderRadius: '4px',
+    fontSize: '0.9em',
     cursor: 'pointer',
   },
 };
+
 
 export default EnergyForm;

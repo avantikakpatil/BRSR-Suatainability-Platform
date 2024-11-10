@@ -31,7 +31,7 @@ const AdminForm = () => {
       if (user) {
         setCurrentUser(user);
         const sanitizedEmail = sanitizeEmail(user.email);
-        fetchProfileData(sanitizedEmail);  // Fetch data if user is signed in
+        fetchProfileData(sanitizedEmail); // Fetch data if user is signed in
       } else {
         console.log('No user is signed in.');
       }
@@ -92,81 +92,111 @@ const AdminForm = () => {
     setIsEditing(!isEditing); // Toggle edit mode
   };
 
-  const formContainerStyle = {
+  // Function to capitalize each word in the label
+  const capitalizeLabel = (label) => {
+    return label.replace(/([A-Z])/g, ' $1')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Styling
+  const containerStyle = {
     maxWidth: '90vw',
     margin: '0 auto',
-    padding: '20px',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Transparent background
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    padding: '30px',
+    backgroundColor: '#f0f4f8',
+    borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+  };
+
+  const formContainerStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '15px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', // Dynamic columns based on screen size
+    gap: '20px',
   };
 
   const labelStyle = {
-    fontWeight: 'bold',
+    fontWeight: 'bold', // Bolder text for labels
+    fontSize: '14px',
+    color: '#333', // Darker color for emphasis
     marginBottom: '5px',
-    fontSize: '13px',
   };
 
   const inputStyle = {
     width: '100%',
-    padding: '8px',
-    fontSize: '14px',
-    borderRadius: '4px',
+    padding: '10px',
+    fontSize: '15px',
+    borderRadius: '6px',
     border: '1px solid #ddd',
-    backgroundColor: isEditing ? '#ffffff' : 'transparent',
+    boxSizing: 'border-box',
+    backgroundColor: isEditing ? '#fff' : '#f5f5f5',
   };
 
   const buttonContainerStyle = {
     gridColumn: '1 / -1',
     display: 'flex',
     justifyContent: 'center',
+    gap: '10px',
+    marginTop: '25px',
   };
 
   const buttonStyle = {
-    padding: '10px 20px',
+    padding: '12px 25px',
     fontSize: '16px',
-    backgroundColor: '#4CAF50',
+    fontWeight: 'bold',
     color: 'white',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '6px',
     cursor: 'pointer',
-    marginTop: '15px',
+    transition: 'background-color 0.3s',
+  };
+
+  const editButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#007BFF',
+  };
+
+  const saveButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#28a745',
   };
 
   return (
-    <form onSubmit={handleSubmit} style={formContainerStyle}>
-      {Object.keys(formData.profile).map((key) => (
-        <div key={key}>
-          <label style={labelStyle}>{key.replace(/([A-Z])/g, ' $1')}:</label>
-          {isEditing ? (
-            <input
-              type="text"
-              name={key}
-              value={formData.profile[key]}
-              onChange={handleChange}
-              style={inputStyle}
-              required
-            />
-          ) : (
-            <p>{key === 'email' ? formData.profile[key] : formData.profile[key] || 'Not provided'}</p>
+    <div style={containerStyle}>
+      <form onSubmit={handleSubmit} style={formContainerStyle}>
+        {Object.keys(formData.profile).map((key) => (
+          <div key={key}>
+            <label style={labelStyle}>{capitalizeLabel(key)}:</label>
+            {isEditing ? (
+              <input
+                type="text"
+                name={key}
+                value={formData.profile[key]}
+                onChange={handleChange}
+                style={inputStyle}
+                required
+              />
+            ) : (
+              <p style={{ ...inputStyle, padding: '8px', border: 'none', backgroundColor: '#f5f5f5' }}>
+                {formData.profile[key] || 'Not provided'}
+              </p>
+            )}
+          </div>
+        ))}
+
+        <div style={buttonContainerStyle}>
+          <button type="button" onClick={toggleEdit} style={editButtonStyle}>
+            {isEditing ? 'Cancel' : 'Edit'}
+          </button>
+          {isEditing && (
+            <button type="submit" style={saveButtonStyle}>
+              Save
+            </button>
           )}
         </div>
-      ))}
-
-      <div style={buttonContainerStyle}>
-        <button type="button" onClick={toggleEdit} style={{ ...buttonStyle, backgroundColor: '#007BFF' }}>
-          {isEditing ? 'Cancel' : 'Edit'}
-        </button>
-        {isEditing && (
-          <button type="submit" style={buttonStyle}>
-            Save
-          </button>
-        )}
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

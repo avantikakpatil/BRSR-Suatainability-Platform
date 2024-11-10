@@ -3,70 +3,14 @@ import { Button, Table } from "react-bootstrap";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { db, auth } from '../../../firebaseConfig';
-import { ref, get, child } from 'firebase/database';
+import { ref, onValue, get, child } from 'firebase/database';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const PostOffices = () => {
   const [profileData, setProfileData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [searchText, setSearchText] = useState("");
-
-  const postOffices = [
-    {
-      id: 1,
-      postOffice: "Post Office 1",
-      city: "Mumbai",
-      address: "123 Main St.",
-      state: "Maharashtra",
-      pincode: "400001",
-      year: 2023,
-    },
-    {
-      id: 2,
-      postOffice: "Post Office 2",
-      city: "Delhi",
-      address: "456 Central Rd.",
-      state: "Delhi",
-      pincode: "110001",
-      year: 2022,
-    },
-    {
-      id: 3,
-      postOffice: "Post Office 3",
-      city: "Chennai",
-      address: "789 South St.",
-      state: "Tamil Nadu",
-      pincode: "600002",
-      year: 2023,
-    },
-    {
-      id: 4,
-      postOffice: "Post Office 4",
-      city: "Kolkata",
-      address: "101 East St.",
-      state: "West Bengal",
-      pincode: "700001",
-      year: 2021,
-    },
-    {
-      id: 5,
-      postOffice: "Post Office 5",
-      city: "Bangalore",
-      address: "234 North St.",
-      state: "Karnataka",
-      pincode: "560001",
-      year: 2022,
-    },
-    {
-      id: 6,
-      postOffice: "Post Office 6",
-      city: "Hyderabad",
-      address: "567 West St.",
-      state: "Telangana",
-      pincode: "500001",
-      year: 2023,
-    },
-  ];
+  const [postOffices, setPostOffices] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -79,7 +23,34 @@ const PostOffices = () => {
       }
     });
 
-    return () => unsubscribe();
+    const postOfficesRef = ref(db, 'postOffices');
+    const postOfficesListener = onValue(postOfficesRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const postOfficesData = [];
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          postOfficesData.push({
+            id: childSnapshot.key,
+            postOffice: data.details.name,
+            city: data.details.address.city,
+            address: `${data.details.address.country}, ${data.details.address.state}, ${data.details.address.city}`,
+            state: data.details.address.state,
+            pincode: data.details.address.pincode,
+            type: data.type,
+            telephone: data.details.telephone,
+            website: data.details.website,
+            email: data.details.email,
+            year: new Date().getFullYear()
+          });
+        });
+        setPostOffices(postOfficesData);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      postOfficesListener();
+    };
   }, []);
 
   const fetchProfileData = async (sanitizedEmail) => {
@@ -109,19 +80,16 @@ const PostOffices = () => {
 
   const generatePDF = (postOffice, isForView = false) => {
     const doc = new jsPDF();
-
-    // Title and Post Office Info
     doc.setFontSize(18);
     doc.text("Business Responsibility and Sustainability Report", 14, 22);
     doc.setFontSize(14);
     doc.text(`Post Office Name: ${postOffice.postOffice}`, 14, 30);
     doc.text(
-      `Address: ${postOffice.address}, ${postOffice.city}, ${postOffice.state} - ${postOffice.pincode}`,
+      `Address: ${postOffice.address}`,
       14,
       36
     );
 
-    // Section A: General Disclosures (Using Admin Form Data)
     doc.setFontSize(16);
     doc.text("SECTION A: GENERAL DISCLOSURES", 14, 46);
 
@@ -129,24 +97,18 @@ const PostOffices = () => {
       startY: 52,
       head: [["Details", "Information"]],
       body: [
-        ["CIN", profileData?.cin || "Not provided"],
-        ["Name of the Listed Entity", profileData?.name || postOffice.postOffice],
-        ["Year of Incorporation", profileData?.yearOfIncorporation || "Not provided"],
-        ["Registered Office Address", profileData?.registeredOffice || postOffice.address],
-        ["Corporate Address", profileData?.corporateAddress || postOffice.address],
-        ["Email", profileData?.email || "Not provided"],
-        ["Telephone", profileData?.telephone || "Not provided"],
-        ["Website", profileData?.website || "Not provided"],
-        ["Financial Year", profileData?.financialYear || "Not provided"],
-        ["Stock Exchange", profileData?.stockExchange || "Not provided"],
-        ["Paid-up Capital", profileData?.paidUpCapital || "Not provided"],
-        ["Contact Person Name", profileData?.contactName || "Not provided"],
-        ["Contact Details", profileData?.contactDetails || "Not provided"],
-        ["Reporting Boundary", profileData?.reportingBoundary || "Not provided"]
+        ["Post Office Type", postOffice.type],
+        ["Name of the Post Office", postOffice.postOffice],
+        ["Registered Office Address", postOffice.address],
+        ["Email", postOffice.email],
+        ["Telephone", postOffice.telephone],
+        ["Website", postOffice.website],
+        ["Pincode", postOffice.pincode],
+        ["State", postOffice.state],
+        ["City", postOffice.city]
       ],
     });
 
-    // Section B: Sustainability Information
     doc.setFontSize(16);
     doc.text(
       "SECTION B: SUSTAINABILITY INFORMATION",
@@ -166,15 +128,14 @@ const PostOffices = () => {
       ],
     });
 
-    // Final touches for official formatting
     doc.setFontSize(12);
     doc.text(
-      `Report Generated by ${profileData?.name || postOffice.postOffice}`,
+      `Report Generated by ${postOffice.postOffice}`,
       14,
       doc.lastAutoTable.finalY + 20
     );
     doc.text(
-      `Contact Information: ${profileData?.email || "N/A"} | ${profileData?.telephone || "N/A"}`,
+      `Contact Information: ${postOffice.email} | ${postOffice.telephone}`,
       14,
       doc.lastAutoTable.finalY + 26
     );
@@ -188,16 +149,16 @@ const PostOffices = () => {
   };
 
   return (
-    <div className="post-office-container" style={{ fontFamily: "Arial, sans-serif", padding: "20px" }}>
-      <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#333' }}>
+    <div className="post-office-container" style={{ fontFamily: "Arial, sans-serif", padding: "10px", width: "100%" }}>
+      <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#333', textAlign: 'center', marginBottom: '20px' }}>
         Post Office Yearly Reports
       </h1>
       {!profileData && (
-        <div className="alert alert-warning" style={{ fontSize: '16px', marginBottom: '20px' }}>
+        <div className="alert alert-warning" style={{ fontSize: '16px', marginBottom: '20px', textAlign: 'center' }}>
           Please complete your profile information in the Admin Form before generating reports.
         </div>
       )}
-      <div className="search-bar" style={{ marginBottom: '20px' }}>
+      <div className="search-bar" style={{ marginBottom: '20px', maxWidth: '600px', margin: '0 auto' }}>
         <input
           type="text"
           placeholder="Search by year, post office, or city"
@@ -213,26 +174,33 @@ const PostOffices = () => {
           }}
         />
       </div>
-      <div className="table-container" style={{ marginTop: '20px' }}>
-        <Table striped bordered hover style={{ fontSize: '16px' }}>
-          <thead style={{ backgroundColor: '#f8f9fa', color: '#495057' }}>
+      <div className="table-container" style={{ overflowX: 'auto', marginTop: '20px' }}>
+        <Table striped bordered hover responsive="lg" style={{
+          fontSize: '16px',
+          minWidth: '1200px',
+          borderCollapse: 'collapse',
+          width: '100%',
+        }}>
+          <thead style={{ backgroundColor: '#f8f9fa', color: '#495057', borderBottom: '2px solid #ddd' }}>
             <tr>
-              <th>Sr No.</th>
-              <th>Post Office</th>
-              <th>City</th>
-              <th>Year</th>
-              <th>View</th>
-              <th>Download PDF</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Sr No.</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Post Office</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>City</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Type</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Year</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>View</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Download PDF</th>
             </tr>
           </thead>
           <tbody>
             {filteredPostOffices.map((postOffice, index) => (
               <tr key={postOffice.id}>
-                <td>{index + 1}</td>
-                <td>{postOffice.postOffice}</td>
-                <td>{postOffice.city}</td>
-                <td>{postOffice.year}</td>
-                <td>
+                <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>{index + 1}</td>
+                <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>{postOffice.postOffice}</td>
+                <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>{postOffice.city}</td>
+                <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>{postOffice.type}</td>
+                <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>{postOffice.year}</td>
+                <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>
                   <Button
                     variant="primary"
                     onClick={() => generatePDF(postOffice, true)}
@@ -246,7 +214,7 @@ const PostOffices = () => {
                     View
                   </Button>
                 </td>
-                <td>
+                <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>
                   <Button
                     variant="success"
                     onClick={() => generatePDF(postOffice)}

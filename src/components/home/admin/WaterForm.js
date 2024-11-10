@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getDatabase, ref, set } from "firebase/database"; // Import Firebase functions
+import { getDatabase, ref, set } from "firebase/database";
 
 const WaterForm = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +15,7 @@ const WaterForm = () => {
     waterIntensity: "",
     externalAssessment: "N",
     externalAgencyName: "",
+    billFile: null,
   });
 
   const handleChange = (e) => {
@@ -22,21 +23,23 @@ const WaterForm = () => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    setFormData((prevData) => ({ ...prevData, billFile: e.target.files[0] }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Get a reference to the database
+  
     const db = getDatabase();
-    const newDataRef = ref(db, 'inputData/waterData/' + Date.now());
-
-    // Set the data in the database
+    const newDataRef = ref(db, "PostalManager/inputData/waterData/" + Date.now()); // Resolving the conflict here
+  
     set(newDataRef, {
       ...formData,
-      createdAt: new Date().toISOString(), // Optionally add a timestamp
+      createdAt: new Date().toISOString(),
+      billFile: formData.billFile ? formData.billFile.name : null,
     })
       .then(() => {
         console.log("Data stored successfully");
-        // Clear the form after submission
         setFormData({
           fyCurrent: "",
           fyPrevious: "",
@@ -50,6 +53,7 @@ const WaterForm = () => {
           waterIntensity: "",
           externalAssessment: "N",
           externalAgencyName: "",
+          billFile: null,
         });
       })
       .catch((error) => {
@@ -59,41 +63,16 @@ const WaterForm = () => {
 
   return (
     <div style={styles.container}>
-      {/* <div style={styles.headingContainer}>
-        <h1 style={styles.heading}><b>Water Consumption Form</b></h1>
-      </div> */}
       <form onSubmit={handleSubmit} style={styles.form}>
-        <h3 style={styles.title}>Water withdrawal by source (in kilolitres)</h3>
-
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>
-            FY (Current Financial Year):
-            <input
-              type="text"
-              name="fyCurrent"
-              value={formData.fyCurrent}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </label>
-
-          <label style={styles.label}>
-            FY (Previous Financial Year):
-            <input
-              type="text"
-              name="fyPrevious"
-              value={formData.fyPrevious}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </label>
-        </div>
+        <h3 style={styles.title}>Water Management Form</h3>
 
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.tableHeader}>Source</th>
-              <th style={styles.tableHeader}>Value (kilolitres)</th>
+              <th style={styles.tableHeader}>
+                Source (Water withdrawal by source (in kilolitres))
+              </th>
+              <th style={styles.tableHeader}>Value (kl)</th>
             </tr>
           </thead>
           <tbody>
@@ -103,9 +82,9 @@ const WaterForm = () => {
               { label: "Third party water", name: "thirdPartyWater" },
               { label: "Seawater / desalinated water", name: "seawater" },
               { label: "Others", name: "others" },
-              { label: "Total volume of water withdrawal", name: "totalWithdrawal" },
-              { label: "Total volume of water consumption", name: "totalConsumption" },
-              { label: "Water intensity per rupee of turnover", name: "waterIntensity" },
+              { label: "Total withdrawal", name: "totalWithdrawal" },
+              { label: "Total consumption", name: "totalConsumption" },
+              { label: "Water intensity per turnover", name: "waterIntensity" },
             ].map(({ label, name }) => (
               <tr key={name}>
                 <td style={styles.tableCell}>{label}</td>
@@ -123,12 +102,9 @@ const WaterForm = () => {
           </tbody>
         </table>
 
-        <h4 style={styles.optionalTitle}>Water Intensity (Optional)</h4>
-        <p style={styles.optionalText}>The relevant metric may be selected by the entity</p>
-
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>
-            External assessment by an agency? (Y/N):
+        <div style={styles.singleInputGroup}>
+          <label style={styles.singleLabel}>
+            External assessment? (Y/N):
             <select
               name="externalAssessment"
               value={formData.externalAssessment}
@@ -139,10 +115,12 @@ const WaterForm = () => {
               <option value="N">No</option>
             </select>
           </label>
+        </div>
 
-          {formData.externalAssessment === "Y" && (
-            <label style={styles.label}>
-              Name of the external agency:
+        {formData.externalAssessment === "Y" && (
+          <div style={styles.singleInputGroup}>
+            <label style={styles.singleLabel}>
+              External agency name:
               <input
                 type="text"
                 name="externalAgencyName"
@@ -151,7 +129,19 @@ const WaterForm = () => {
                 style={styles.input}
               />
             </label>
-          )}
+          </div>
+        )}
+
+        <div style={styles.singleInputGroup}>
+          <label style={styles.singleLabel}>
+            Upload Bill (PDF, DOC, Image files):
+            <input
+              type="file"
+              name="billFile"
+              onChange={handleFileChange}
+              style={styles.fileInput}
+            />
+          </label>
         </div>
 
         <button type="submit" style={styles.submitButton}>
@@ -161,112 +151,98 @@ const WaterForm = () => {
     </div>
   );
 };
+
 const styles = {
   container: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    padding: "20px",
-    backgroundColor: "#f0f0f0",
+    padding: "5px",
+    backgroundColor: "#f9f9f9",
     minHeight: "100vh",
   },
-  
   form: {
     backgroundColor: "#fff",
-    padding: "30px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    padding: "15px",
+    borderRadius: "6px",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
     width: "100%",
-    maxWidth: "700px",
+    maxWidth: "1400px",
     display: "flex",
     flexDirection: "column",
   },
   title: {
     textAlign: "center",
-    marginBottom: "30px",
-    fontSize: "1.8em",
+    marginBottom: "8px",
+    fontSize: "1.5em", // Increased font size of the heading
     color: "#333",
-    fontWeight: "600",
+    fontWeight: "bold",
   },
-  inputGroup: {
+  singleInputGroup: {
     display: "flex",
-    flexDirection: "column", // Ensures vertical stacking
-    marginBottom: "20px",
-    width: "100%", // Makes sure it spans the form width
+    flexDirection: "column",
+    alignItems: "flex-start",
+    marginBottom: "10px",
   },
-  label: {
-    margin: "10px 0",
-    fontSize: "1em",
+  singleLabel: {
+    fontSize: "1em", // Slightly decreased font size
     color: "#333",
-    fontWeight: "500",
-    width: "100%",
+    fontWeight: "bold",
+    marginBottom: "5px",
   },
   input: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "5px",
-    borderRadius: "5px",
+    padding: "6px",
+    marginTop: "4px",
+    borderRadius: "3px",
     border: "1px solid #ccc",
-    fontSize: "1em",
+    fontSize: "0.8em",
     outline: "none",
-    boxSizing: "border-box",
-    transition: "border-color 0.3s ease",
+  },
+  fileInput: {
+    padding: "6px",
+    marginTop: "4px",
+    borderRadius: "3px",
+    fontSize: "0.8em",
+    outline: "none",
   },
   table: {
     width: "100%",
+    maxWidth: "100%",
     borderCollapse: "collapse",
-    marginBottom: "20px",
+    marginBottom: "15px",
   },
   tableHeader: {
     textAlign: "left",
-    padding: "12px",
+    padding: "10px",
     backgroundColor: "#4CAF50",
     color: "#fff",
     fontWeight: "600",
+    fontSize: "0.8em",
   },
   tableCell: {
-    padding: "12px",
-    borderBottom: "1px solid #ccc",
+    padding: "10px",
+    borderBottom: "1px solid #ddd",
+    fontSize: "0.8em",
   },
   tableInput: {
     width: "100%",
-    padding: "10px",
-    borderRadius: "5px",
+    padding: "6px",
+    borderRadius: "3px",
     border: "1px solid #ccc",
-    fontSize: "1em",
+    fontSize: "0.8em",
     outline: "none",
-    transition: "border-color 0.3s ease",
-  },
-  optionalTitle: {
-    fontSize: "1.4em",
-    color: "#333",
-    fontWeight: "600",
-    marginTop: "30px",
-    marginBottom: "10px",
-  },
-  optionalText: {
-    fontSize: "0.9em",
-    color: "#555",
-    marginBottom: "20px",
   },
   submitButton: {
-    display: "block",
-    width: "100%",
-    padding: "15px",
+    padding: "10px",
     backgroundColor: "#4CAF50",
     color: "#fff",
     border: "none",
-    borderRadius: "5px",
-    fontSize: "1.1em",
+    borderRadius: "3px",
+    fontSize: "0.9em",
     fontWeight: "600",
     cursor: "pointer",
-    transition: "background-color 0.3s ease",
-  },
-  submitButtonHover: {
-    backgroundColor: "#45a049",
+    width: "100%",
   },
 };
-
-  
 
 export default WaterForm;

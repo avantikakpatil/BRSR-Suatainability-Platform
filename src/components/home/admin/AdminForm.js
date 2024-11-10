@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../../firebaseConfig';
 import { ref, set, get, child } from 'firebase/database';
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from 'firebase/auth';
 
 const AdminForm = () => {
   const [formData, setFormData] = useState({
@@ -30,7 +30,8 @@ const AdminForm = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);
-        fetchProfileData(user.uid);  // Fetch data if user is signed in
+        const sanitizedEmail = sanitizeEmail(user.email);
+        fetchProfileData(sanitizedEmail);  // Fetch data if user is signed in
       } else {
         console.log('No user is signed in.');
       }
@@ -39,10 +40,14 @@ const AdminForm = () => {
     return () => unsubscribe();
   }, []);
 
-  const fetchProfileData = async (userId) => {
+  const sanitizeEmail = (email) => {
+    return email.replace(/\./g, '_').replace(/@/g, '_');
+  };
+
+  const fetchProfileData = async (sanitizedEmail) => {
     const dbRef = ref(db);
     try {
-      const snapshot = await get(child(dbRef, `profile/${userId}`));
+      const snapshot = await get(child(dbRef, `PostalManager/profile/${sanitizedEmail}`));
       if (snapshot.exists()) {
         setFormData({ profile: snapshot.val() });
       } else {
@@ -71,12 +76,13 @@ const AdminForm = () => {
       return;
     }
 
-    const profileRef = ref(db, `profile/${currentUser.uid}`);
+    const sanitizedEmail = sanitizeEmail(currentUser.email);
+    const profileRef = ref(db, `PostalManager/profile/${sanitizedEmail}`);
     try {
-      await set(profileRef, { ...formData.profile, userId: currentUser.uid });
+      await set(profileRef, { ...formData.profile, email: currentUser.email, userId: currentUser.uid });
       console.log('Data stored successfully!');
       setIsEditing(false); // Disable edit mode after saving
-      fetchProfileData(currentUser.uid); // Refresh data display
+      fetchProfileData(sanitizedEmail); // Refresh data display
     } catch (error) {
       console.error('Error storing data:', error);
     }
@@ -145,7 +151,7 @@ const AdminForm = () => {
               required
             />
           ) : (
-            <p>{formData.profile[key] || 'Not provided'}</p>
+            <p>{key === 'email' ? formData.profile[key] : formData.profile[key] || 'Not provided'}</p>
           )}
         </div>
       ))}

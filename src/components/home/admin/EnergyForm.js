@@ -6,16 +6,13 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 const EnergyForm = () => {
   const [formData, setFormData] = useState({
     currentYearElectricity: '',
-    previousYearElectricity: '',
     currentYearFuel: '',
-    previousYearFuel: '',
     currentYearOtherSources: '',
-    previousYearOtherSources: '',
     currentYearEnergyIntensity: '',
-    previousYearEnergyIntensity: '',
     optionalEnergyIntensity: '',
     externalAssessment: '',
     externalAgencyName: '',
+    bill: null, // New state for file upload
   });
 
   const [userEmail, setUserEmail] = useState('');
@@ -39,13 +36,20 @@ const EnergyForm = () => {
     });
   };
 
+  const handleFileChange = (e) => {
+    setFormData({
+      ...formData,
+      bill: e.target.files[0], // Handle file upload
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submitted Data:', { ...formData, email: userEmail });
 
     try {
-      // Create a reference in the Realtime Database under inputData/energyData
-      const newDataRef = ref(db, 'inputData/energyData/' + Date.now()); // Use timestamp as a unique ID
+      // Create a reference in the Realtime Database under PostalManager/inputData/energyData
+      const newDataRef = ref(db, 'PostalManager/inputData/energyData/' + Date.now()); // Use timestamp as a unique ID
       await set(newDataRef, {
         ...formData,
         email: userEmail, // Include the user's email
@@ -55,16 +59,13 @@ const EnergyForm = () => {
       // Clear the form or provide success feedback
       setFormData({
         currentYearElectricity: '',
-        previousYearElectricity: '',
         currentYearFuel: '',
-        previousYearFuel: '',
         currentYearOtherSources: '',
-        previousYearOtherSources: '',
         currentYearEnergyIntensity: '',
-        previousYearEnergyIntensity: '',
         optionalEnergyIntensity: '',
         externalAssessment: '',
         externalAgencyName: '',
+        bill: null, // Clear uploaded file
       });
     } catch (error) {
       console.error("Error storing data: ", error);
@@ -74,15 +75,14 @@ const EnergyForm = () => {
   return (
     <div style={styles.container}>
       <div style={styles.headingContainer}>
-        <h1 style={styles.heading}><b>Energy Consumption Form</b></h1>
+        <h1 style={styles.heading}>Energy Consumption Form</h1>
       </div>
       <form onSubmit={handleSubmit} style={styles.form}>
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Parameter</th>
+              <th style={styles.th}>Parameter (Total energy consumption in Joules or multiples)</th>
               <th style={styles.th}>FY ____ (Current Financial Year)</th>
-              <th style={styles.th}>FY ____ (Previous Financial Year)</th>
             </tr>
           </thead>
           <tbody>
@@ -94,15 +94,6 @@ const EnergyForm = () => {
                   type="number"
                   name="currentYearElectricity"
                   value={formData.currentYearElectricity}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearElectricity"
-                  value={formData.previousYearElectricity}
                   onChange={handleChange}
                   style={styles.inputSmall}
                 />
@@ -120,15 +111,6 @@ const EnergyForm = () => {
                   style={styles.inputSmall}
                 />
               </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearFuel"
-                  value={formData.previousYearFuel}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
             </tr>
             {/* Energy consumption through other sources */}
             <tr>
@@ -138,15 +120,6 @@ const EnergyForm = () => {
                   type="number"
                   name="currentYearOtherSources"
                   value={formData.currentYearOtherSources}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearOtherSources"
-                  value={formData.previousYearOtherSources}
                   onChange={handleChange}
                   style={styles.inputSmall}
                 />
@@ -167,38 +140,15 @@ const EnergyForm = () => {
                   style={styles.inputReadOnly}
                 />
               </td>
-              <td style={styles.td}>
-                <input
-                  type="text"
-                  value={(
-                    Number(formData.previousYearElectricity) +
-                    Number(formData.previousYearFuel) +
-                    Number(formData.previousYearOtherSources)
-                  ).toFixed(2)}
-                  readOnly
-                  style={styles.inputReadOnly}
-                />
-              </td>
             </tr>
             {/* Energy intensity per rupee of turnover */}
             <tr>
-              <td style={styles.td}>
-                Energy intensity per rupee of turnover (Total energy consumption/turnover)
-              </td>
+              <td style={styles.td}>Energy intensity per rupee of turnover (Total energy consumption/turnover)</td>
               <td style={styles.td}>
                 <input
                   type="number"
                   name="currentYearEnergyIntensity"
                   value={formData.currentYearEnergyIntensity}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="previousYearEnergyIntensity"
-                  value={formData.previousYearEnergyIntensity}
                   onChange={handleChange}
                   style={styles.inputSmall}
                 />
@@ -221,6 +171,7 @@ const EnergyForm = () => {
             </tr>
           </tbody>
         </table>
+
         {/* External assessment and evaluation */}
         <div style={styles.assessmentSection}>
           <label style={styles.label}>External Assessment (Y/N):</label>
@@ -244,6 +195,18 @@ const EnergyForm = () => {
             </>
           )}
         </div>
+
+        {/* File Upload Section */}
+        <div style={styles.uploadSection}>
+          <label style={styles.label}>Upload Bill (PDF, DOC, Image files):</label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept=".pdf, .doc, .docx, .jpg, .jpeg, .png"
+            style={styles.uploadInput}
+          />
+        </div>
+
         <button type="submit" style={styles.button}>Submit</button>
       </form>
     </div>
@@ -253,113 +216,102 @@ const EnergyForm = () => {
 const styles = {
   container: {
     display: 'flex',
-    flexDirection: 'column', // Main container uses column layout
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '20px',
-    backgroundColor: '#f0f0f0',
-    minHeight: '100vh',
+    marginTop: '20px',
+    padding: '10px',
   },
   headingContainer: {
-    display: 'flex', // Heading container uses flex for alignment
-    justifyContent: 'center',
-    marginBottom: '20px', // Add some margin below the heading
+    textAlign: 'center',
+    marginBottom: '20px',
+  },
+  heading: {
+    fontSize: '1.5em', // Adjusted font size
+    color: '#4CAF50', // Matches the button's green color
+    marginBottom: '10px',
   },
   form: {
     backgroundColor: "#fff",
-    padding: "30px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-    width: "100%",
-    maxWidth: "700px",
+    padding: "20px",
+    borderRadius: "15px",
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.1)",
+    width: "95%",
+    maxWidth: "1200px",
     display: "flex",
     flexDirection: "column",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "30px",
-    fontSize: "1.8em",
-    color: "#333",
-    fontWeight: "600",
-  },
-  inputGroup: {
-    display: "flex",
-    flexDirection: "column", // Ensures vertical stacking
-    marginBottom: "20px",
-    width: "100%", // Makes sure it spans the form width
-  },
-  label: {
-    margin: "10px 0",
-    fontSize: "1em",
-    color: "#333",
-    fontWeight: "500",
-    width: "100%",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "5px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "1em",
-    outline: "none",
-    boxSizing: "border-box",
-    transition: "border-color 0.3s ease",
+    alignItems: "stretch",
   },
   table: {
     width: "100%",
-    borderCollapse: "collapse",
     marginBottom: "20px",
-  },
-  tableHeader: {
-    textAlign: "left",
-    padding: "12px",
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    fontWeight: "600",
-  },
-  tableCell: {
-    padding: "12px",
-    borderBottom: "1px solid #ccc",
-  },
-  tableInput: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "1em",
-    outline: "none",
-    transition: "border-color 0.3s ease",
-  },
-  optionalTitle: {
-    fontSize: "1.4em",
-    color: "#333",
-    fontWeight: "600",
-    marginTop: "30px",
-    marginBottom: "10px",
-  },
-  optionalText: {
     fontSize: "0.9em",
-    color: "#555",
-    marginBottom: "20px",
   },
-  submitButton: {
-    display: "block",
-    width: "100%",
-    padding: "15px",
+  th: {
+    padding: "8px",
     backgroundColor: "#4CAF50",
     color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    fontSize: "1.1em",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease",
+    textAlign: "left",
+    width: '50%',
   },
-  submitButtonHover: {
-    backgroundColor: "#45a049",
+  td: {
+    padding: "8px",
+    borderBottom: "1px solid #ddd",
+    width: '50%',
+  },
+  inputSmall: {
+    width: '100%',
+    padding: '6px',
+    fontSize: '0.9em',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+  },
+  inputReadOnly: {
+    width: '100%',
+    padding: '6px',
+    fontSize: '0.9em',
+    borderRadius: '5px',
+    backgroundColor: '#e9e9e9',
+    border: '1px solid #ccc',
+  },
+  inputLarge: {
+    width: '100%',
+    padding: '6px',
+    fontSize: '0.9em',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+  },
+  assessmentSection: {
+    marginTop: '8px',
+    marginBottom: '8px',
+  },
+  label: {
+    fontSize: '0.9em',
+    marginBottom: '6px',
+  },
+  inputAssessment: {
+    width: '100%',
+    padding: '8px',
+    fontSize: '0.9em',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+  },
+  uploadSection: {
+    marginTop: '12px',
+    marginBottom: '12px',
+  },
+  uploadInput: {
+    marginTop: '6px',
+  },
+  button: {
+    padding: '10px 15px',
+    backgroundColor: '#4CAF50',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '1em',
+    cursor: 'pointer',
   },
 };
 
 export default EnergyForm;
-

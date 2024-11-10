@@ -9,6 +9,7 @@ const InputDataForm = ({ selectedOption }) => {
   const [formData, setFormData] = useState({
     parameter: "", // General form parameter (Energy, Waste, Water)
     bill: null,
+    communityEngagement: "", // New parameter for community engagement
   });
 
   const auth = getAuth();
@@ -51,7 +52,7 @@ const InputDataForm = ({ selectedOption }) => {
       const fileRef = storageRef(storage, `bills/${sanitizedEmail}/${selectedOption}`);
       await uploadBytes(fileRef, formData.bill);
 
-      setFormData({ parameter: "", bill: null });
+      setFormData({ parameter: "", bill: null, communityEngagement: "" });
       console.log("Data stored successfully");
     } catch (error) {
       console.error("Error adding document: ", error);
@@ -75,6 +76,14 @@ const InputDataForm = ({ selectedOption }) => {
           accept="image/*,application/pdf"
           onChange={handleFileChange}
           required
+        />
+        <label htmlFor="communityEngagement">Community Engagement:</label>
+        <input
+          type="text" // Adjust type as needed (e.g., number, date)
+          name="communityEngagement"
+          value={formData.communityEngagement}
+          onChange={handleChange}
+          // Consider adding a placeholder or explanation
         />
       </div>
       <button type="submit">Submit</button>

@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { useRoutes, useLocation, useNavigate } from "react-router-dom";
 import Login from "./components/auth/login";
 import Register from "./components/auth/register";
@@ -6,29 +6,24 @@ import Header from "./components/header/index.jsx";
 import Home from "./components/home/index.jsx";
 import Sidebar from "./components/sidebar/Sidebar";
 import Leaderboard from "./components/home/admin/leaderboard";
-import Challenges from "./components/home/admin/challenges"; // Ensure correct import path
-import Report from "./components/home/admin/report"; // Import the Report component
-import AdminPanel from "./components/home/admin/AdminPanel"; // Import AdminPanel
-import BaselineParametersForm from "./components/home/admin/BaselineParametersForm"; // Import Baseline component
-import AdminForm from "./components/home/admin/AdminForm"; // Import AdminForm
+import Challenges from "./components/home/admin/challenges"; // Only keep one import for Challenges
+import Report from "./components/home/admin/report";
+import AdminPanel from "./components/home/admin/AdminPanel";
+import BaselineParametersForm from "./components/home/admin/BaselineParametersForm";
+import AdminForm from "./components/home/admin/AdminForm";
 import HeadquarterDashboard from "./components/home/admin/HeadquarterDashboard.js";
 import CreatePO from "./components/home/admin/CreatePO.js";
-import Rdb from "./components/home/admin/RDB.js";
 import ResourceUsageForm from "./components/home/admin/ResourceUsageForm.js";
-// import Rdb from "./components/home/admin/Rdb.js";
+import ListPO from "./components/home/admin/ListPO";
 import { AuthProvider, useAuth } from "./contexts/authContext";
-import { elements } from "chart.js";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
-
 
 function App() {
   const location = useLocation();
-  const { userLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   
   const routesArray = [
-    
     { path: "*", element: <Login /> },
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
@@ -36,43 +31,38 @@ function App() {
     { path: "/admin/leaderboard", element: <Leaderboard /> },
     { path: "/admin/challenges", element: <Challenges /> },
     { path: "/admin/inputdata", element: <AdminPanel /> },
-    { path: "/admin/baseline", element: <BaselineParametersForm /> }, // Add route for Baseline
-    { path: "/admin/profile", element: <AdminForm /> }, // Add route for AdminForm
-    {path: "/admin/report",element:<Report/>},
-    {path: "/admin/headquarterdashboard",element:<HeadquarterDashboard/>},
-    {path: "/admin/post-office-head-dashboard", element: <Rdb /> },
-    {path: "/admin/createpo",element:<CreatePO/>},
-    {path: "/admin/ResourceUsageForm", element:<ResourceUsageForm setFormData={setFormData} />},
-    {path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} />} 
+    { path: "/admin/baseline", element: <BaselineParametersForm /> },
+    { path: "/admin/profile", element: <AdminForm /> },
+    { path: "/admin/report", element: <Report /> },
+    { path: "/admin/headquarterdashboard", element: <HeadquarterDashboard /> },
+    { path: "/admin/createpo", element: <CreatePO /> },
+    { path: "/admin/ResourceUsageForm", element: <ResourceUsageForm setFormData={setFormData} /> },
+    { path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} /> },
+    { path: "/admin/listpo", element: <ListPO /> },
   ];
 
+  const { userLoggedIn } = useAuth();
   let routesElement = useRoutes(routesArray);
+
+  const isAuthPage = ["/login", "/register"].includes(location.pathname);
 
   return (
     <div className="admin-panel flex">
-      {/* Render Header unless on login or register pages */}
-      {!["/login", "/register"].includes(location.pathname) && <Header />}
-
-      {/* Show Sidebar if user is logged in and not on login/register pages */}
-      {userLoggedIn && !["/login", "/register"].includes(location.pathname) && (
+      {!isAuthPage && <Header />}
+      {userLoggedIn && !isAuthPage && (
         <Sidebar
           onLeaderboardClick={() => navigate("/admin/leaderboard")}
           onChallengesClick={() => navigate("/admin/challenges")}
           onInputDataClick={() => navigate("/admin/inputdata")}
-          onBaselineClick={() => navigate("/admin/baseline")} 
-          onProfileClick={() => navigate("/admin/profile")} 
-          onReportClick={()=>navigate('/admin/report')}
-          onHeadquarterDashboard={()=>navigate('/admin/headquarterdashboard')}
-          onCreatePO={()=>navigate("/admin/createpo")}
+          onBaselineClick={() => navigate("/admin/baseline")}
+          onProfileClick={() => navigate("/admin/profile")}
+          onReportClick={() => navigate("/admin/report")}
+          onHeadquarterDashboard={() => navigate("/admin/headquarterdashboard")}
+          onCreatePO={() => navigate("/admin/createpo")}
+          onListPO={() => navigate("/admin/listpo")}
         />
       )}
-
-      {/* Main content area */}
-      <div
-        className={`content flex-grow p-4 ${
-          ["/login", "/register"].includes(location.pathname) ? "mt-0" : "mt-16"
-        }`}
-      >
+      <div className={`content flex-grow p-4 ${isAuthPage ? "mt-0" : "mt-16"}`}>
         {routesElement}
       </div>
     </div>

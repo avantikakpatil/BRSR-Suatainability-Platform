@@ -1,200 +1,79 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const BaselineParametersForm = () => {
-  const [formData, setFormData] = useState({
-    electricityEmployees: '',
-    electricitySize: '',
-    fuelVehicles: '',
-    fuelDistance: '',
-    wasteEmployees: '',
-    wasteHistorical: '',
-    waterEmployees: '',
-    waterSize: '',
-    outreachInitiatives: ''
-  });
+const Rdb = () => {
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log('Form Data:', formData);
+  const handleSetBaseline = () => {
+    navigate('/admin/ResourceUsageForm');
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>Baseline Parameters</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        {/* Electricity Section */}
-        <div style={styles.section}>
-          <h2 style={styles.subHeading}>Electricity</h2>
-          <label style={styles.label}>Number of Employees</label>
-          <input
-            type="number"
-            name="electricityEmployees"
-            value={formData.electricityEmployees}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
-          <label style={styles.label}>Size of Post Office</label>
-          <input
-            type="text"
-            name="electricitySize"
-            value={formData.electricitySize}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
+    <div className="min-h-screen bg-gradient-to-r from-green-200 to-blue-200 flex items-center justify-center">
+      <div className="w-full max-w-5xl bg-white shadow-2xl rounded-xl p-8">
+        <h1 className="text-4xl font-bold text-center text-green-700 mb-6">
+          Welcome! To Your Office
+        </h1>
+        <p className="text-lg text-center text-gray-600 mb-8">
+          Comprehensive Overview of Branch Operations
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Post Office Info */}
+          <div className="bg-green-50 p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold text-green-700 mb-4">Branch Information</h2>
+            <ul className="text-gray-700">
+              <li><strong>Post Office Name:</strong> Main Post Office</li>
+              <li><strong>Location:</strong> City Center, District</li>
+              <li><strong>Postal Zone:</strong> North Zone</li>
+              <li><strong>Contact:</strong> +123-456-7890</li>
+            </ul>
+          </div>
+
+          {/* Operational Metrics */}
+          <div className="bg-blue-50 p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold text-blue-700 mb-4">Operational Metrics</h2>
+            <ul className="text-gray-700">
+              <li><strong>Number of Employees:</strong> 45</li>
+              <li><strong>Daily Transactions:</strong> 350 on average</li>
+              <li><strong>Monthly Revenue:</strong> $50,000</li>
+              <li><strong>Postal Deliveries Per Day:</strong> 1,200</li>
+            </ul>
+          </div>
+
+          {/* Infrastructure Details */}
+          <div className="bg-yellow-50 p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold text-yellow-700 mb-4">Infrastructure</h2>
+            <ul className="text-gray-700">
+              <li><strong>Counters:</strong> 5</li>
+              <li><strong>Sorting Machines:</strong> 3</li>
+              <li><strong>Key Services:</strong> Speed Post, Registered Post, Savings Account, Insurance</li>
+            </ul>
+          </div>
+
+          {/* Additional Services */}
+          <div className="bg-red-50 p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold text-red-700 mb-4">Services Offered</h2>
+            <ul className="text-gray-700">
+              <li><strong>Financial Services:</strong> Postal Savings, Insurance</li>
+              <li><strong>Mail Services:</strong> Speed Post, Registered Post</li>
+              <li><strong>Parcel Services:</strong> National and International</li>
+              <li><strong>Utility Payments:</strong> Bill Collection</li>
+            </ul>
+          </div>
         </div>
 
-        {/* Fuel Section */}
-        <div style={styles.section}>
-          <h2 style={styles.subHeading}>Fuel</h2>
-          <label style={styles.label}>Number of Vehicles</label>
-          <input
-            type="number"
-            name="fuelVehicles"
-            value={formData.fuelVehicles}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
-          <label style={styles.label}>Average Distance (per year or month)</label>
-          <input
-            type="text"
-            name="fuelDistance"
-            value={formData.fuelDistance}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
+        <div className="mt-8 text-center">
+          <button
+            onClick={handleSetBaseline}
+            className="bg-green-600 text-white text-lg px-8 py-4 rounded-lg hover:bg-green-500 shadow-lg transition duration-300"
+          >
+            Set Baseline
+          </button>
         </div>
-
-        {/* Waste Section */}
-        <div style={styles.section}>
-          <h2 style={styles.subHeading}>Waste</h2>
-          <label style={styles.label}>Number of Employees</label>
-          <input
-            type="number"
-            name="wasteEmployees"
-            value={formData.wasteEmployees}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
-          <label style={styles.label}>Historical Waste Data</label>
-          <input
-            type="text"
-            name="wasteHistorical"
-            value={formData.wasteHistorical}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
-        </div>
-
-        {/* Water Section */}
-        <div style={styles.section}>
-          <h2 style={styles.subHeading}>Water</h2>
-          <label style={styles.label}>Number of Employees</label>
-          <input
-            type="number"
-            name="waterEmployees"
-            value={formData.waterEmployees}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
-          <label style={styles.label}>Size of Post Office</label>
-          <input
-            type="text"
-            name="waterSize"
-            value={formData.waterSize}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
-        </div>
-
-        {/* Community Outreach Section */}
-        <div style={styles.section}>
-          <h2 style={styles.subHeading}>Community Outreach</h2>
-          <label style={styles.label}>Number of Outreach Initiatives</label>
-          <input
-            type="text"
-            name="outreachInitiatives"
-            value={formData.outreachInitiatives}
-            onChange={handleChange}
-            style={styles.smallInput}
-          />
-        </div>
-
-        <button type="submit" style={styles.button}>Submit</button>
-      </form>
+      </div>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    maxWidth: '900px',
-    margin: '20px auto',
-    padding: '20px',
-    backgroundColor: '#f0f5f5',
-    borderRadius: '10px',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-    textAlign: 'center',
-  },
-  heading: {
-    fontSize: '28px',
-    marginBottom: '30px',
-    color: '#2e7d32',
-    textAlign: 'center',  // Centering the main heading
-  },
-  form: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)', // Two columns layout
-    gap: '20px',  // Larger gap for better spacing
-  },
-  section: {
-    backgroundColor: '#ffffff',
-    padding: '15px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  subHeading: {
-    fontSize: '16px',
-    color: '#388e3c',
-    marginBottom: '10px',
-    textAlign: 'center',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    fontSize: '14px',
-    color: '#4f4f4f',
-    textAlign: 'left',
-    width: '100%',
-  },
-  smallInput: {
-    width: '90%',  // Reduced the width to fit inside the section
-    padding: '8px',
-    marginBottom: '10px',
-    borderRadius: '4px',
-    border: '1px solid #b0bec5',
-    fontSize: '12px',
-    backgroundColor: '#fafafa',
-  },
-  button: {
-    gridColumn: 'span 2',  // Button spans across both columns
-    padding: '12px',
-    fontSize: '16px',
-    backgroundColor: '#388e3c',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginTop: '20px',
-  },
-};
-
-export default BaselineParametersForm;
+export default Rdb;

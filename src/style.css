@@ -319,7 +319,7 @@ td {
 }
 
 th {
-  background: linear-gradient(135deg, #f0ed39 0%, #f7f8bc 100%);
+  background:rgb(80, 80, 85);
   color: white;
   text-transform: uppercase;
   letter-spacing: 1px;

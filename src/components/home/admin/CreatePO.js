@@ -110,85 +110,133 @@ const CreatePO = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{
-      maxWidth: '1500px',
-      margin: '0px',
-      padding: '10px',
-      backgroundColor: 'rgba(255, 255, 255, 0.8)',
-      borderRadius: '8px',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
-      gap: '10px',
-    }}>
-      <h2 style={{ fontWeight: 'bold', fontSize: '24px' }}>Create Post Office</h2>
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Corporate Identity Number (CIN):</label>
-        <input className="input-field" type="text" name="cin" value={formData.details.cin} onChange={handleChange} required />
+    <form onSubmit={handleSubmit} style={styles.formContainer}>
+      <h2 style={styles.heading}>Create Post Office</h2>
+
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Corporate Identity Number (CIN):</label>
+        <input className="input-field" type="text" name="cin" value={formData.details.cin} onChange={handleChange} required style={styles.input} />
       </div>
 
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Post Office Type:</label>
-        <select style={{ width: '370px', height: '45px' }} value={poType} onChange={handleTypeChange}>
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Post Office Type:</label>
+        <select value={poType} onChange={handleTypeChange} style={styles.select}>
           <option value="regular">Regular Post Office</option>
           <option value="divisional">Divisional Post Office</option>
         </select>
       </div>
 
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Post Office Name:</label>
-        <input className="input-field" type="text" name="name" value={formData.details.name} onChange={handleChange} required />
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Post Office Name:</label>
+        <input className="input-field" type="text" name="name" value={formData.details.name} onChange={handleChange} required style={styles.input} />
       </div>
 
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Email:</label>
-        <input className="input-field" type="email" name="email" value={formData.details.email} onChange={handleChange} required />
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Email:</label>
+        <input className="input-field" type="email" name="email" value={formData.details.email} onChange={handleChange} required style={styles.input} />
       </div>
 
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Password:</label>
-        <input className="input-field" type="password" name="password" value={formData.details.password} onChange={handleChange} required />
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Password:</label>
+        <input className="input-field" type="password" name="password" value={formData.details.password} onChange={handleChange} required style={styles.input} />
       </div>
 
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Telephone:</label>
-        <input className="input-field" type="text" name="telephone" value={formData.details.telephone} onChange={handleChange} required />
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Telephone:</label>
+        <input className="input-field" type="text" name="telephone" value={formData.details.telephone} onChange={handleChange} required style={styles.input} />
       </div>
 
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Website:</label>
-        <input className="input-field" type="text" name="website" value={formData.details.website} onChange={handleChange} required />
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Website:</label>
+        <input className="input-field" type="text" name="website" value={formData.details.website} onChange={handleChange} required style={styles.input} />
       </div>
 
-      <div style={{ marginTop: '25px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Contact Number:</label>
-        <input className="input-field" type="number" name="contactNumber" value={formData.details.contactNumber} onChange={handleChange} required />
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Contact Number:</label>
+        <input className="input-field" type="number" name="contactNumber" value={formData.details.contactNumber} onChange={handleChange} required style={styles.input} />
       </div>
 
-      <div style={{ marginTop: '20px', width: '370px' }}>
-        <label style={{ fontWeight: 'bold', fontSize: '20px' }}>Address:</label>
-        <div style={{ display: 'flex', gap: '10px',width:'1000px' }}>
-          <input className="input-field" type="text" name="address.country" placeholder="Country" value={formData.details.address.country} onChange={handleChange} required />
-          <input className="input-field" type="text" name="address.state" placeholder="State" value={formData.details.address.state} onChange={handleChange} required />
-          <input className="input-field" type="text" name="address.city" placeholder="City" value={formData.details.address.city} onChange={handleChange} required />
-          <input className="input-field" type="text" name="address.pincode" placeholder="Pincode" value={formData.details.address.pincode} onChange={handleChange} required />
+      <div style={styles.addressGroup}>
+        <label style={{ ...styles.label, fontSize: '14px' }}>Address:</label>
+        <div style={styles.addressInputs}>
+          <input className="input-field" type="text" name="address.country" placeholder="Country" value={formData.details.address.country} onChange={handleChange} required style={styles.input} />
+          <input className="input-field" type="text" name="address.state" placeholder="State" value={formData.details.address.state} onChange={handleChange} required style={styles.input} />
+          <input className="input-field" type="text" name="address.city" placeholder="City" value={formData.details.address.city} onChange={handleChange} required style={styles.input} />
+          <input className="input-field" type="text" name="address.pincode" placeholder="Pincode" value={formData.details.address.pincode} onChange={handleChange} required style={styles.input} />
         </div>
       </div>
-      <button style={{
-        width: '150px',
-        height: '50px',
-        padding: '10px 20px',
-        fontSize: '16px',
-        backgroundColor: '#4CAF50',
-        color: 'white',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        marginTop: '160px',
-        marginLeft: '10%',
-      }} type="submit">Submit</button>
+
+      <button type="submit" style={styles.submitButton}>Submit</button>
     </form>
   );
+};
+
+const styles = {
+  formContainer: {
+    maxWidth: '1100px', // Increased width for better space
+    margin: '20px auto',
+    padding: '30px',
+    backgroundColor: '#ffffff',
+    borderRadius: '10px',
+    boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.1)',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)', // Two columns layout
+    gap: '20px',
+  },
+  heading: {
+    gridColumn: 'span 2',
+    fontSize: '24px', // Reduced size for heading
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: '20px',
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: '20px',
+  },
+  label: {
+    fontSize: '12px', // Reduced font size
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: '8px',
+  },
+  input: {
+    padding: '10px',
+    fontSize: '13px', // Reduced font size for input fields
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+    width: '100%',
+  },
+  select: {
+    padding: '10px',
+    fontSize: '13px', // Reduced font size for select
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+    width: '100%',
+  },
+  addressGroup: {
+    gridColumn: 'span 2',
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: '20px',
+  },
+  addressInputs: {
+    display: 'flex',
+    gap: '15px',
+    width: '100%',
+  },
+  submitButton: {
+    width: '100%',
+    padding: '12px',
+    fontSize: '14px', // Reduced font size for button
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '30px',
+  }
 };
 
 export default CreatePO;

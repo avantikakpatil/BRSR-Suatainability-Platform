@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { db } from "../../../firebaseConfig";
 import { ref, set } from "firebase/database";
 
-const ResourceUsageForm = () => {
+const ResourceUsageForm = ({ registeredMailId }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [resourceData, setResourceData] = useState({
     energyConsumption: {
@@ -59,15 +59,15 @@ const ResourceUsageForm = () => {
   });
 
   const sections = [
-    "Energy Consumption",
-    "Water Usage",
-    "Fuel and Transportation",
-    "Consumables for Operations",
-    "Office Supplies",
-    "Building Maintenance",
-    "IT and Communication Infrastructure",
-    "Human Resources",
-    "Sustainability Efforts"
+    "energyConsumption",
+    "waterUsage",
+    "fuelAndTransportation",
+    "consumables",
+    "officeSupplies",
+    "buildingMaintenance",
+    "itCommunicationInfrastructure",
+    "humanResources",
+    "sustainabilityEfforts"
   ];
 
   const nextStep = () => {
@@ -84,8 +84,15 @@ const ResourceUsageForm = () => {
   };
 
   const saveDataToFirebase = () => {
+    if (!registeredMailId) {
+      console.error("Error: registeredMailId is undefined");
+      return;
+    }
     const sectionKey = sections[currentStep];
-    set(ref(db, `PostalManager/ResourceUsage/${sectionKey}`), resourceData[sectionKey] || {});
+    set(
+      ref(db, `PostalManager/${registeredMailId}/ResourceUsage/${sectionKey}`),
+      resourceData[sectionKey] || {}
+    );
   };
 
   const handleInputChange = (sectionKey, fieldName, value) => {
@@ -98,11 +105,16 @@ const ResourceUsageForm = () => {
     }));
   };
 
-  // Function to handle form submission
   const handleSubmit = () => {
-    // Save all data to Firebase when the form is submitted
+    if (!registeredMailId) {
+      console.error("Error: registeredMailId is undefined");
+      return;
+    }
     Object.keys(resourceData).forEach((sectionKey) => {
-      set(ref(db, `PostalManager/ResourceUsage/${sectionKey}`), resourceData[sectionKey] || {});
+      set(
+        ref(db, `PostalManager/${registeredMailId}/ResourceUsage/${sectionKey}`),
+        resourceData[sectionKey] || {}
+      );
     });
     alert("Data submitted successfully!");
   };

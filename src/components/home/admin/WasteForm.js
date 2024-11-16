@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
 
-// Initialize Firebase (replace with your Firebase configuration)
+// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
   authDomain: "brsr-9b56a.firebaseapp.com",
@@ -10,14 +11,20 @@ const firebaseConfig = {
   storageBucket: "brsr-9b56a.appspot.com",
   messagingSenderId: "548279958491",
   appId: "1:548279958491:web:19199e42e0d796ad4185fe",
-  measurementId: "G-7SYPSVZR9H"
+  measurementId: "G-7SYPSVZR9H",
 };
 
-// Initialize Firebase
+// Initialize Firebase app and services
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+const auth = getAuth();
 
-const WasteManagementForm = () => {
+// Function to sanitize email for Firebase
+const sanitizeEmail = (email) => {
+  return email.replace(/\./g, '_');
+};
+
+const WasteForm = () => {
   const [formData, setFormData] = useState({
     wasteData: {
       currentPlasticWaste: '',
@@ -30,7 +37,6 @@ const WasteManagementForm = () => {
       otherNonHazardousWaste: '',
     },
     externalAssessment: '',
-    externalAgencyName: '',
     billFile: null,
   });
 
@@ -42,35 +48,46 @@ const WasteManagementForm = () => {
         billFile: files[0],
       }));
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        wasteData: {
-          ...prevData.wasteData,
+      setFormData((prevData) => {
+        if (name in prevData.wasteData) {
+          return {
+            ...prevData,
+            wasteData: {
+              ...prevData.wasteData,
+              [name]: value,
+            },
+          };
+        }
+        return {
+          ...prevData,
           [name]: value,
-        },
-        ...(name === 'externalAssessment' || name === 'externalAgencyName' ? { [name]: value } : {}),
-      }));
+        };
+      });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submitted Data:', formData);
-  
-    const uniqueKey = Date.now(); // Unique key for each entry
-    const dataRef = ref(database, 'PostalManager/inputData/wasteData/' + uniqueKey); // Updated path
-  
-    set(dataRef, formData.wasteData)
-      .then(() => {
-        console.log('Data submitted successfully!');
-        alert('Data submitted successfully!');
-      })
-      .catch((error) => {
-        console.error('Error submitting data:', error);
-        alert('Error submitting data: ' + error.message);
-      });
+
+    const user = auth.currentUser;
+    if (user) {
+      const sanitizedEmail = sanitizeEmail(user.email); // Sanitize the email
+      const wasteDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/wasteData/${Date.now()}`);
+
+      // Store waste data
+      set(wasteDataPath, formData.wasteData)
+        .then(() => {
+          console.log('Waste data submitted successfully!');
+          alert('Waste data submitted successfully!');
+        })
+        .catch((error) => {
+          console.error('Error submitting waste data:', error);
+          alert('Error submitting waste data: ' + error.message);
+        });
+    } else {
+      alert('No user is logged in');
+    }
   };
-  
 
   return (
     <div style={styles.container}>
@@ -107,30 +124,31 @@ const WasteManagementForm = () => {
             ))}
             <tr>
               <td style={styles.td}>Other hazardous waste (G)</td>
-              <td colSpan="2" style={styles.fullWidthTd}>
+              <td style={styles.td}>
                 <input
                   type="number"
                   name="otherHazardousWaste"
                   value={formData.wasteData.otherHazardousWaste}
                   onChange={handleChange}
-                  style={styles.fullWidthInput}
+                  style={styles.input}
                 />
               </td>
             </tr>
             <tr>
               <td style={styles.td}>Other non-hazardous waste (H)</td>
-              <td colSpan="2" style={styles.fullWidthTd}>
+              <td style={styles.td}>
                 <input
                   type="number"
                   name="otherNonHazardousWaste"
                   value={formData.wasteData.otherNonHazardousWaste}
                   onChange={handleChange}
-                  style={styles.fullWidthInput}
+                  style={styles.input}
                 />
               </td>
             </tr>
           </tbody>
         </table>
+
         <div style={styles.additionalInputs}>
           <label style={{ fontWeight: 'bold', fontSize: '16px' }}>
             External Assessment (Y/N):<br />
@@ -152,6 +170,7 @@ const WasteManagementForm = () => {
             />
           </label>
         </div>
+
         <button type="submit" style={styles.button}>Submit</button>
       </form>
     </div>
@@ -160,8 +179,8 @@ const WasteManagementForm = () => {
 
 const styles = {
   container: {
-    width: '100%', 
-    maxWidth: '1200px', 
+    width: '100%',
+    maxWidth: '1200px',
     margin: '0 auto',
     padding: '10px',
     backgroundColor: '#f9f9f9',
@@ -169,7 +188,7 @@ const styles = {
   },
   heading: {
     textAlign: 'center',
-    fontSize: '24px', 
+    fontSize: '24px',
     marginBottom: '10px',
   },
   form: {
@@ -183,10 +202,9 @@ const styles = {
   th: {
     backgroundColor: '#4CAF50',
     color: 'white',
-    padding: '8px', 
+    padding: '8px',
     textAlign: 'center',
     fontSize: '14px',
-    width: '50%',
   },
   td: {
     border: '1px solid #ccc',
@@ -194,18 +212,8 @@ const styles = {
     textAlign: 'center',
     fontSize: '14px',
   },
-  fullWidthTd: {
-    border: '1px solid #ccc',
-    padding: '8px',
-    textAlign: 'center',
-  },
   input: {
-    width: '100%', 
-    padding: '4px',
-    fontSize: '14px',
-  },
-  fullWidthInput: {
-    width: '100%', 
+    width: '100%',
     padding: '4px',
     fontSize: '14px',
   },
@@ -232,4 +240,4 @@ const styles = {
   },
 };
 
-export default WasteManagementForm;
+export default WasteForm;

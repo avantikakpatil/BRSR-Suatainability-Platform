@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../../firebaseConfig'; // Adjust the path as needed
+import { db, storage } from '../../../firebaseConfig'; // Adjust the path as needed
 import { ref, set } from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { uploadBytesResumable, getDownloadURL, ref as storageRef } from 'firebase/storage';
 
 const EnergyForm = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const EnergyForm = () => {
   });
 
   const [userEmail, setUserEmail] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   // Get the currently logged-in user's email
   useEffect(() => {
@@ -46,16 +48,36 @@ const EnergyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submitted Data:', { ...formData, email: userEmail });
-
+  
     try {
+      let billUrl = null;
+  
+      // If a bill file is uploaded, upload it to Firebase Storage and get the download URL
+      if (formData.bill) {
+        const fileRef = storageRef(storage, 'bills/' + Date.now() + '-' + formData.bill.name);
+        const uploadTask = uploadBytesResumable(fileRef, formData.bill);
+  
+        setUploading(true); // Set uploading state to true before the upload starts
+  
+        // Await the upload task to complete
+        await uploadTask;
+  
+        // After upload, get the download URL of the uploaded file
+        billUrl = await getDownloadURL(fileRef);
+      }
+  
       // Create a reference in the Realtime Database under PostalManager/inputData/energyData
-      const newDataRef = ref(db, 'PostalManager/inputData/energyData/' + Date.now()); // Use timestamp as a unique ID
+      const sanitizedEmail = sanitizeEmail(userEmail); // Sanitize email to ensure it's valid for Firebase
+      const newDataRef = ref(db, `PostalManager/${sanitizedEmail}/inputData/energyData/${Date.now()}`); // Use email as part of the path for uniqueness
+  
       await set(newDataRef, {
         ...formData,
         email: userEmail, // Include the user's email
+        billUrl: billUrl || null, // Store the bill URL if available
       });
-
+  
       console.log("Data stored successfully.");
+  
       // Clear the form or provide success feedback
       setFormData({
         currentYearElectricity: '',
@@ -69,7 +91,15 @@ const EnergyForm = () => {
       });
     } catch (error) {
       console.error("Error storing data: ", error);
+      alert('Error storing data: ' + error.message); // Optionally show an alert for error feedback
+    } finally {
+      setUploading(false); // Ensure uploading state is reset regardless of success or failure
     }
+  };
+
+  // Function to sanitize the email (replace invalid characters for Firebase path)
+  const sanitizeEmail = (email) => {
+    return email.replace(/[.#$/[\]]/g, '_'); // Replaces . # $ / [ ] with underscores
   };
 
   return (
@@ -207,11 +237,14 @@ const EnergyForm = () => {
           />
         </div>
 
-        <button type="submit" style={styles.button}>Submit</button>
+        <button type="submit" style={styles.button} disabled={uploading}>
+          {uploading ? "Uploading..." : "Submit"}
+        </button>
       </form>
     </div>
   );
 };
+
 
 const styles = {
   container: {

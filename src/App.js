@@ -17,6 +17,7 @@ import ResourceUsageForm from "./components/home/admin/ResourceUsageForm.js";
 import ListPO from "./components/home/admin/ListPO";
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
+import Baselinenew from "./components/home/admin/Baselinenew.js";
 
 function App() {
   const location = useLocation();
@@ -39,6 +40,7 @@ function App() {
     { path: "/admin/ResourceUsageForm", element: <ResourceUsageForm setFormData={setFormData} /> },
     { path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} /> },
     { path: "/admin/listpo", element: <ListPO /> },
+    {path: "/admin/baselinenew", element: <Baselinenew/>}
   ];
 
   const { userLoggedIn } = useAuth();

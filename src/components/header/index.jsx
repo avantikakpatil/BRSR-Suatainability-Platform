@@ -10,26 +10,25 @@ const Header = () => {
   const navigate = useNavigate();
   const { userLoggedIn, currentUser } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userName, setUserName] = useState(''); 
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     const fetchUserName = async () => {
-      try {
-        const db = getDatabase();
-        const profileRef = ref(db, 'PostalManager/inputData/profile'); 
+      if (currentUser?.uid) {
+        try {
+          const db = getDatabase();
+          const userRef = ref(db, `users/${currentUser.uid}`); // Path to the specific user
 
-        const snapshot = await get(profileRef);
-        if (snapshot.exists()) {
-          const profileData = snapshot.val();
-          const firstKey = Object.keys(profileData)[0];
-          const userProfile = profileData[firstKey];
-          console.log("Fetched user profile:", userProfile);
-          setUserName(userProfile.name);
-        } else {
-          console.log('No profile data found.');
+          const snapshot = await get(userRef);
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            setUserName(userData.name || 'User'); // Use name from DB or fallback to 'User'
+          } else {
+            console.log('No user data found.');
+          }
+        } catch (error) {
+          console.error('Error fetching user name:', error);
         }
-      } catch (error) {
-        console.error('Error fetching user name:', error);
       }
     };
 
@@ -74,7 +73,7 @@ const Header = () => {
               >
                 <FaUserCircle className="text-2xl" />
                 <span className="ml-2 text-gray-700 font-medium">
-                  {userName || 'User'}
+                  {userName}
                 </span>
                 <FaBars className="ml-2 text-lg" />
               </button>

@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { getDatabase, ref, set } from "firebase/database";
+import { getAuth } from "firebase/auth";
+
 
 const CommunityEngagementForm = ({ goBack }) => {
   const [challenges, setChallenges] = useState([
@@ -34,11 +37,45 @@ const CommunityEngagementForm = ({ goBack }) => {
     setChallenges(updatedChallenges);
   };
 
+
+  const sanitizeEmail = (email) => {
+    return email.replace(/[.#$/[\]]/g, '_');
+  };
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Challenges:", challenges);
-    goBack();
+  
+    // Get authenticated user
+    const auth = getAuth();
+    const user = auth.currentUser;
+  
+    if (user) {
+      const sanitizedEmail = sanitizeEmail(user.email);
+  
+      // Create a reference to store data dynamically under user's email
+      const database = getDatabase();
+      const fuelDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/communityData`);
+  
+      // Store the user-entered challenge data
+      const communityFormData = {
+        challenges: challenges, // Use the state directly here
+      };
+  
+      // Store the data at the dynamically created path
+      set(fuelDataPath, communityFormData)
+        .then(() => {
+          console.log("Community Data saved successfully under the user's email path!");
+          // Redirect or handle post-submit action (e.g., reset form or show success message)
+        })
+        .catch((error) => {
+          console.error("Error saving data: ", error);
+        });
+    } else {
+      console.log("No user is authenticated.");
+    }
   };
+  
 
   return (
     <div style={styles.container}>

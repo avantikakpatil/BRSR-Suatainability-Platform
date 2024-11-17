@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf, FaChartPie } from "react-icons/fa"; // Import FaChartPie for the Dashboard icon
 
-const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick, onHeadquarterDashboard, onCreatePO, onListPO }) => {
+const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onReportClick, onHeadquarterDashboard, onCreatePO, onListPO,onVerifyReport }) => {
   const navigate = useNavigate();
 
   return (
@@ -94,7 +94,14 @@ const Sidebar = ({ onLeaderboardClick, onChallengesClick, onInputDataClick, onRe
             <span>Report</span>
           </button>
         </li>
-
+        <li>
+          <button
+            onClick={onVerifyReport}
+            className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md">
+            <FaFilePdf className="text-lg mr-3" />
+            <span>Verify Report</span>
+          </button>
+        </li>
         <li>
           <button
             onClick={onHeadquarterDashboard}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../../firebaseConfig';
-import { ref, set, push } from 'firebase/database';
+import { ref, set, push, update } from 'firebase/database';
 import { onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const CreatePO = () => {
@@ -63,7 +63,7 @@ const CreatePO = () => {
     e.preventDefault();
 
     if (!currentUser) {
-      alert("You must be signed in to submit data.");
+      alert('You must be signed in to submit data.');
       return;
     }
 
@@ -76,7 +76,9 @@ const CreatePO = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.details.email, formData.details.password);
       const newUser = userCredential.user;
 
-      const poRef = push(ref(db, 'postOffices'));
+      const headquarterRef = ref(db, 'headquarter');
+      const poRef = push(ref(db, 'headquarter/postOffices')); // Adding under headquarter/postOffices
+
       await set(poRef, {
         ...formData,
         details: {

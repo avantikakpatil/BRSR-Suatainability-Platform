@@ -1,0 +1,56 @@
+.table-container {
+    margin: 20px auto;
+    max-width: 95%;
+    overflow-x: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table-container table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .table-container th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .table-container td,
+  .table-container th {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .table-container tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .table-container tbody tr:hover {
+    background-color: #e6f7ff;
+  }
+  
+  button {
+    background-color: #1763c7;
+    color: rgb(254, 251, 251);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  form select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+  }
+  

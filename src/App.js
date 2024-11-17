@@ -17,6 +17,8 @@ import ResourceUsageForm from "./components/home/admin/ResourceUsageForm.js";
 import ListPO from "./components/home/admin/ListPO";
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
+import VerifyReport from "./components/home/admin/verifyReport";
+import Baselinenew from "./components/home/admin/Baselinenew.js";
 
 function App() {
   const location = useLocation();
@@ -39,6 +41,8 @@ function App() {
     { path: "/admin/ResourceUsageForm", element: <ResourceUsageForm setFormData={setFormData} /> },
     { path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} /> },
     { path: "/admin/listpo", element: <ListPO /> },
+    { path: "/admin/VerifyReport", element: <VerifyReport /> },
+    {path: "/admin/baselinenew", element: <Baselinenew/>}
   ];
 
   const { userLoggedIn } = useAuth();
@@ -60,6 +64,7 @@ function App() {
           onHeadquarterDashboard={() => navigate("/admin/headquarterdashboard")}
           onCreatePO={() => navigate("/admin/createpo")}
           onListPO={() => navigate("/admin/listpo")}
+          onVerifyReport={() => navigate("/admin/verifyreport")}
         />
       )}
       <div className={`content flex-grow p-4 ${isAuthPage ? "mt-0" : "mt-16"}`}>

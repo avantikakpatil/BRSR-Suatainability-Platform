@@ -32,15 +32,39 @@ const WasteForm = ({ goBack }) => {
     externalAssessment: '',
     externalAgencyName: '',
     billFile: null,
+    totalWaste: 0,
   });
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
+    let updatedFormData = { ...formData };
+
     if (type === 'file') {
-      setFormData({ ...formData, billFile: files[0] });
+      updatedFormData.billFile = files[0];
     } else {
-      setFormData({ ...formData, [name]: value });
+      updatedFormData[name] = value;
     }
+
+    // Calculate total waste for relevant fields
+    const wasteFields = [
+      'currentPlasticWaste',
+      'currentEWaste',
+      'currentBioMedicalWaste',
+      'currentConstructionWaste',
+      'currentBatteryWaste',
+      'currentRadioactiveWaste',
+      'otherHazardousWaste',
+      'otherNonHazardousWaste',
+    ];
+
+    const totalWaste = wasteFields.reduce((total, field) => {
+      const fieldValue = parseFloat(updatedFormData[field]) || 0;
+      return total + fieldValue;
+    }, 0);
+
+    updatedFormData.totalWaste = totalWaste;
+
+    setFormData(updatedFormData);
   };
 
   const handleSubmit = (e) => {
@@ -66,6 +90,7 @@ const WasteForm = ({ goBack }) => {
             externalAssessment: '',
             externalAgencyName: '',
             billFile: null,
+            totalWaste: 0,
           });
         })
         .catch((error) => {
@@ -78,7 +103,6 @@ const WasteForm = ({ goBack }) => {
 
   return (
     <div style={styles.container}>
-      {/* Added Go Back Button */}
       <button onClick={goBack} style={styles.goBackButton}>
         Go Back
       </button>
@@ -118,6 +142,10 @@ const WasteForm = ({ goBack }) => {
             ))}
           </tbody>
         </table>
+
+        <div style={styles.totalSection}>
+          <b>Total Waste:</b> {formData.totalWaste.toFixed(2)} Metric Tonnes
+        </div>
 
         <div style={styles.additionalInputs}>
           <label>

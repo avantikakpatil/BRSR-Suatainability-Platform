@@ -1,7 +1,6 @@
-// firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database"; // Import Realtime Database
+import { getDatabase, ref, set } from "firebase/database"; // Add ref and set for database
 
 const firebaseConfig = {
   apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
@@ -13,8 +12,11 @@ const firebaseConfig = {
   measurementId: "G-7SYPSVZR9H"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app); // Initialize Realtime Database
 
-export { app, auth, db };
+// Initialize Auth and Database
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+export { app, auth, db, ref, set };

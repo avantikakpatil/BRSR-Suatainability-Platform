@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { db, ref, set, auth} from '../../../firebaseConfig'; // Adjust the import path as necessary
+
 function BaselineCalculator() {
   const [currentForm, setCurrentForm] = useState(1);
 
@@ -148,8 +150,42 @@ function BaselineCalculator() {
     );
   };
 
+ // Function to sanitize email for Firebase
+const sanitizeEmail = (email) => {
+  return email.replace(/\./g, '_');
+};
+
+  
+  const saveDataToFirebase = () => {
+    const user = auth.currentUser;
+    if (user) {
+      const sanitizedEmail = sanitizeEmail(user.email); // Use the updated sanitizeEmail function
+      const data = {
+        electricity: baselineElectricity,
+        water: baselineWater,
+        fuel: baselineFuel,
+        waste: totalWaste,
+        timestamp: Date.now(),
+      };
+  
+      const dataRef = ref(db, `PostalManager/${sanitizedEmail}/BaselineScores/${data.timestamp}`);
+      
+      set(dataRef, data)
+        .then(() => {
+          console.log("Data saved successfully!");
+        })
+        .catch((error) => {
+          console.error("Error saving data: ", error);
+        });
+    } else {
+      console.log("No user is authenticated");
+    }
+  };
+  
+
   const renderFormButtons = () => (
     <div className="flex justify-between mt-6">
+      {/* Previous Button */}
       <button
         type="button"
         disabled={currentForm === 1}
@@ -162,21 +198,28 @@ function BaselineCalculator() {
       >
         Previous
       </button>
-      <button
-        type="button"
-        onClick={() => setCurrentForm(currentForm + 1)}
-        disabled={currentForm === 4}
-        className={`py-3 px-6 ${
-          currentForm === 4
-            ? "bg-gray-300 cursor-not-allowed"
-            : "bg-green-600 hover:bg-green-700"
-        } text-white rounded-lg font-semibold`}
-      >
-        Next
-      </button>
+  
+      {/* Conditionally render Next or Submit button */}
+      {currentForm === 4 ? (
+        <button
+          type="button"
+          onClick={saveDataToFirebase}
+          className="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+        >
+          Submit
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setCurrentForm(currentForm + 1)}
+          className="py-3 px-6 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold"
+        >
+          Next
+        </button>
+      )}
     </div>
   );
-
+  
   // Form rendering logic
   const renderForm = () => {
     switch (currentForm) {
@@ -249,20 +292,23 @@ function BaselineCalculator() {
             <div className="bg-green-100 p-4 rounded mb-6">
               <p>
                 <b>Get Your Baseline:</b> Please fill in the information below
-                to calculate your water usage baseline.
+                to calculate your water baseline usage.
               </p>
             </div>
             {Object.keys(waterInputs).map((key) => (
               <div key={key} className="mb-4">
                 <label className="block mb-2 font-medium">
-                  {key.replace(/([A-Z])/g, " $1")}:
+                  {key.toUpperCase()} Usage (Liters per Hour):
                 </label>
                 <input
                   type="number"
-                  placeholder="Liters per hour (L/h)"
+                  placeholder={`Usage for ${key}`}
                   value={waterInputs[key] || ""}
                   onChange={(e) =>
-                    setWaterInputs({ ...waterInputs, [key]: e.target.value })
+                    setWaterInputs({
+                      ...waterInputs,
+                      [key]: e.target.value,
+                    })
                   }
                   className="p-2 border rounded w-full"
                 />
@@ -274,9 +320,7 @@ function BaselineCalculator() {
             >
               Calculate Water Baseline
             </button>
-            {baselineWater && (
-              <div>Baseline Water Consumption: {baselineWater} KL</div>
-            )}
+            {baselineWater && <div>Baseline Water: {baselineWater} KL</div>}
           </>
         );
       case 3:
@@ -287,20 +331,23 @@ function BaselineCalculator() {
             </h1>
             <div className="bg-green-100 p-4 rounded mb-6">
               <p>
-                <b>Get Your Baseline:</b> Fill the below information.
+                <b>Get Your Baseline:</b> Please fill in the information below
+                to calculate your fuel baseline usage.
               </p>
             </div>
             {Object.keys(fuelInputs).map((key) => (
               <div key={key} className="mb-4">
                 <label className="block mb-2 font-medium">
-                  {key.replace(/([A-Z])/g, " $1")}:
+                  {key.toUpperCase()} (Liters per day):
                 </label>
                 <input
                   type="number"
-                  placeholder="Liters/day"
                   value={fuelInputs[key] || ""}
                   onChange={(e) =>
-                    setFuelInputs({ ...fuelInputs, [key]: e.target.value })
+                    setFuelInputs({
+                      ...fuelInputs,
+                      [key]: e.target.value,
+                    })
                   }
                   className="p-2 border rounded w-full"
                 />
@@ -308,7 +355,7 @@ function BaselineCalculator() {
             ))}
             <button
               onClick={calculateFuelBaseline}
-              className="bg-green-600 text-white p-2 mt-4"
+              className="bg-green-600 hover:bg-green-700 text-white p-2 mt-4"
             >
               Calculate Fuel Baseline
             </button>
@@ -319,25 +366,27 @@ function BaselineCalculator() {
         return (
           <>
             <h1 className="text-3xl font-bold text-green-600 mb-6">
-              Provide Waste Generation Data
+              Provide Waste Data
             </h1>
             <div className="bg-green-100 p-4 rounded mb-6">
               <p>
-                <b>Get Your Baseline:</b> Please provide details about waste
-                management.
+                <b>Get Your Baseline:</b> Please fill in the information below
+                to calculate your waste baseline.
               </p>
             </div>
             {Object.keys(wasteInputs).map((key) => (
               <div key={key} className="mb-4">
                 <label className="block mb-2 font-medium">
-                  {key.replace(/([A-Z])/g, " $1")}:
+                  {key.toUpperCase()} (Kg per month):
                 </label>
                 <input
                   type="number"
-                  placeholder="Metric Tons"
                   value={wasteInputs[key] || ""}
                   onChange={(e) =>
-                    setWasteInputs({ ...wasteInputs, [key]: e.target.value })
+                    setWasteInputs({
+                      ...wasteInputs,
+                      [key]: e.target.value,
+                    })
                   }
                   className="p-2 border rounded w-full"
                 />
@@ -345,24 +394,28 @@ function BaselineCalculator() {
             ))}
             <button
               onClick={calculateWasteBaseline}
-              className="bg-green-600 text-white p-2 mt-4"
+              className="bg-green-600 hover:bg-green-700 text-white p-2 mt-4"
             >
               Calculate Waste Baseline
             </button>
-            {totalWaste && <div>Total Waste Generated: {totalWaste} Metric Tons</div>}
+            {totalWaste && <div>Total Waste: {totalWaste} Metric Tons</div>}
           </>
         );
       default:
         return null;
     }
   };
-
+  
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="flex justify-center items-start p-6 space-x-6">
       {renderTimeline()}
-      <div className="w-3/4 p-8">{renderForm()}{renderFormButtons()}</div>
+      <div className="w-3/4">
+        {renderForm()} {/* Render the current form */}
+        {renderFormButtons()} {/* Render the form buttons */}
+      </div>
     </div>
   );
+  
 }
 
 export default BaselineCalculator;

@@ -1,57 +1,129 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
+  authDomain: "brsr-9b56a.firebaseapp.com",
+  projectId: "brsr-9b56a",
+  storageBucket: "brsr-9b56a.appspot.com",
+  messagingSenderId: "548279958491",
+  appId: "1:548279958491:web:19199e42e0d796ad4185fe",
+  measurementId: "G-7SYPSVZR9H",
+};
+
+// Initialize Firebase app and services
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const auth = getAuth();
+
+// Function to sanitize email for Firebase
+const sanitizeEmail = (email) => email.replace(/\./g, '_');
 
 const FuelConsumptionForm = ({ goBack }) => {
+  const [formData, setFormData] = useState({
+    electricityConsumption: '',
+    fuelConsumption: '',
+    otherEnergyConsumption: '',
+    totalEnergyConsumption: '',
+    energyIntensity: '',
+    billFile: null,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      billFile: e.target.files[0],
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const user = auth.currentUser;
+    if (user) {
+      const sanitizedEmail = sanitizeEmail(user.email);
+      const fuelDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/fuelData`);
+
+      // Prepare data to store
+      const dataToStore = { ...formData };
+      delete dataToStore.billFile; // Handle file uploads separately
+
+      // Store or update data
+      set(fuelDataPath, dataToStore)
+        .then(() => {
+          alert('Fuel data submitted successfully!');
+        })
+        .catch((error) => {
+          console.error('Error submitting fuel data:', error);
+          alert('Error submitting fuel data: ' + error.message);
+        });
+    } else {
+      alert('No user is logged in');
+    }
+  };
+
   return (
     <div style={styles.container}>
-      <button
-        onClick={goBack}
-        style={styles.goBackButton}
-      >
+      <button onClick={goBack} style={styles.goBackButton}>
         Go Back
       </button>
 
       <h2 style={styles.heading}>Fuel Consumption Form</h2>
 
-      {/* Table Section */}
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>Parameter</th>
-            <th style={styles.th}>FY ____ (Current Financial Year)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            { label: 'Total electricity consumption (A)', key: 'electricityConsumption' },
-            { label: 'Total fuel consumption (B)', key: 'fuelConsumption' },
-            { label: 'Energy consumption through other sources (C)', key: 'otherEnergyConsumption' },
-            { label: 'Total energy consumption (A+B+C)', key: 'totalEnergyConsumption' },
-            { label: 'Energy intensity per rupee of turnover (Total energy consumption / turnover in rupees)', key: 'energyIntensity' },
-          ].map((item) => (
-            <tr key={item.key}>
-              <td style={styles.td}>{item.label}</td>
-              <td style={styles.td}>
-                <input
-                  type="text"
-                  placeholder="Enter value"
-                  style={styles.input}
-                />
-              </td>
+      <form onSubmit={handleSubmit}>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th style={styles.th}>Parameter</th>
+              <th style={styles.th}>FY ____ (Current Financial Year)</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {[
+              { label: 'Total electricity consumption (A)', key: 'electricityConsumption' },
+              { label: 'Total fuel consumption (B)', key: 'fuelConsumption' },
+              { label: 'Energy consumption through other sources (C)', key: 'otherEnergyConsumption' },
+              { label: 'Total energy consumption (A+B+C)', key: 'totalEnergyConsumption' },
+              { label: 'Energy intensity per rupee of turnover (Total energy consumption / turnover in rupees)', key: 'energyIntensity' },
+            ].map((item) => (
+              <tr key={item.key}>
+                <td style={styles.td}>{item.label}</td>
+                <td style={styles.td}>
+                  <input
+                    type="text"
+                    name={item.key}
+                    value={formData[item.key]}
+                    onChange={handleChange}
+                    placeholder="Enter value"
+                    style={styles.input}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      {/* Upload Bill Section */}
-      <div style={styles.uploadSection}>
-        <label style={styles.label}>Upload Bill</label>
-        <input
-          type="file"
-          style={styles.fileInput}
-        />
-      </div>
+        <div style={styles.uploadSection}>
+          <label style={styles.label}>Upload Bill</label>
+          <input type="file" onChange={handleFileChange} style={styles.fileInput} />
+        </div>
 
-      {/* Note Section */}
+        <button type="submit" style={styles.submitButton}>
+          Submit
+        </button>
+      </form>
+
       <p style={styles.note}>
         <strong>Note:</strong> Indicate if any independent assessment/evaluation/assurance has been carried out by an
         external agency? (Y/N) If yes, name the external agency.
@@ -126,6 +198,14 @@ const styles = {
     fontSize: '14px',
     border: '1px solid #ccc',
     borderRadius: '4px',
+  },
+  submitButton: {
+    padding: '10px 20px',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
   },
   note: {
     marginTop: '20px',

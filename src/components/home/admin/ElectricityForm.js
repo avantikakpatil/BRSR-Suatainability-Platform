@@ -46,33 +46,39 @@ const ElectricityForm = ({ goBack }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitted Data:', { ...formData, email: userEmail });
-
+  
     try {
+      console.log('Submitted Data:', { ...formData, email: userEmail });
       let billUrl = null;
-
+  
+      // Upload the bill file if provided
       if (formData.bill) {
-        const fileRef = storageRef(storage, 'bills/' + Date.now() + '-' + formData.bill.name);
+        const fileRef = storageRef(storage, `bills/${Date.now()}-${formData.bill.name}`);
         const uploadTask = uploadBytesResumable(fileRef, formData.bill);
-
+  
         setUploading(true);
-
+  
         await uploadTask;
-
+  
         billUrl = await getDownloadURL(fileRef);
       }
-
+  
+      // Use sanitized email to create a unique node
       const sanitizedEmail = sanitizeEmail(userEmail);
-      const newDataRef = ref(db, `PostalManager/${sanitizedEmail}/inputData/electricityData/${Date.now()}`);
-
-      await set(newDataRef, {
+  
+      // Use a fixed path for electricityData
+      const electricityDataRef = ref(db, `PostalManager/${sanitizedEmail}/inputData/electricityData`);
+  
+      // Save the data
+      await set(electricityDataRef, {
         ...formData,
         email: userEmail,
         billUrl: billUrl || null,
       });
-
+  
       console.log('Data stored successfully.');
-
+  
+      // Reset form fields after successful submission
       setFormData({
         currentYearElectricity: '',
         currentYearFuel: '',
@@ -90,6 +96,8 @@ const ElectricityForm = ({ goBack }) => {
       setUploading(false);
     }
   };
+  
+  
 
   const sanitizeEmail = (email) => {
     return email.replace(/[.#$/[\]]/g, '_');

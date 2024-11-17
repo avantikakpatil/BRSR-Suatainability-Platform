@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, set } from 'firebase/database';
-import { getAuth } from 'firebase/auth';
+import React, { useEffect, useState } from "react";
+import { initializeApp } from "firebase/app";
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  update,
+} from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -17,29 +23,47 @@ const firebaseConfig = {
 // Initialize Firebase app and services
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
-const auth = getAuth();
+const auth = getAuth(app);
 
 const WasteForm = ({ goBack }) => {
   const [formData, setFormData] = useState({
-    currentPlasticWaste: '',
-    currentEWaste: '',
-    currentBioMedicalWaste: '',
-    currentConstructionWaste: '',
-    currentBatteryWaste: '',
-    currentRadioactiveWaste: '',
-    otherHazardousWaste: '',
-    otherNonHazardousWaste: '',
-    externalAssessment: '',
-    externalAgencyName: '',
+    currentPlasticWaste: "",
+    currentEWaste: "",
+    currentBioMedicalWaste: "",
+    currentConstructionWaste: "",
+    currentBatteryWaste: "",
+    currentRadioactiveWaste: "",
+    otherHazardousWaste: "",
+    otherNonHazardousWaste: "",
+    externalAssessment: "",
+    externalAgencyName: "",
     billFile: null,
-    totalWaste: 0,
+    totalWaste: "",
   });
+
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  // Retrieve existing data if available
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const sanitizedEmail = user.email.replace(/[.#$/[\]]/g, "_");
+        setCurrentUserId(sanitizedEmail);
+        const userRef = ref(database, `PostalManager/${sanitizedEmail}/inputData/wasteData`);
+        get(userRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            setFormData(snapshot.val());
+          }
+        });
+      }
+    });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     let updatedFormData = { ...formData };
 
-    if (type === 'file') {
+    if (type === "file") {
       updatedFormData.billFile = files[0];
     } else {
       updatedFormData[name] = value;
@@ -47,14 +71,14 @@ const WasteForm = ({ goBack }) => {
 
     // Calculate total waste for relevant fields
     const wasteFields = [
-      'currentPlasticWaste',
-      'currentEWaste',
-      'currentBioMedicalWaste',
-      'currentConstructionWaste',
-      'currentBatteryWaste',
-      'currentRadioactiveWaste',
-      'otherHazardousWaste',
-      'otherNonHazardousWaste',
+      "currentPlasticWaste",
+      "currentEWaste",
+      "currentBioMedicalWaste",
+      "currentConstructionWaste",
+      "currentBatteryWaste",
+      "currentRadioactiveWaste",
+      "otherHazardousWaste",
+      "otherNonHazardousWaste",
     ];
 
     const totalWaste = wasteFields.reduce((total, field) => {
@@ -62,22 +86,25 @@ const WasteForm = ({ goBack }) => {
       return total + fieldValue;
     }, 0);
 
-    updatedFormData.totalWaste = totalWaste;
+    updatedFormData.totalWaste = totalWaste.toFixed(2);
 
     setFormData(updatedFormData);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const user = auth.currentUser;
     if (user) {
+      // Use sanitized email as a unique identifier
       const sanitizedEmail = user.email.replace(/[.#$/[\]]/g, '_');
-      const newDataRef = ref(database, `PostalManager/${sanitizedEmail}/inputData/wasteData/${Date.now()}`);
-
-      set(newDataRef, { ...formData })
+      // Store data in a consistent node under the user's data
+      const wasteDataRef = ref(database, `PostalManager/${sanitizedEmail}/inputData/wasteData`);
+  
+      // Upload the form data
+      set(wasteDataRef, { ...formData })
         .then(() => {
-          alert('Data submitted successfully!');
+          alert('Data submitted successfully! Existing data has been overwritten.');
           setFormData({
             currentPlasticWaste: '',
             currentEWaste: '',
@@ -100,6 +127,7 @@ const WasteForm = ({ goBack }) => {
       alert('No user is logged in.');
     }
   };
+  
 
   return (
     <div style={styles.container}>
@@ -107,25 +135,35 @@ const WasteForm = ({ goBack }) => {
         Go Back
       </button>
 
-      <h1 style={styles.heading}><b>Waste Management Form</b></h1>
+      <h1 style={styles.heading}>
+        <b>Waste Management Form</b>
+      </h1>
       <form onSubmit={handleSubmit} style={styles.form}>
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>PARAMETER (TOTAL WASTE GENERATED IN METRIC TONNES)</th>
+              <th style={styles.th}>
+                PARAMETER (TOTAL WASTE GENERATED IN METRIC TONNES)
+              </th>
               <th style={styles.th}>FY (CURRENT YEAR)</th>
             </tr>
           </thead>
           <tbody>
             {[
-              { label: 'Plastic Waste', name: 'currentPlasticWaste' },
-              { label: 'e-Waste', name: 'currentEWaste' },
-              { label: 'Bio-Medical Waste', name: 'currentBioMedicalWaste' },
-              { label: 'Construction and Demolition Waste', name: 'currentConstructionWaste' },
-              { label: 'Battery Waste', name: 'currentBatteryWaste' },
-              { label: 'Radioactive Waste', name: 'currentRadioactiveWaste' },
-              { label: 'Other Hazardous Waste', name: 'otherHazardousWaste' },
-              { label: 'Other Non-Hazardous Waste', name: 'otherNonHazardousWaste' },
+              { label: "Plastic Waste", name: "currentPlasticWaste" },
+              { label: "e-Waste", name: "currentEWaste" },
+              { label: "Bio-Medical Waste", name: "currentBioMedicalWaste" },
+              {
+                label: "Construction and Demolition Waste",
+                name: "currentConstructionWaste",
+              },
+              { label: "Battery Waste", name: "currentBatteryWaste" },
+              { label: "Radioactive Waste", name: "currentRadioactiveWaste" },
+              { label: "Other Hazardous Waste", name: "otherHazardousWaste" },
+              {
+                label: "Other Non-Hazardous Waste",
+                name: "otherNonHazardousWaste",
+              },
             ].map((item) => (
               <tr key={item.name}>
                 <td style={styles.td}>{item.label}</td>
@@ -144,33 +182,43 @@ const WasteForm = ({ goBack }) => {
         </table>
 
         <div style={styles.totalSection}>
-          <b>Total Waste:</b> {formData.totalWaste.toFixed(2)} Metric Tonnes
-        </div>
-
-        <div style={styles.additionalInputs}>
           <label>
-            External Assessment (Y/N):<br />
+            <b>Total Waste:</b>
             <input
               type="text"
-              name="externalAssessment"
-              value={formData.externalAssessment}
-              onChange={handleChange}
+              name="totalWaste"
+              value={formData.totalWaste}
+              readOnly
               style={styles.input}
             />
           </label>
-          {formData.externalAssessment.toLowerCase() === 'y' && (
-            <label>
-              Name of External Agency:<br />
-              <input
-                type="text"
-                name="externalAgencyName"
-                value={formData.externalAgencyName}
-                onChange={handleChange}
-                style={styles.input}
-              />
-            </label>
-          )}
         </div>
+
+        <div style={styles.additionalInputs}>
+  <label>
+    External Assessment (Y/N):<br />
+    <input
+      type="text"
+      name="externalAssessment"
+      value={formData.externalAssessment || ""}
+      onChange={handleChange}
+      style={styles.input}
+    />
+  </label>
+  {formData.externalAssessment?.toLowerCase() === "y" && (
+    <label>
+      Name of External Agency:<br />
+      <input
+        type="text"
+        name="externalAgencyName"
+        value={formData.externalAgencyName || ""}
+        onChange={handleChange}
+        style={styles.input}
+      />
+    </label>
+  )}
+</div>
+
 
         <div style={styles.uploadSection}>
           <label>

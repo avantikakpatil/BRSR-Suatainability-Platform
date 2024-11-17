@@ -56,17 +56,17 @@ const WaterForm = ({ goBack }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const user = auth.currentUser;
     if (user) {
       const sanitizedEmail = sanitizeEmail(user.email); // Sanitize the email
-      const waterDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/waterData/${Date.now()}`);
-
+      const waterDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/waterData`);
+  
       // Prepare data to store
       const dataToStore = { ...formData };
       delete dataToStore.billFile; // File uploads should be handled separately, not stored in Realtime Database
-
-      // Store water data
+  
+      // Overwrite existing water data or create a new one if it doesn't exist
       set(waterDataPath, dataToStore)
         .then(() => {
           console.log('Water data submitted successfully!');
@@ -80,6 +80,7 @@ const WaterForm = ({ goBack }) => {
       alert('No user is logged in');
     }
   };
+  
 
   return (
     <div style={styles.container}>

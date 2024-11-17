@@ -19,50 +19,27 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth();
 
-// Function to sanitize email for Firebase
-const sanitizeEmail = (email) => {
-  return email.replace(/\./g, '_');
-};
-
-const WasteForm = () => {
+const WasteForm = ({ goBack }) => {
   const [formData, setFormData] = useState({
-    wasteData: {
-      currentPlasticWaste: '',
-      currentEWaste: '',
-      currentBioMedicalWaste: '',
-      currentConstructionWaste: '',
-      currentBatteryWaste: '',
-      currentRadioactiveWaste: '',
-      otherHazardousWaste: '',
-      otherNonHazardousWaste: '',
-    },
+    currentPlasticWaste: '',
+    currentEWaste: '',
+    currentBioMedicalWaste: '',
+    currentConstructionWaste: '',
+    currentBatteryWaste: '',
+    currentRadioactiveWaste: '',
+    otherHazardousWaste: '',
+    otherNonHazardousWaste: '',
     externalAssessment: '',
+    externalAgencyName: '',
     billFile: null,
   });
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     if (type === 'file') {
-      setFormData((prevData) => ({
-        ...prevData,
-        billFile: files[0],
-      }));
+      setFormData({ ...formData, billFile: files[0] });
     } else {
-      setFormData((prevData) => {
-        if (name in prevData.wasteData) {
-          return {
-            ...prevData,
-            wasteData: {
-              ...prevData.wasteData,
-              [name]: value,
-            },
-          };
-        }
-        return {
-          ...prevData,
-          [name]: value,
-        };
-      });
+      setFormData({ ...formData, [name]: value });
     }
   };
 
@@ -71,26 +48,41 @@ const WasteForm = () => {
 
     const user = auth.currentUser;
     if (user) {
-      const sanitizedEmail = sanitizeEmail(user.email); // Sanitize the email
-      const wasteDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/wasteData/${Date.now()}`);
+      const sanitizedEmail = user.email.replace(/[.#$/[\]]/g, '_');
+      const newDataRef = ref(database, `PostalManager/${sanitizedEmail}/inputData/wasteData/${Date.now()}`);
 
-      // Store waste data
-      set(wasteDataPath, formData.wasteData)
+      set(newDataRef, { ...formData })
         .then(() => {
-          console.log('Waste data submitted successfully!');
-          alert('Waste data submitted successfully!');
+          alert('Data submitted successfully!');
+          setFormData({
+            currentPlasticWaste: '',
+            currentEWaste: '',
+            currentBioMedicalWaste: '',
+            currentConstructionWaste: '',
+            currentBatteryWaste: '',
+            currentRadioactiveWaste: '',
+            otherHazardousWaste: '',
+            otherNonHazardousWaste: '',
+            externalAssessment: '',
+            externalAgencyName: '',
+            billFile: null,
+          });
         })
         .catch((error) => {
-          console.error('Error submitting waste data:', error);
-          alert('Error submitting waste data: ' + error.message);
+          alert('Error submitting data: ' + error.message);
         });
     } else {
-      alert('No user is logged in');
+      alert('No user is logged in.');
     }
   };
 
   return (
     <div style={styles.container}>
+      {/* Added Go Back Button */}
+      <button onClick={goBack} style={styles.goBackButton}>
+        Go Back
+      </button>
+
       <h1 style={styles.heading}><b>Waste Management Form</b></h1>
       <form onSubmit={handleSubmit} style={styles.form}>
         <table style={styles.table}>
@@ -102,76 +94,71 @@ const WasteForm = () => {
           </thead>
           <tbody>
             {[
-              { label: 'Plastic waste (A)', current: 'currentPlasticWaste' },
-              { label: 'E-waste (B)', current: 'currentEWaste' },
-              { label: 'Bio-medical waste (C)', current: 'currentBioMedicalWaste' },
-              { label: 'Construction and demolition waste (D)', current: 'currentConstructionWaste' },
-              { label: 'Battery waste (E)', current: 'currentBatteryWaste' },
-              { label: 'Radioactive waste (F)', current: 'currentRadioactiveWaste' },
+              { label: 'Plastic Waste', name: 'currentPlasticWaste' },
+              { label: 'e-Waste', name: 'currentEWaste' },
+              { label: 'Bio-Medical Waste', name: 'currentBioMedicalWaste' },
+              { label: 'Construction and Demolition Waste', name: 'currentConstructionWaste' },
+              { label: 'Battery Waste', name: 'currentBatteryWaste' },
+              { label: 'Radioactive Waste', name: 'currentRadioactiveWaste' },
+              { label: 'Other Hazardous Waste', name: 'otherHazardousWaste' },
+              { label: 'Other Non-Hazardous Waste', name: 'otherNonHazardousWaste' },
             ].map((item) => (
-              <tr key={item.label}>
+              <tr key={item.name}>
                 <td style={styles.td}>{item.label}</td>
                 <td style={styles.td}>
                   <input
                     type="number"
-                    name={item.current}
-                    value={formData.wasteData[item.current]}
+                    name={item.name}
+                    value={formData[item.name]}
                     onChange={handleChange}
                     style={styles.input}
                   />
                 </td>
               </tr>
             ))}
-            <tr>
-              <td style={styles.td}>Other hazardous waste (G)</td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="otherHazardousWaste"
-                  value={formData.wasteData.otherHazardousWaste}
-                  onChange={handleChange}
-                  style={styles.input}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td style={styles.td}>Other non-hazardous waste (H)</td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="otherNonHazardousWaste"
-                  value={formData.wasteData.otherNonHazardousWaste}
-                  onChange={handleChange}
-                  style={styles.input}
-                />
-              </td>
-            </tr>
           </tbody>
         </table>
 
         <div style={styles.additionalInputs}>
-          <label style={{ fontWeight: 'bold', fontSize: '16px' }}>
+          <label>
             External Assessment (Y/N):<br />
             <input
               type="text"
               name="externalAssessment"
               value={formData.externalAssessment}
               onChange={handleChange}
-              style={styles.extraInput}
+              style={styles.input}
             />
           </label>
-          <label style={{ fontWeight: 'bold', fontSize: '16px' }}>
-            Upload Bill (PDF, DOC, Image files):<br />
+          {formData.externalAssessment.toLowerCase() === 'y' && (
+            <label>
+              Name of External Agency:<br />
+              <input
+                type="text"
+                name="externalAgencyName"
+                value={formData.externalAgencyName}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </label>
+          )}
+        </div>
+
+        <div style={styles.uploadSection}>
+          <label>
+            Upload Supporting Document (PDF, DOC, Image files):<br />
             <input
               type="file"
-              name="billFile"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
               onChange={handleChange}
-              style={styles.extraInput}
+              style={styles.fileInput}
             />
           </label>
         </div>
 
-        <button type="submit" style={styles.button}>Submit</button>
+        <button type="submit" style={styles.button}>
+          Submit
+        </button>
       </form>
     </div>
   );
@@ -185,6 +172,16 @@ const styles = {
     padding: '10px',
     backgroundColor: '#f9f9f9',
     borderRadius: '10px',
+  },
+  goBackButton: {
+    marginBottom: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
   },
   heading: {
     textAlign: 'center',
@@ -218,18 +215,17 @@ const styles = {
     fontSize: '14px',
   },
   additionalInputs: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    marginTop: '8px',
+    marginTop: '20px',
   },
-  extraInput: {
-    width: '100%',
-    padding: '5px',
+  uploadSection: {
+    marginTop: '20px',
+  },
+  fileInput: {
+    marginTop: '10px',
     fontSize: '14px',
   },
   button: {
-    marginTop: '10px',
+    marginTop: '20px',
     padding: '10px 20px',
     backgroundColor: '#4CAF50',
     color: '#fff',

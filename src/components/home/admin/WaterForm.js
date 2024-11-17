@@ -24,7 +24,7 @@ const sanitizeEmail = (email) => {
   return email.replace(/\./g, '_');
 };
 
-const WaterForm = () => {
+const WaterForm = ({ goBack }) => {
   const [formData, setFormData] = useState({
     surfaceWater: '',
     groundwater: '',
@@ -83,6 +83,11 @@ const WaterForm = () => {
 
   return (
     <div style={styles.container}>
+      {/* Added Go Back Button */}
+      <button onClick={goBack} style={styles.goBackButton}>
+        Go Back
+      </button>
+
       <form onSubmit={handleSubmit} style={styles.form}>
         <h3 style={styles.title}>Water Management Form</h3>
 
@@ -180,6 +185,16 @@ const styles = {
     padding: '10px',
     backgroundColor: '#f9f9f9',
     borderRadius: '10px',
+  },
+  goBackButton: {
+    marginBottom: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
   },
   title: {
     textAlign: 'center',

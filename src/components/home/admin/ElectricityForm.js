@@ -4,7 +4,7 @@ import { ref, set } from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { uploadBytesResumable, getDownloadURL, ref as storageRef } from 'firebase/storage';
 
-const ElectricityForm = () => {
+const ElectricityForm = ({ goBack }) => {
   const [formData, setFormData] = useState({
     currentYearElectricity: '',
     currentYearFuel: '',
@@ -13,7 +13,7 @@ const ElectricityForm = () => {
     optionalElectricityIntensity: '',
     externalAssessment: '',
     externalAgencyName: '',
-    bill: null, // New state for file upload
+    bill: null,
   });
 
   const [userEmail, setUserEmail] = useState('');
@@ -23,7 +23,7 @@ const ElectricityForm = () => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserEmail(user.email); // Set the user's email if logged in
+        setUserEmail(user.email);
       }
     });
 
@@ -40,7 +40,7 @@ const ElectricityForm = () => {
   const handleFileChange = (e) => {
     setFormData({
       ...formData,
-      bill: e.target.files[0], // Handle file upload
+      bill: e.target.files[0],
     });
   };
 
@@ -71,7 +71,7 @@ const ElectricityForm = () => {
         billUrl: billUrl || null,
       });
 
-      console.log("Data stored successfully.");
+      console.log('Data stored successfully.');
 
       setFormData({
         currentYearElectricity: '',
@@ -84,7 +84,7 @@ const ElectricityForm = () => {
         bill: null,
       });
     } catch (error) {
-      console.error("Error storing data: ", error);
+      console.error('Error storing data: ', error);
       alert('Error storing data: ' + error.message);
     } finally {
       setUploading(false);
@@ -97,54 +97,41 @@ const ElectricityForm = () => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.headingContainer}>
-        <h1 style={styles.heading}>Electricity Consumption Form</h1>
-      </div>
+      <button
+        onClick={goBack}
+        style={styles.goBackButton}
+      >
+        Go Back
+      </button>
+
+      <h1 style={styles.heading}><b>Electricity Consumption Form</b></h1>
       <form onSubmit={handleSubmit} style={styles.form}>
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Parameter (Total electricity consumption in Joules or multiples)</th>
+              <th style={styles.th}>Parameter</th>
               <th style={styles.th}>FY ____ (Current Financial Year)</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style={styles.td}>Total electricity consumption (A)</td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="currentYearElectricity"
-                  value={formData.currentYearElectricity}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td style={styles.td}>Total fuel consumption (B)</td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="currentYearFuel"
-                  value={formData.currentYearFuel}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td style={styles.td}>Electricity consumption through other sources (C)</td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  name="currentYearOtherSources"
-                  value={formData.currentYearOtherSources}
-                  onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-            </tr>
+            {[
+              { label: 'Total electricity consumption (A)', name: 'currentYearElectricity' },
+              { label: 'Total fuel consumption (B)', name: 'currentYearFuel' },
+              { label: 'Electricity consumption through other sources (C)', name: 'currentYearOtherSources' },
+            ].map((item) => (
+              <tr key={item.name}>
+                <td style={styles.td}>{item.label}</td>
+                <td style={styles.td}>
+                  <input
+                    type="number"
+                    name={item.name}
+                    value={formData[item.name]}
+                    onChange={handleChange}
+                    style={styles.input}
+                  />
+                </td>
+              </tr>
+            ))}
             <tr>
               <td style={styles.td}><b>Total electricity consumption (A+B+C)</b></td>
               <td style={styles.td}>
@@ -156,71 +143,64 @@ const ElectricityForm = () => {
                     Number(formData.currentYearOtherSources)
                   ).toFixed(2)}
                   readOnly
-                  style={styles.inputReadOnly}
+                  style={styles.input}
                 />
               </td>
             </tr>
             <tr>
-              <td style={styles.td}>Electricity intensity per rupee of turnover (Total electricity consumption/turnover)</td>
+              <td style={styles.td}>Electricity intensity per rupee of turnover</td>
               <td style={styles.td}>
                 <input
                   type="number"
                   name="currentYearElectricityIntensity"
                   value={formData.currentYearElectricityIntensity}
                   onChange={handleChange}
-                  style={styles.inputSmall}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td style={styles.td}>
-                Electricity intensity (optional) – the relevant metric may be selected by the entity
-              </td>
-              <td colSpan="2" style={styles.td}>
-                <input
-                  type="text"
-                  name="optionalElectricityIntensity"
-                  value={formData.optionalElectricityIntensity}
-                  onChange={handleChange}
-                  style={styles.inputLarge}
+                  style={styles.input}
                 />
               </td>
             </tr>
           </tbody>
         </table>
-        <div style={styles.assessmentSection}>
-          <label style={styles.label}>External Assessment (Y/N):</label>
-          <input
-            type="text"
-            name="externalAssessment"
-            value={formData.externalAssessment}
-            onChange={handleChange}
-            style={styles.inputAssessment}
-          />
+
+        <div style={styles.additionalInputs}>
+          <label>
+            External Assessment (Y/N):<br />
+            <input
+              type="text"
+              name="externalAssessment"
+              value={formData.externalAssessment}
+              onChange={handleChange}
+              style={styles.extraInput}
+            />
+          </label>
           {formData.externalAssessment.toLowerCase() === 'y' && (
-            <>
-              <label style={styles.label}>Name of External Agency:</label>
+            <label>
+              Name of External Agency:<br />
               <input
                 type="text"
                 name="externalAgencyName"
                 value={formData.externalAgencyName}
                 onChange={handleChange}
-                style={styles.inputAssessment}
+                style={styles.extraInput}
               />
-            </>
+            </label>
           )}
         </div>
+
         <div style={styles.uploadSection}>
-          <label style={styles.label}>Upload Bill (PDF, DOC, Image files):</label>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            accept=".pdf, .doc, .docx, .jpg, .jpeg, .png"
-            style={styles.uploadInput}
-          />
+          <label>
+            Upload Bill (PDF, DOC, Image files):<br />
+            <input
+              type="file"
+              onChange={handleFileChange}
+              accept=".pdf, .doc, .docx, .jpg, .jpeg, .png"
+              style={styles.extraInput}
+            />
+          </label>
         </div>
+
         <button type="submit" style={styles.button} disabled={uploading}>
-          {uploading ? "Uploading..." : "Submit"}
+          {uploading ? 'Uploading...' : 'Submit'}
         </button>
       </form>
     </div>
@@ -228,23 +208,79 @@ const ElectricityForm = () => {
 };
 
 const styles = {
-  container: { padding: '20px', fontFamily: 'Arial, sans-serif' },
-  headingContainer: { marginBottom: '20px' },
-  heading: { fontSize: '24px', textAlign: 'center' },
-  form: { margin: '0 auto', width: '80%', maxWidth: '900px' },
-  table: { width: '100%', borderCollapse: 'collapse' },
-  th: { padding: '10px', backgroundColor: '#f4f4f4', textAlign: 'left' },
-  td: { padding: '10px', border: '1px solid #ddd' },
-  inputSmall: { width: '100px', padding: '5px' },
-  inputReadOnly: { width: '100px', padding: '5px', backgroundColor: '#f9f9f9' },
-  inputLarge: { width: '300px', padding: '5px' },
-  label: { marginBottom: '5px', display: 'block' },
-  inputAssessment: { width: '250px', padding: '5px', marginBottom: '10px' },
-  uploadSection: { marginTop: '20px' },
-  uploadInput: { padding: '5px' },
-  button: { padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' },
-  buttonDisabled: { backgroundColor: '#ddd' },
-  assessmentSection: { marginTop: '20px' }
+  container: {
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '10px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '10px',
+  },
+  goBackButton: {
+    marginBottom: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+  },
+  heading: {
+    textAlign: 'center',
+    fontSize: '24px',
+    marginBottom: '10px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
+  th: {
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    padding: '8px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  td: {
+    border: '1px solid #ccc',
+    padding: '8px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  input: {
+    width: '100%',
+    padding: '4px',
+    fontSize: '14px',
+  },
+  additionalInputs: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    marginTop: '8px',
+  },
+  extraInput: {
+    width: '100%',
+    padding: '5px',
+    fontSize: '14px',
+  },
+  uploadSection: {
+    marginTop: '15px',
+  },
+  button: {
+    marginTop: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#4CAF50',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    cursor: 'pointer',
+  },
 };
 
 export default ElectricityForm;

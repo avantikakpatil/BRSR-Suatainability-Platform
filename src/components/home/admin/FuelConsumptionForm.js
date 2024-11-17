@@ -2,132 +2,136 @@ import React from 'react';
 
 const FuelConsumptionForm = ({ goBack }) => {
   return (
-    <div className="fuel-consumption-form p-8 bg-gray-50 shadow-md rounded-md">
+    <div style={styles.container}>
       <button
         onClick={goBack}
-        className="mb-4 px-4 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600 transition"
+        style={styles.goBackButton}
       >
         Go Back
       </button>
 
-      <h2 className="text-2xl font-bold mb-6">Fuel Consumption Form</h2>
+      <h2 style={styles.heading}>Fuel Consumption Form</h2>
 
       {/* Table Section */}
-      <table className="table-auto border-collapse w-full text-left text-sm mb-6">
+      <table style={styles.table}>
         <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 px-4 py-2">Parameter</th>
-            <th className="border border-gray-300 px-4 py-2">FY ____ (Current Financial Year)</th>
-            <th className="border border-gray-300 px-4 py-2">FY ____ (Previous Financial Year)</th>
+          <tr>
+            <th style={styles.th}>Parameter</th>
+            <th style={styles.th}>FY ____ (Current Financial Year)</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2">Total electricity consumption (A)</td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2">Total fuel consumption (B)</td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2">Energy consumption through other sources (C)</td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2 font-bold">Total energy consumption (A+B+C)</td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2">
-              Energy intensity per rupee of turnover (Total energy consumption / turnover in rupees)
-            </td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-            <td className="border border-gray-300 px-4 py-2">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-2 py-1"
-                placeholder="Enter value"
-              />
-            </td>
-          </tr>
+          {[
+            { label: 'Total electricity consumption (A)', key: 'electricityConsumption' },
+            { label: 'Total fuel consumption (B)', key: 'fuelConsumption' },
+            { label: 'Energy consumption through other sources (C)', key: 'otherEnergyConsumption' },
+            { label: 'Total energy consumption (A+B+C)', key: 'totalEnergyConsumption' },
+            { label: 'Energy intensity per rupee of turnover (Total energy consumption / turnover in rupees)', key: 'energyIntensity' },
+          ].map((item) => (
+            <tr key={item.key}>
+              <td style={styles.td}>{item.label}</td>
+              <td style={styles.td}>
+                <input
+                  type="text"
+                  placeholder="Enter value"
+                  style={styles.input}
+                />
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
       {/* Upload Bill Section */}
-      <div className="mb-6">
-        <label className="block font-bold mb-2">Upload Bill</label>
+      <div style={styles.uploadSection}>
+        <label style={styles.label}>Upload Bill</label>
         <input
           type="file"
-          className="w-full border border-gray-300 rounded px-2 py-1"
+          style={styles.fileInput}
         />
       </div>
 
       {/* Note Section */}
-      <p className="mt-6 text-sm text-gray-600">
+      <p style={styles.note}>
         <strong>Note:</strong> Indicate if any independent assessment/evaluation/assurance has been carried out by an
-        external agency? (Y/N) If yes, name of the external agency.
+        external agency? (Y/N) If yes, name the external agency.
       </p>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '20px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  heading: {
+    textAlign: 'center',
+    fontSize: '24px',
+    marginBottom: '20px',
+    fontWeight: 'bold',
+  },
+  goBackButton: {
+    marginBottom: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginBottom: '20px',
+  },
+  th: {
+    backgroundColor: '#4CAF50',
+    color: '#fff',
+    padding: '10px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  td: {
+    border: '1px solid #ccc',
+    padding: '10px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  input: {
+    width: '100%',
+    padding: '8px',
+    fontSize: '14px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+  },
+  uploadSection: {
+    marginBottom: '20px',
+  },
+  label: {
+    display: 'block',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    marginBottom: '8px',
+  },
+  fileInput: {
+    width: '100%',
+    padding: '8px',
+    fontSize: '14px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+  },
+  note: {
+    marginTop: '20px',
+    fontSize: '14px',
+    color: '#666',
+  },
 };
 
 export default FuelConsumptionForm;

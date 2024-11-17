@@ -24,10 +24,7 @@ const sanitizeEmail = (email) => email.replace(/\./g, '_');
 
 const FuelConsumptionForm = ({ goBack }) => {
   const [formData, setFormData] = useState({
-    electricityConsumption: '',
     fuelConsumption: '',
-    otherEnergyConsumption: '',
-    totalEnergyConsumption: '',
     energyIntensity: '',
     billFile: null,
   });
@@ -91,10 +88,7 @@ const FuelConsumptionForm = ({ goBack }) => {
           </thead>
           <tbody>
             {[
-              { label: 'Total electricity consumption (A)', key: 'electricityConsumption' },
               { label: 'Total fuel consumption (B)', key: 'fuelConsumption' },
-              { label: 'Energy consumption through other sources (C)', key: 'otherEnergyConsumption' },
-              { label: 'Total energy consumption (A+B+C)', key: 'totalEnergyConsumption' },
               { label: 'Energy intensity per rupee of turnover (Total energy consumption / turnover in rupees)', key: 'energyIntensity' },
             ].map((item) => (
               <tr key={item.key}>

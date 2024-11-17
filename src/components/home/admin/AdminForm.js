@@ -20,7 +20,7 @@ const AdminForm = () => {
       contactName: '',
       contactDetails: '',
       reportingBoundary: '',
-    }
+    },
   });
 
   const [currentUser, setCurrentUser] = useState(null);
@@ -31,7 +31,7 @@ const AdminForm = () => {
       if (user) {
         setCurrentUser(user);
         const sanitizedEmail = sanitizeEmail(user.email);
-        fetchProfileData(sanitizedEmail); // Fetch data if user is signed in
+        fetchProfileData(sanitizedEmail);
       } else {
         console.log('No user is signed in.');
       }
@@ -40,9 +40,7 @@ const AdminForm = () => {
     return () => unsubscribe();
   }, []);
 
-  const sanitizeEmail = (email) => {
-    return email.replace(/\./g, '_').replace(/@/g, '_');
-  };
+  const sanitizeEmail = (email) => email.replace(/\./g, '_').replace(/@/g, '_');
 
   const fetchProfileData = async (sanitizedEmail) => {
     const dbRef = ref(db);
@@ -51,10 +49,10 @@ const AdminForm = () => {
       if (snapshot.exists()) {
         setFormData({ profile: snapshot.val() });
       } else {
-        console.log("No data available");
+        console.log('No data available');
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   };
 
@@ -72,7 +70,7 @@ const AdminForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) {
-      alert("You must be signed in to submit data.");
+      alert('You must be signed in to submit data.');
       return;
     }
 
@@ -81,71 +79,70 @@ const AdminForm = () => {
     try {
       await set(profileRef, { ...formData.profile, email: currentUser.email, userId: currentUser.uid });
       console.log('Data stored successfully!');
-      setIsEditing(false); // Disable edit mode after saving
-      fetchProfileData(sanitizedEmail); // Refresh data display
+      setIsEditing(false);
+      fetchProfileData(sanitizedEmail);
     } catch (error) {
       console.error('Error storing data:', error);
     }
   };
 
   const toggleEdit = () => {
-    setIsEditing(!isEditing); // Toggle edit mode
+    setIsEditing(!isEditing);
   };
 
-  // Function to capitalize each word in the label
-  const capitalizeLabel = (label) => {
-    return label.replace(/([A-Z])/g, ' $1')
+  const capitalizeLabel = (label) =>
+    label
+      .replace(/([A-Z])/g, ' $1')
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
-  };
 
-  // Styling
   const containerStyle = {
-    maxWidth: '90vw',
-    margin: '0 auto',
-    padding: '30px',
-    backgroundColor: '#f0f4f8',
+    maxWidth: '1000px', 
+    margin: '30px auto',
+    padding: '20px',
+    backgroundColor: '#f7fafc', // Light background for form
     borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    fontFamily: '"Roboto", sans-serif',
   };
 
   const formContainerStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', // Dynamic columns based on screen size
-    gap: '20px',
+    gridTemplateColumns: 'repeat(2, 1fr)', 
+    gap: '20px', 
   };
 
   const labelStyle = {
-    fontWeight: 'bold', // Bolder text for labels
-    fontSize: '14px',
-    color: '#333', // Darker color for emphasis
+    fontWeight: 'bold',
+    fontSize: '15px',
+    color: '#4A5568', // Darker gray for labels
     marginBottom: '5px',
   };
 
   const inputStyle = {
     width: '100%',
-    padding: '10px',
-    fontSize: '15px',
+    padding: '8px',
+    fontSize: '14px',
     borderRadius: '6px',
-    border: '1px solid #ddd',
+    border: '1px solid #ccc',
     boxSizing: 'border-box',
-    backgroundColor: isEditing ? '#fff' : '#f5f5f5',
+    backgroundColor: isEditing ? '#fff' : '#f1f3f5', // White for editable, gray for non-editable
   };
 
   const buttonContainerStyle = {
     gridColumn: '1 / -1',
     display: 'flex',
     justifyContent: 'center',
-    gap: '10px',
-    marginTop: '25px',
+    gap: '15px',
+    marginTop: '20px',
   };
 
   const buttonStyle = {
-    padding: '12px 25px',
-    fontSize: '16px',
+    padding: '10px 20px',
+    fontSize: '14px',
     fontWeight: 'bold',
-    color: 'white',
+    color: '#fff',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
@@ -154,12 +151,12 @@ const AdminForm = () => {
 
   const editButtonStyle = {
     ...buttonStyle,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#007bff', // Blue for Edit
   };
 
   const saveButtonStyle = {
     ...buttonStyle,
-    backgroundColor: '#28a745',
+    backgroundColor: '#28a745', // Green for Save
   };
 
   return (
@@ -178,7 +175,7 @@ const AdminForm = () => {
                 required
               />
             ) : (
-              <p style={{ ...inputStyle, padding: '8px', border: 'none', backgroundColor: '#f5f5f5' }}>
+              <p style={{ ...inputStyle, padding: '8px', border: 'none', backgroundColor: '#f1f3f5' }}>
                 {formData.profile[key] || 'Not provided'}
               </p>
             )}

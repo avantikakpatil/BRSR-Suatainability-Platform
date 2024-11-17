@@ -9,6 +9,7 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState(''); // State for name
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { userLoggedIn } = useAuth();
@@ -37,6 +38,11 @@ const Register = () => {
     e.preventDefault();
     setErrorMessage('');
 
+    if (!name.trim()) {
+      setErrorMessage('Please enter your name');
+      return;
+    }
+
     if (!selectedRole) {
       setErrorMessage('Please select a role');
       return;
@@ -57,6 +63,7 @@ const Register = () => {
         const db = getDatabase();
         const userRef = ref(db, `users/${uid}`);
         await set(userRef, {
+          name: name, // Save the name
           email: email,
           role: selectedRole,
           profileCompleted: false,
@@ -85,6 +92,18 @@ const Register = () => {
           </div>
           <form onSubmit={onSubmit} className="space-y-4">
             <div style={{ width: '310px' }}>
+              {/* Name Input */}
+              <div>
+                <label className="text-sm text-gray-600 font-bold">Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
+                />
+              </div>
+
               {/* Email Input */}
               <div>
                 <label className="text-sm text-gray-600 font-bold">Email</label>

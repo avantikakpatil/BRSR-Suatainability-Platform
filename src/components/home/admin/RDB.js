@@ -5,7 +5,7 @@ const Rdb = () => {
   const navigate = useNavigate();
 
   const handleSetBaseline = () => {
-    navigate('/admin/ResourceUsageForm');
+    navigate('/admin/Baselinenew');
   };
 
   return (

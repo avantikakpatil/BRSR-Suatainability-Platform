@@ -1,64 +1,84 @@
-import React, { useState } from "react";
-import { getDatabase, ref, set } from "firebase/database";
+import React, { useState } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
+  authDomain: "brsr-9b56a.firebaseapp.com",
+  projectId: "brsr-9b56a",
+  storageBucket: "brsr-9b56a.appspot.com",
+  messagingSenderId: "548279958491",
+  appId: "1:548279958491:web:19199e42e0d796ad4185fe",
+  measurementId: "G-7SYPSVZR9H",
+};
+
+// Initialize Firebase app and services
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const auth = getAuth();
+
+// Function to sanitize email for Firebase
+const sanitizeEmail = (email) => {
+  return email.replace(/\./g, '_');
+};
 
 const WaterForm = () => {
   const [formData, setFormData] = useState({
-    fyCurrent: "",
-    fyPrevious: "",
-    surfaceWater: "",
-    groundwater: "",
-    thirdPartyWater: "",
-    seawater: "",
-    others: "",
-    totalWithdrawal: "",
-    totalConsumption: "",
-    waterIntensity: "",
-    externalAssessment: "N",
-    externalAgencyName: "",
-    billFile: null,
+    surfaceWater: '',
+    groundwater: '',
+    thirdPartyWater: '',
+    seawater: '',
+    others: '',
+    totalWithdrawal: '',
+    totalConsumption: '',
+    waterIntensity: '',
+    externalAssessment: 'N',
+    externalAgencyName: '',
+    billFile: null, // For file upload
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleFileChange = (e) => {
-    setFormData((prevData) => ({ ...prevData, billFile: e.target.files[0] }));
+    setFormData((prevData) => ({
+      ...prevData,
+      billFile: e.target.files[0], // Capture the uploaded file
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
-    const db = getDatabase();
-    const newDataRef = ref(db, "PostalManager/inputData/waterData/" + Date.now()); // Resolving the conflict here
-  
-    set(newDataRef, {
-      ...formData,
-      createdAt: new Date().toISOString(),
-      billFile: formData.billFile ? formData.billFile.name : null,
-    })
-      .then(() => {
-        console.log("Data stored successfully");
-        setFormData({
-          fyCurrent: "",
-          fyPrevious: "",
-          surfaceWater: "",
-          groundwater: "",
-          thirdPartyWater: "",
-          seawater: "",
-          others: "",
-          totalWithdrawal: "",
-          totalConsumption: "",
-          waterIntensity: "",
-          externalAssessment: "N",
-          externalAgencyName: "",
-          billFile: null,
+
+    const user = auth.currentUser;
+    if (user) {
+      const sanitizedEmail = sanitizeEmail(user.email); // Sanitize the email
+      const waterDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/waterData/${Date.now()}`);
+
+      // Prepare data to store
+      const dataToStore = { ...formData };
+      delete dataToStore.billFile; // File uploads should be handled separately, not stored in Realtime Database
+
+      // Store water data
+      set(waterDataPath, dataToStore)
+        .then(() => {
+          console.log('Water data submitted successfully!');
+          alert('Water data submitted successfully!');
+        })
+        .catch((error) => {
+          console.error('Error submitting water data:', error);
+          alert('Error submitting water data: ' + error.message);
         });
-      })
-      .catch((error) => {
-        console.error("Error storing data: ", error);
-      });
+    } else {
+      alert('No user is logged in');
+    }
   };
 
   return (
@@ -154,94 +174,63 @@ const WaterForm = () => {
 
 const styles = {
   container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "5px",
-    backgroundColor: "#f9f9f9",
-    minHeight: "100vh",
-  },
-  form: {
-    backgroundColor: "#fff",
-    padding: "15px",
-    borderRadius: "6px",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    width: "100%",
-    maxWidth: "1400px",
-    display: "flex",
-    flexDirection: "column",
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '10px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '10px',
   },
   title: {
-    textAlign: "center",
-    marginBottom: "8px",
-    fontSize: "1.5em", // Increased font size of the heading
-    color: "#333",
-    fontWeight: "bold",
+    textAlign: 'center',
+    fontSize: '24px',
+    marginBottom: '20px',
   },
-  singleInputGroup: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    marginBottom: "10px",
-  },
-  singleLabel: {
-    fontSize: "1em", // Slightly decreased font size
-    color: "#333",
-    fontWeight: "bold",
-    marginBottom: "5px",
-  },
-  input: {
-    padding: "6px",
-    marginTop: "4px",
-    borderRadius: "3px",
-    border: "1px solid #ccc",
-    fontSize: "0.8em",
-    outline: "none",
-  },
-  fileInput: {
-    padding: "6px",
-    marginTop: "4px",
-    borderRadius: "3px",
-    fontSize: "0.8em",
-    outline: "none",
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
   },
   table: {
-    width: "100%",
-    maxWidth: "100%",
-    borderCollapse: "collapse",
-    marginBottom: "15px",
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginBottom: '20px',
   },
   tableHeader: {
-    textAlign: "left",
-    padding: "10px",
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: "0.8em",
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    padding: '10px',
   },
   tableCell: {
-    padding: "10px",
-    borderBottom: "1px solid #ddd",
-    fontSize: "0.8em",
+    border: '1px solid #ccc',
+    padding: '10px',
+    textAlign: 'center',
   },
   tableInput: {
-    width: "100%",
-    padding: "6px",
-    borderRadius: "3px",
-    border: "1px solid #ccc",
-    fontSize: "0.8em",
-    outline: "none",
+    width: '100%',
+    padding: '5px',
+  },
+  singleInputGroup: {
+    marginBottom: '15px',
+  },
+  singleLabel: {
+    fontWeight: 'bold',
+    display: 'block',
+    marginBottom: '5px',
+  },
+  input: {
+    width: '100%',
+    padding: '8px',
+  },
+  fileInput: {
+    padding: '5px',
   },
   submitButton: {
-    padding: "10px",
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    border: "none",
-    borderRadius: "3px",
-    fontSize: "0.9em",
-    fontWeight: "600",
-    cursor: "pointer",
-    width: "100%",
+    padding: '10px 20px',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
   },
 };
 

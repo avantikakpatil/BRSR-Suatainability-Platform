@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import EnergyForm from './EnergyForm';
+import ElectricityForm from './ElectricityForm'; 
 import WasteForm from './WasteForm';
 import WaterForm from './WaterForm';
-import CommunityEngagementForm from './CommunityEngagementForm'; // Import the new form component
+import CommunityEngagementForm from './CommunityEngagementForm'; 
+import FuelConsumptionForm from './FuelConsumptionForm'; 
 
 const AdminPanel = () => {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -15,57 +16,69 @@ const AdminPanel = () => {
     setSelectedOption(null);
   };
 
+  const menuOptions = [
+    {
+      label: 'Electricity',
+      colorClass: 'bg-blue-100',
+      buttonClass: 'bg-blue-400 hover:bg-blue-500',
+      action: 'Electricity',
+    },
+    {
+      label: 'Waste',
+      colorClass: 'bg-green-100',
+      buttonClass: 'bg-green-400 hover:bg-green-500',
+      action: 'Waste',
+    },
+    {
+      label: 'Water',
+      colorClass: 'bg-teal-100',
+      buttonClass: 'bg-teal-400 hover:bg-teal-500',
+      action: 'Water',
+    },
+    {
+      label: 'Community Engagement',
+      colorClass: 'bg-pink-100',
+      buttonClass: 'bg-pink-400 hover:bg-pink-500',
+      action: 'CommunityEngagement',
+    },
+    {
+      label: 'Fuel Consumption',
+      colorClass: 'bg-orange-100',
+      buttonClass: 'bg-orange-400 hover:bg-orange-500',
+      action: 'FuelConsumption',
+    },
+  ];
+
   return (
     <div className="admin-panel p-8" style={{ marginLeft: '50px' }}>
       {!selectedOption && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-          <div className="flex flex-col items-center bg-blue-100 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4">Energy</h2>
-            <button
-              onClick={() => handleOptionClick('Energy')}
-              className="p-4 bg-blue-400 text-white font-bold rounded shadow-lg hover:bg-blue-500 transition w-full"
+          {menuOptions.map((option, index) => (
+            <div
+              key={index}
+              className={`flex flex-col items-center ${option.colorClass} p-6 rounded-lg shadow-md`}
             >
-              Input Energy Data
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center bg-green-100 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4">Waste</h2>
-            <button
-              onClick={() => handleOptionClick('Waste')}
-              className="p-4 bg-green-400 text-white font-bold rounded shadow-lg hover:bg-green-500 transition w-full"
-            >
-              Input Waste Data
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center bg-teal-100 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4">Water</h2>
-            <button
-              onClick={() => handleOptionClick('Water')}
-              className="p-4 bg-teal-400 text-white font-bold rounded shadow-lg hover:bg-teal-500 transition w-full"
-            >
-              Input Water Data
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center bg-pink-100 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4">Community Engagement</h2>
-            <button
-              onClick={() => handleOptionClick('CommunityEngagement')}
-              className="p-4 bg-pink-400 text-white font-bold rounded shadow-lg hover:bg-pink-500 transition w-full"
-            >
-              Input Community Engagement Data
-            </button>
-          </div>
+              <h2 className="text-xl font-bold mb-4">{option.label}</h2>
+              <button
+                onClick={() => handleOptionClick(option.action)}
+                className={`p-4 text-white font-bold rounded shadow-lg transition w-full ${option.buttonClass}`}
+              >
+                Input {option.label} Data
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Conditionally render forms based on selected option */}
-      {selectedOption === 'Energy' && <EnergyForm goBack={goBack} />}
+      {selectedOption === 'Electricity' && <ElectricityForm goBack={goBack} />}
       {selectedOption === 'Waste' && <WasteForm goBack={goBack} />}
       {selectedOption === 'Water' && <WaterForm goBack={goBack} />}
-      {selectedOption === 'CommunityEngagement' && <CommunityEngagementForm goBack={goBack} />}
+      {selectedOption === 'CommunityEngagement' && (
+        <CommunityEngagementForm goBack={goBack} />
+      )}
+      {selectedOption === 'FuelConsumption' && (
+        <FuelConsumptionForm goBack={goBack} />
+      )}
     </div>
   );
 };

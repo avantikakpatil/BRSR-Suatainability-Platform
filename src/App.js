@@ -6,7 +6,7 @@ import Header from "./components/header/index.jsx";
 import Home from "./components/home/index.jsx";
 import Sidebar from "./components/sidebar/Sidebar";
 import Leaderboard from "./components/home/admin/leaderboard";
-import Challenges from "./components/home/admin/challenges"; // Only keep one import for Challenges
+import Challenges from "./components/home/admin/challenges";
 import Report from "./components/home/admin/report";
 import AdminPanel from "./components/home/admin/AdminPanel";
 import BaselineParametersForm from "./components/home/admin/BaselineParametersForm";
@@ -15,6 +15,7 @@ import HeadquarterDashboard from "./components/home/admin/HeadquarterDashboard.j
 import CreatePO from "./components/home/admin/CreatePO.js";
 import ResourceUsageForm from "./components/home/admin/ResourceUsageForm.js";
 import ListPO from "./components/home/admin/ListPO";
+import PostOfficeReport from "./components/home/admin/PostOfficeReport"; // Import the new file
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
 import VerifyReport from "./components/home/admin/verifyReport";
@@ -24,7 +25,7 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
-  
+
   const routesArray = [
     { path: "*", element: <Login /> },
     { path: "/login", element: <Login /> },
@@ -42,7 +43,8 @@ function App() {
     { path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} /> },
     { path: "/admin/listpo", element: <ListPO /> },
     { path: "/admin/VerifyReport", element: <VerifyReport /> },
-    {path: "/admin/baselinenew", element: <Baselinenew/>}
+    { path: "/admin/baselinenew", element: <Baselinenew /> },
+    { path: "/admin/postofficereport", element: <PostOfficeReport /> }, // Add the route for PostOfficeReport
   ];
 
   const { userLoggedIn } = useAuth();
@@ -65,6 +67,7 @@ function App() {
           onCreatePO={() => navigate("/admin/createpo")}
           onListPO={() => navigate("/admin/listpo")}
           onVerifyReport={() => navigate("/admin/verifyreport")}
+          onPostOfficeReport={() => navigate("/admin/postofficereport")} // Add this callback for navigation
         />
       )}
       <div className={`content flex-grow p-4 ${isAuthPage ? "mt-0" : "mt-16"}`}>

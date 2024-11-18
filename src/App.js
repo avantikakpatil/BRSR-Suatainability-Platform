@@ -18,8 +18,11 @@ import ListPO from "./components/home/admin/ListPO";
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
 import VerifyReport from "./components/home/admin/verifyReport";
+import Comparision from "./components/home/admin/Comparision.js";
 import Baselinenew from "./components/home/admin/Baselinenew.js";
 import SetDeadline from "./components/home/admin/setdeadline.js";
+
+
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,6 +47,8 @@ function App() {
     { path: "/admin/VerifyReport", element: <VerifyReport /> },
     {path: "/admin/baselinenew", element: <Baselinenew/>},
     {path: "/admin/SetDeadline", element: <SetDeadline/>}
+    {path: "/admin/baselinenew", element: <Baselinenew/>},
+    {path: "/admin/Comparision", element: <Comparision/>}
   ];
 
   const { userLoggedIn } = useAuth();

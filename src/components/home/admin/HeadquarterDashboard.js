@@ -1,96 +1,133 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, onValue, off } from "firebase/database";
 
-const HeadquarterDashboard = () => {
-  const [viewBy, setViewBy] = useState('state');
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
+  authDomain: "brsr-9b56a.firebaseapp.com",
+  projectId: "brsr-9b56a",
+  storageBucket: "brsr-9b56a.appspot.com",
+  messagingSenderId: "548279958491",
+  appId: "1:548279958491:web:19199e42e0d796ad4185fe",
+  measurementId: "G-7SYPSVZR9H"
+};
 
-  const handleViewChange = (event) => {
-    setViewBy(event.target.value);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const Dashboard = () => {
+  const [baselineData, setBaselineData] = useState({});
+  const [inputData, setInputData] = useState({});
+  const [comparisonResults, setComparisonResults] = useState([]);
+
+  useEffect(() => {
+    // Replace with logged-in user's email or unique identifier
+    const userEmail = "avantikapatil420@gmail_com";
+
+    // Firebase database references
+    const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
+    const inputDataRef = ref(db, `PostalManager/${userEmail}/inputData`);
+
+    // Function to fetch and listen to data
+    const fetchData = () => {
+      // Listen to baseline data
+      const baselineListener = onValue(baselineRef, (snapshot) => {
+        if (snapshot.exists()) {
+          setBaselineData(snapshot.val());
+        }
+      });
+
+      // Listen to input data
+      const inputListener = onValue(inputDataRef, (snapshot) => {
+        if (snapshot.exists()) {
+          setInputData(snapshot.val());
+        }
+      });
+
+      // Cleanup function to remove listeners
+      return () => {
+        off(baselineRef, baselineListener);
+        off(inputDataRef, inputListener);
+      };
+    };
+
+    // Call fetchData and clean up listeners on unmount
+    const cleanup = fetchData();
+    return cleanup;
+  }, []);
+
+  useEffect(() => {
+    // Perform comparison only when both baseline and input data are loaded
+    if (Object.keys(baselineData).length && Object.keys(inputData).length) {
+      const results = compareData(baselineData, inputData);
+      setComparisonResults(results);
+    }
+  }, [baselineData, inputData]);
+
+  // Comparison logic
+  const compareData = (baseline, inputData) => {
+    const results = [];
+    const comparisons = [
+      { key: "electricity", label: "Electricity Consumption" },
+      { key: "fuel", label: "Fuel Consumption" },
+      { key: "water", label: "Water Consumption" },
+      { key: "waste", label: "Waste Generation" }
+    ];
+
+    comparisons.forEach(({ key, label }) => {
+      const baselineValue = parseFloat(baseline[key]) || 0;
+      const inputValue = parseFloat(inputData[key]) || 0;
+
+      let status = "Need to Improve";
+      if (inputValue < baselineValue) {
+        status = "Good";
+      } else if (inputValue === baselineValue) {
+        status = "OK";
+      }
+
+      results.push({ label, baseline: baselineValue, input: inputValue, status });
+    });
+
+    return results;
   };
 
   return (
-    <div className="headquarters-dashboard">
-      <h2 className="dashboard-title">Headquarter Dashboard</h2>
-
-      <div className="button-container">
-        <button className="action-button">Create Post Office</button>
-        <button className="action-button">Assign Role</button>
-      </div>
-
-      <div className="view-selection">
-        <label className="report-label">Report:</label>
-        <label className="view-by-label">View By:</label>
-        <select className="view-by-select" value={viewBy} onChange={handleViewChange}>
-          <option value="state">State</option>
-          <option value="division">Division</option>
-        </select>
-      </div>
-
-      <style jsx>{`
-        .headquarters-dashboard {
-          max-width: 100%;
-          margin: 40px auto;
-          padding: 20px;
-          background-color: #f5f5f5;
-          border-radius: 8px;
-          box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-          text-align: left;
-        }
-
-        .dashboard-title {
-          font-size: 28px;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 20px;
-        }
-
-        .button-container {
-          display: flex;
-          justify-content: space-evenly;
-          margin-bottom: 20px;
-        }
-
-        .action-button {
-          width: 45%;
-          padding: 12px;
-          font-size: 18px;
-          font-weight: bold;
-          color: #fff;
-          background-color: #4caf50; /* Primary color */
-          border: none;
-          border-radius: 5px;
-          transition: background-color 0.3s ease;
-        }
-
-        .action-button:hover {
-          background-color: #45a049;
-        }
-
-        .view-selection {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          gap: 20px;
-          margin-top: 20px;
-        }
-
-        .report-label,
-        .view-by-label {
-          font-size: 18px;
-          font-weight: 500;
-          color: #555;
-        }
-
-        .view-by-select {
-          padding: 10px 15px;
-          font-size: 18px;
-          color: #333;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          width: 200px;
-        }
-      `}</style>
+    <div>
+      <h1>Comparison Dashboard</h1>
+      <table className="min-w-full border-collapse border border-gray-300 mt-4">
+        <thead>
+          <tr>
+            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Parameter</th>
+            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Baseline</th>
+            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Input Values</th>
+            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Sustainability Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {comparisonResults.map((result, index) => (
+            <tr key={index} className="odd:bg-white even:bg-gray-50">
+              <td className="border border-gray-300 px-4 py-2">{result.label}</td>
+              <td className="border border-gray-300 px-4 py-2">{result.baseline}</td>
+              <td className="border border-gray-300 px-4 py-2">{result.input}</td>
+              <td
+                className={`border border-gray-300 px-4 py-2 font-bold ${
+                  result.status === "Good"
+                    ? "text-green-600"
+                    : result.status === "OK"
+                    ? "text-blue-600"
+                    : "text-red-600"
+                }`}
+              >
+                {result.status}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default HeadquarterDashboard;
+export default Dashboard;

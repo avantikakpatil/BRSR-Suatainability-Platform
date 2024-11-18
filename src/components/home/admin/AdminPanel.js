@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import ElectricityForm from './ElectricityForm'; 
+import { FaBolt, FaTrash, FaTint, FaHandsHelping, FaGasPump } from 'react-icons/fa'; // Import icons
+import ElectricityForm from './ElectricityForm';
 import WasteForm from './WasteForm';
 import WaterForm from './WaterForm';
-import CommunityEngagementForm from './CommunityEngagementForm'; 
-import FuelConsumptionForm from './FuelConsumptionForm'; 
+import CommunityEngagementForm from './CommunityEngagementForm';
+import FuelConsumptionForm from './FuelConsumptionForm';
 
 const AdminPanel = () => {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -19,30 +20,35 @@ const AdminPanel = () => {
   const menuOptions = [
     {
       label: 'Electricity',
+      icon: <FaBolt className="text-blue-500 text-4xl mb-2" />, // Icon for electricity
       colorClass: 'bg-blue-100',
       buttonClass: 'bg-blue-400 hover:bg-blue-500',
       action: 'Electricity',
     },
     {
       label: 'Waste',
+      icon: <FaTrash className="text-green-500 text-4xl mb-2" />, // Icon for waste
       colorClass: 'bg-green-100',
       buttonClass: 'bg-green-400 hover:bg-green-500',
       action: 'Waste',
     },
     {
       label: 'Water',
+      icon: <FaTint className="text-teal-500 text-4xl mb-2" />, // Icon for water
       colorClass: 'bg-teal-100',
       buttonClass: 'bg-teal-400 hover:bg-teal-500',
       action: 'Water',
     },
     {
       label: 'Community Engagement',
+      icon: <FaHandsHelping className="text-pink-500 text-4xl mb-2" />, // Icon for community engagement
       colorClass: 'bg-pink-100',
       buttonClass: 'bg-pink-400 hover:bg-pink-500',
       action: 'CommunityEngagement',
     },
     {
       label: 'Fuel Consumption',
+      icon: <FaGasPump className="text-orange-500 text-4xl mb-2" />, // Icon for fuel
       colorClass: 'bg-orange-100',
       buttonClass: 'bg-orange-400 hover:bg-orange-500',
       action: 'FuelConsumption',
@@ -58,6 +64,7 @@ const AdminPanel = () => {
               key={index}
               className={`flex flex-col items-center ${option.colorClass} p-6 rounded-lg shadow-md`}
             >
+              <div className="mb-2">{option.icon}</div> {/* Display icon above label */}
               <h2 className="text-xl font-bold mb-4">{option.label}</h2>
               <button
                 onClick={() => handleOptionClick(option.action)}

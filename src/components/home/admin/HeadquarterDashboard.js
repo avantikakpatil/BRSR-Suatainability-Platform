@@ -22,9 +22,16 @@ const auth = getAuth(app);
 const Dashboard = () => {
   const [baselineData, setBaselineData] = useState({});
   const [comparisonResults, setComparisonResults] = useState([]);
-  const [totalConsumption, setTotalConsumption] = useState(0); // New state for total consumption
+  const [additionalData, setAdditionalData] = useState({});
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
+
+  const paths = {
+    electricity: `PostalManager/${userEmail}/inputData/electricityData/currentYearElectricity`,
+    fuel: `PostalManager/${userEmail}/inputData/fuelData/fuelConsumption`,
+    waste: `PostalManager/${userEmail}/inputData/wasteData/totalWaste`,
+    water: `PostalManager/${userEmail}/inputData/waterData/totalConsumption`,
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -43,29 +50,39 @@ const Dashboard = () => {
     if (!userEmail) return;
 
     const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
+    const additionalRefs = Object.entries(paths).reduce((acc, [key, path]) => {
+      acc[key] = ref(db, path);
+      return acc;
+    }, {});
 
     const baselineListener = onValue(baselineRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const latestEntry = Object.values(data).pop();
         setBaselineData(latestEntry);
-
-        // Calculate total consumption
-        const total =
-          parseFloat(latestEntry.electricity || 0) +
-          parseFloat(latestEntry.fuel || 0) +
-          parseFloat(latestEntry.water || 0) +
-          parseFloat(latestEntry.waste || 0);
-        setTotalConsumption(total);
-
-        setLoading(false);
       } else {
         console.log("No baseline data found for user");
-        setLoading(false);
       }
+      setLoading(false);
     });
 
-    return () => off(baselineRef, baselineListener);
+    const additionalListeners = Object.entries(additionalRefs).map(([key, refPath]) =>
+      onValue(refPath, (snapshot) => {
+        if (snapshot.exists()) {
+          setAdditionalData((prevData) => ({
+            ...prevData,
+            [key]: snapshot.val(),
+          }));
+        } else {
+          console.log(`No ${key} data found`);
+        }
+      })
+    );
+
+    return () => {
+      off(baselineRef, baselineListener);
+      additionalListeners.forEach((unsubscribe) => off(unsubscribe));
+    };
   }, [userEmail]);
 
   useEffect(() => {
@@ -73,19 +90,19 @@ const Dashboard = () => {
       const results = compareData(baselineData);
       setComparisonResults(results);
     }
-  }, [baselineData]);
+  }, [baselineData, additionalData]);
 
   const compareData = (baseline) => {
-    const results = [];
-    const comparisons = [
+    const results = [
       { key: "electricity", label: "Electricity Consumption" },
       { key: "fuel", label: "Fuel Consumption" },
       { key: "water", label: "Water Consumption" },
       { key: "waste", label: "Waste Generation" },
     ];
 
-    comparisons.forEach(({ key, label }) => {
+    return results.map(({ key, label }) => {
       const baselineValue = parseFloat(baseline[key]) || 0;
+      const totalValue = parseFloat(additionalData[key]) || 0;
 
       let status = "OK";
       if (baselineValue === 0) {
@@ -94,10 +111,8 @@ const Dashboard = () => {
         status = "Good";
       }
 
-      results.push({ label, baseline: baselineValue, status });
+      return { label, baseline: baselineValue, status, total: totalValue };
     });
-
-    return results;
   };
 
   return (
@@ -119,7 +134,7 @@ const Dashboard = () => {
                 Sustainability Status
               </th>
               <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
-                Total Consumption
+                Total Value
               </th>
             </tr>
           </thead>
@@ -141,14 +156,9 @@ const Dashboard = () => {
                 >
                   {result.status}
                 </td>
-                {index === 0 && (
-                  <td
-                    rowSpan={comparisonResults.length}
-                    className="border border-gray-300 px-4 py-2 text-center align-middle font-bold"
-                  >
-                    {totalConsumption.toFixed(2)} {/* Display total consumption */}
-                  </td>
-                )}
+                <td className="border border-gray-300 px-4 py-2 text-center">
+                  {result.total.toFixed(2)}
+                </td>
               </tr>
             ))}
           </tbody>

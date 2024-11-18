@@ -19,7 +19,10 @@ import PostOfficeReport from "./components/home/admin/PostOfficeReport"; // Impo
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
 import VerifyReport from "./components/home/admin/verifyReport";
+import Comparision from "./components/home/admin/Comparision.js";
 import Baselinenew from "./components/home/admin/Baselinenew.js";
+import SetDeadline from "./components/home/admin/setdeadline.js";
+
 
 function App() {
   const location = useLocation();
@@ -45,6 +48,9 @@ function App() {
     { path: "/admin/VerifyReport", element: <VerifyReport /> },
     { path: "/admin/baselinenew", element: <Baselinenew /> },
     { path: "/admin/postofficereport", element: <PostOfficeReport /> }, // Add the route for PostOfficeReport
+    {path: "/admin/baselinenew", element: <Baselinenew/>},
+    {path: "/admin/SetDeadline", element: <SetDeadline/>},
+    {path: "/admin/Comparision", element: <Comparision/>}
   ];
 
   const { userLoggedIn } = useAuth();
@@ -68,6 +74,7 @@ function App() {
           onListPO={() => navigate("/admin/listpo")}
           onVerifyReport={() => navigate("/admin/verifyreport")}
           onPostOfficeReport={() => navigate("/admin/postofficereport")} // Add this callback for navigation
+          onSetDeadline={() => navigate("/admin/SetDeadline")}
         />
       )}
       <div className={`content flex-grow p-4 ${isAuthPage ? "mt-0" : "mt-16"}`}>

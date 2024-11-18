@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue, off } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -10,122 +11,151 @@ const firebaseConfig = {
   storageBucket: "brsr-9b56a.appspot.com",
   messagingSenderId: "548279958491",
   appId: "1:548279958491:web:19199e42e0d796ad4185fe",
-  measurementId: "G-7SYPSVZR9H"
+  measurementId: "G-7SYPSVZR9H",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 const Dashboard = () => {
   const [baselineData, setBaselineData] = useState({});
-  const [inputData, setInputData] = useState({});
   const [comparisonResults, setComparisonResults] = useState([]);
+  const [totalConsumption, setTotalConsumption] = useState(0); // New state for total consumption
+  const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
-    // Replace with logged-in user's email or unique identifier
-    const userEmail = "avantikapatil420@gmail_com";
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const formattedEmail = user.email.replace(/[.#$/[\]]/g, "_");
+        setUserEmail(formattedEmail);
+      } else {
+        console.log("No user logged in");
+      }
+    });
 
-    // Firebase database references
-    const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
-    const inputDataRef = ref(db, `PostalManager/${userEmail}/inputData`);
-
-    // Function to fetch and listen to data
-    const fetchData = () => {
-      // Listen to baseline data
-      const baselineListener = onValue(baselineRef, (snapshot) => {
-        if (snapshot.exists()) {
-          setBaselineData(snapshot.val());
-        }
-      });
-
-      // Listen to input data
-      const inputListener = onValue(inputDataRef, (snapshot) => {
-        if (snapshot.exists()) {
-          setInputData(snapshot.val());
-        }
-      });
-
-      // Cleanup function to remove listeners
-      return () => {
-        off(baselineRef, baselineListener);
-        off(inputDataRef, inputListener);
-      };
-    };
-
-    // Call fetchData and clean up listeners on unmount
-    const cleanup = fetchData();
-    return cleanup;
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    // Perform comparison only when both baseline and input data are loaded
-    if (Object.keys(baselineData).length && Object.keys(inputData).length) {
-      const results = compareData(baselineData, inputData);
+    if (!userEmail) return;
+
+    const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
+
+    const baselineListener = onValue(baselineRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const latestEntry = Object.values(data).pop();
+        setBaselineData(latestEntry);
+
+        // Calculate total consumption
+        const total =
+          parseFloat(latestEntry.electricity || 0) +
+          parseFloat(latestEntry.fuel || 0) +
+          parseFloat(latestEntry.water || 0) +
+          parseFloat(latestEntry.waste || 0);
+        setTotalConsumption(total);
+
+        setLoading(false);
+      } else {
+        console.log("No baseline data found for user");
+        setLoading(false);
+      }
+    });
+
+    return () => off(baselineRef, baselineListener);
+  }, [userEmail]);
+
+  useEffect(() => {
+    if (Object.keys(baselineData).length) {
+      const results = compareData(baselineData);
       setComparisonResults(results);
     }
-  }, [baselineData, inputData]);
+  }, [baselineData]);
 
-  // Comparison logic
-  const compareData = (baseline, inputData) => {
+  const compareData = (baseline) => {
     const results = [];
     const comparisons = [
       { key: "electricity", label: "Electricity Consumption" },
       { key: "fuel", label: "Fuel Consumption" },
       { key: "water", label: "Water Consumption" },
-      { key: "waste", label: "Waste Generation" }
+      { key: "waste", label: "Waste Generation" },
     ];
 
     comparisons.forEach(({ key, label }) => {
       const baselineValue = parseFloat(baseline[key]) || 0;
-      const inputValue = parseFloat(inputData[key]) || 0;
 
-      let status = "Need to Improve";
-      if (inputValue < baselineValue) {
+      let status = "OK";
+      if (baselineValue === 0) {
+        status = "Need to Improve";
+      } else if (baselineValue < 5) {
         status = "Good";
-      } else if (inputValue === baselineValue) {
-        status = "OK";
       }
 
-      results.push({ label, baseline: baselineValue, input: inputValue, status });
+      results.push({ label, baseline: baselineValue, status });
     });
 
     return results;
   };
 
   return (
-    <div>
-      <h1>Comparison Dashboard</h1>
-      <table className="min-w-full border-collapse border border-gray-300 mt-4">
-        <thead>
-          <tr>
-            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Parameter</th>
-            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Baseline</th>
-            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Input Values</th>
-            <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">Sustainability Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {comparisonResults.map((result, index) => (
-            <tr key={index} className="odd:bg-white even:bg-gray-50">
-              <td className="border border-gray-300 px-4 py-2">{result.label}</td>
-              <td className="border border-gray-300 px-4 py-2">{result.baseline}</td>
-              <td className="border border-gray-300 px-4 py-2">{result.input}</td>
-              <td
-                className={`border border-gray-300 px-4 py-2 font-bold ${
-                  result.status === "Good"
-                    ? "text-green-600"
-                    : result.status === "OK"
-                    ? "text-blue-600"
-                    : "text-red-600"
-                }`}
-              >
-                {result.status}
-              </td>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Comparison Dashboard</h1>
+      {loading ? (
+        <p>Loading data...</p>
+      ) : Object.keys(baselineData).length ? (
+        <table className="min-w-full border-collapse border border-gray-300 mt-4">
+          <thead>
+            <tr>
+              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
+                Parameter
+              </th>
+              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
+                Baseline
+              </th>
+              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
+                Sustainability Status
+              </th>
+              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
+                Total Consumption
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {comparisonResults.map((result, index) => (
+              <tr key={index} className="odd:bg-white even:bg-gray-50">
+                <td className="border border-gray-300 px-4 py-2">{result.label}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {result.baseline}
+                </td>
+                <td
+                  className={`border border-gray-300 px-4 py-2 font-bold ${
+                    result.status === "Good"
+                      ? "text-green-600"
+                      : result.status === "OK"
+                      ? "text-blue-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {result.status}
+                </td>
+                {index === 0 && (
+                  <td
+                    rowSpan={comparisonResults.length}
+                    className="border border-gray-300 px-4 py-2 text-center align-middle font-bold"
+                  >
+                    {totalConsumption.toFixed(2)} {/* Display total consumption */}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>No data available for the current user.</p>
+      )}
     </div>
   );
 };

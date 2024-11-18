@@ -1,57 +1,141 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/authContext';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, child, get } from 'firebase/database';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+// Register Chart.js elements
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
+  authDomain: "brsr-9b56a.firebaseapp.com",
+  projectId: "brsr-9b56a",
+  storageBucket: "brsr-9b56a.appspot.com",
+  messagingSenderId: "548279958491",
+  appId: "1:548279958491:web:19199e42e0d796ad4185fe",
+  measurementId: "G-7SYPSVZR9H",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 const Home = () => {
-    const { currentUser } = useAuth();
-    const userName = currentUser?.displayName || currentUser?.email || 'User';
+  const { currentUser } = useAuth();
+  const [baselineScores, setBaselineScores] = useState([]);
+  const [error, setError] = useState(null);
 
-    return (
-        <div className="bg-gray-100 min-h-screen p-8">
+  const userEmail = currentUser?.email?.replace(/\./g, '_');
 
-            {/* Dashboard Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Dashboard Cards */}
-                <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                    <h3 className="text-xl font-semibold text-gray-700">Total Accounts</h3>
-                    <p className="text-4xl font-bold text-green-500 mt-2">2,104</p>
-                    <p className="text-sm text-gray-500">↑ 20% vs previous 30 days</p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                    <h3 className="text-xl font-semibold text-gray-700">Orders per Month</h3>
-                    <p className="text-4xl font-bold text-green-500 mt-2">37</p>
-                    <p className="text-sm text-gray-500">↑ 15 vs previous 30 days</p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                    <h3 className="text-xl font-semibold text-gray-700">Average Contract</h3>
-                    <p className="text-4xl font-bold text-green-500 mt-2">$1,553</p>
-                    <p className="text-sm text-gray-500">↑ 7.3% vs previous 30 days</p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                    <h3 className="text-xl font-semibold text-gray-700">Growth Rate</h3>
-                    <p className="text-4xl font-bold text-green-500 mt-2">8.29%</p>
-                    <p className="text-sm text-gray-500">↑ 1.3% vs previous 30 days</p>
-                </div>
-            </div>
+  useEffect(() => {
+    const fetchBaselineScores = async () => {
+      if (!userEmail) return;
 
-            {/* Chart Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-4">Sales Growth by Market Segment</h3>
-                    {/* Replace this placeholder with an actual chart component */}
-                    <div className="h-48 bg-gray-200 flex items-center justify-center rounded-lg">
-                        <p className="text-gray-500">Chart Placeholder</p>
-                    </div>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-4">Sales per Rep</h3>
-                    {/* Replace this placeholder with an actual chart component */}
-                    <div className="h-48 bg-gray-200 flex items-center justify-center rounded-lg">
-                        <p className="text-gray-500">Chart Placeholder</p>
-                    </div>
-                </div>
-            </div>
+      try {
+        const dbRef = ref(db);
+        const userPath = `PostalManager/${userEmail}/BaselineScores`;
+
+        const snapshot = await get(child(dbRef, userPath));
+
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const formattedData = Object.values(data).map((value) => ({
+            electricity: parseFloat(value.electricity) || 0,
+            fuel: parseFloat(value.fuel) || 0,
+            waste: parseFloat(value.waste) || 0,
+            water: parseFloat(value.water) || 0,
+          }));
+          setBaselineScores(formattedData);
+        } else {
+          setBaselineScores([]);
+        }
+      } catch (error) {
+        setError("Failed to fetch data. Please try again.");
+      }
+    };
+
+    fetchBaselineScores();
+  }, [userEmail]);
+
+  const createChartData = (label, value) => ({
+    labels: [`${label} Usage`, 'Remaining'],
+    datasets: [
+      {
+        data: [value, 100 - value],
+        backgroundColor: ['#4CAF50', '#E0E0E0'],
+        hoverBackgroundColor: ['#45A049', '#C0C0C0'],
+        borderWidth: 1,
+        cutout: '70%',
+      },
+    ],
+  });
+
+  return (
+    <div className="bg-gray-100 min-h-screen p-8">
+      <h1 className="text-2xl font-bold mb-4">
+        Welcome, {currentUser?.displayName || currentUser?.email || 'User'}!
+      </h1>
+
+      {/* Existing Dashboard Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <h3 className="text-xl font-semibold text-gray-700">Total Accounts</h3>
+          <p className="text-4xl font-bold text-green-500 mt-2">2,104</p>
+          <p className="text-sm text-gray-500">↑ 20% vs previous 30 days</p>
         </div>
-    );
+        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <h3 className="text-xl font-semibold text-gray-700">Orders per Month</h3>
+          <p className="text-4xl font-bold text-green-500 mt-2">37</p>
+          <p className="text-sm text-gray-500">↑ 15 vs previous 30 days</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <h3 className="text-xl font-semibold text-gray-700">Average Contract</h3>
+          <p className="text-4xl font-bold text-green-500 mt-2">$1,553</p>
+          <p className="text-sm text-gray-500">↑ 7.3% vs previous 30 days</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <h3 className="text-xl font-semibold text-gray-700">Growth Rate</h3>
+          <p className="text-4xl font-bold text-green-500 mt-2">8.29%</p>
+          <p className="text-sm text-gray-500">↑ 1.3% vs previous 30 days</p>
+        </div>
+      </div>
+
+      {/* New Section Heading */}
+      <div className="bg-green-500 text-white text-lg font-bold p-4 rounded-lg mt-8 text-center">
+        YOUR BASELINES
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+        {baselineScores[0] && (
+          <>
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                Electricity Usage
+              </h3>
+              <Doughnut data={createChartData('Electricity', baselineScores[0].electricity)} options={{ rotation: -90, circumference: 180 }} />
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Fuel Usage</h3>
+              <Doughnut data={createChartData('Fuel', baselineScores[0].fuel)} options={{ rotation: -90, circumference: 180 }} />
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Waste Usage</h3>
+              <Doughnut data={createChartData('Waste', baselineScores[0].waste)} options={{ rotation: -90, circumference: 180 }} />
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Water Usage</h3>
+              <Doughnut data={createChartData('Water', baselineScores[0].water)} options={{ rotation: -90, circumference: 180 }} />
+            </div>
+          </>
+        )}
+        {!baselineScores.length && <p>No data available for the current user.</p>}
+      </div>
+    </div>
+  );
 };
 
 export default Home;

@@ -19,7 +19,7 @@ import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
 import VerifyReport from "./components/home/admin/verifyReport";
 import Baselinenew from "./components/home/admin/Baselinenew.js";
-
+import SetDeadline from "./components/home/admin/setdeadline.js";
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,7 +42,8 @@ function App() {
     { path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} /> },
     { path: "/admin/listpo", element: <ListPO /> },
     { path: "/admin/VerifyReport", element: <VerifyReport /> },
-    {path: "/admin/baselinenew", element: <Baselinenew/>}
+    {path: "/admin/baselinenew", element: <Baselinenew/>},
+    {path: "/admin/SetDeadline", element: <SetDeadline/>}
   ];
 
   const { userLoggedIn } = useAuth();
@@ -65,6 +66,7 @@ function App() {
           onCreatePO={() => navigate("/admin/createpo")}
           onListPO={() => navigate("/admin/listpo")}
           onVerifyReport={() => navigate("/admin/verifyreport")}
+          onSetDeadline={() => navigate("/admin/SetDeadline")}
         />
       )}
       <div className={`content flex-grow p-4 ${isAuthPage ? "mt-0" : "mt-16"}`}>

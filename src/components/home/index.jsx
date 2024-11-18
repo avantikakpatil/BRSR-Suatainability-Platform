@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/authContext';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, child, get } from 'firebase/database';
+import { getDatabase, ref, get, child } from 'firebase/database';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
@@ -27,6 +27,31 @@ const Home = () => {
   const { currentUser } = useAuth();
   const [baselineScores, setBaselineScores] = useState([]);
   const [error, setError] = useState(null);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    // Fetch user's name from the database
+    const fetchUserName = async () => {
+      if (!currentUser) return;
+
+      try {
+        const userRef = ref(db, `users/${currentUser.uid}`);
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          setUserName(userData.name || 'User'); // Use the name or default to 'User'
+        } else {
+          setUserName('User');
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setUserName('User'); // Default if error occurs
+      }
+    };
+
+    fetchUserName();
+  }, [currentUser]);
 
   const userEmail = currentUser?.email?.replace(/\./g, '_');
 
@@ -47,6 +72,7 @@ const Home = () => {
             fuel: parseFloat(value.fuel) || 0,
             waste: parseFloat(value.waste) || 0,
             water: parseFloat(value.water) || 0,
+            co2: parseFloat(value.co2) || 0,
           }));
           setBaselineScores(formattedData);
         } else {
@@ -76,56 +102,58 @@ const Home = () => {
   return (
     <div className="bg-gray-100 min-h-screen p-8">
       <h1 className="text-2xl font-bold mb-4">
-        Welcome, {currentUser?.displayName || currentUser?.email || 'User'}!
+        Welcome, {userName}!
       </h1>
 
-      {/* Existing Dashboard Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Existing dashboard content */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h3 className="text-xl font-semibold text-gray-700">Total Accounts</h3>
-          <p className="text-4xl font-bold text-green-500 mt-2">2,104</p>
-          <p className="text-sm text-gray-500">↑ 20% vs previous 30 days</p>
+          <h3 className="text-xl font-semibold text-gray-700">Total Energy Saved</h3>
+          <p className="text-4xl font-bold text-green-500 mt-2">12,340 kWh</p>
+          <p className="text-sm text-gray-500">↓ 5% vs previous month</p>
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h3 className="text-xl font-semibold text-gray-700">Orders per Month</h3>
-          <p className="text-4xl font-bold text-green-500 mt-2">37</p>
-          <p className="text-sm text-gray-500">↑ 15 vs previous 30 days</p>
+          <h3 className="text-xl font-semibold text-gray-700">Total Waste Reduced</h3>
+          <p className="text-4xl font-bold text-blue-500 mt-2">4.5 tons</p>
+          <p className="text-sm text-gray-500">↓ 2% vs previous month</p>
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h3 className="text-xl font-semibold text-gray-700">Average Contract</h3>
-          <p className="text-4xl font-bold text-green-500 mt-2">$1,553</p>
-          <p className="text-sm text-gray-500">↑ 7.3% vs previous 30 days</p>
+          <h3 className="text-xl font-semibold text-gray-700">Water Usage Reduction</h3>
+          <p className="text-4xl font-bold text-blue-500 mt-2">3,200 liters</p>
+          <p className="text-sm text-gray-500">↓ 4% vs previous month</p>
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h3 className="text-xl font-semibold text-gray-700">Growth Rate</h3>
-          <p className="text-4xl font-bold text-green-500 mt-2">8.29%</p>
-          <p className="text-sm text-gray-500">↑ 1.3% vs previous 30 days</p>
+          <h3 className="text-xl font-semibold text-gray-700">CO2 Emissions Reduced</h3>
+          <p className="text-4xl font-bold text-red-500 mt-2">1.2 tons</p>
+          <p className="text-sm text-gray-500">↓ 6% vs previous month</p>
         </div>
       </div>
 
-      {/* New Section Heading */}
       <div className="bg-green-500 text-white text-lg font-bold p-4 rounded-lg mt-8 text-center">
         YOUR BASELINES
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
         {baselineScores[0] && (
           <>
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                Electricity Usage
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Electricity Usage</h3>
               <Doughnut data={createChartData('Electricity', baselineScores[0].electricity)} options={{ rotation: -90, circumference: 180 }} />
             </div>
+
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Fuel Usage</h3>
               <Doughnut data={createChartData('Fuel', baselineScores[0].fuel)} options={{ rotation: -90, circumference: 180 }} />
             </div>
+
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Waste Usage</h3>
               <Doughnut data={createChartData('Waste', baselineScores[0].waste)} options={{ rotation: -90, circumference: 180 }} />
             </div>
+
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Water Usage</h3>
               <Doughnut data={createChartData('Water', baselineScores[0].water)} options={{ rotation: -90, circumference: 180 }} />

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+
 import { db, ref, set, auth} from '../../../firebaseConfig'; // Adjust the import path as necessary
+
 function BaselineCalculator() {
   const [currentForm, setCurrentForm] = useState(1);
 
@@ -198,7 +200,6 @@ const sanitizeEmail = (email) => {
       </button>
   
       {/* Conditionally render Next or Submit button */}
-      
       {currentForm === 4 ? (
         <button
           type="button"
@@ -413,10 +414,8 @@ const sanitizeEmail = (email) => {
         {renderFormButtons()} {/* Render the form buttons */}
       </div>
     </div>
-    
   );
   
 }
-
 
 export default BaselineCalculator;

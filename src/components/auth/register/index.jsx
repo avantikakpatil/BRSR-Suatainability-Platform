@@ -9,7 +9,7 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState(''); // State for name
+  const [name, setName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { userLoggedIn } = useAuth();
@@ -17,7 +17,6 @@ const Register = () => {
   const roles = ['DoP Headquarters', 'Postal Managers (Regional Managers)', 'Post Office Heads'];
   const [postOfficeData, setPostOfficeData] = useState({});
 
-  // Fetch post office data on mount
   useEffect(() => {
     const db = getDatabase();
     const postOfficeRef = ref(db, 'postOfficeData');
@@ -59,17 +58,15 @@ const Register = () => {
         const userCredential = await doCreateUserWithEmailAndPassword(email, password);
         const uid = userCredential.user.uid;
 
-        // Store user information in the database
         const db = getDatabase();
         const userRef = ref(db, `users/${uid}`);
         await set(userRef, {
-          name: name, // Save the name
-          email: email,
+          name,
+          email,
           role: selectedRole,
           profileCompleted: false,
         });
 
-        // Redirect to profile page after registration
         navigate('/admin/profile');
       } catch (error) {
         setErrorMessage(error.message);
@@ -91,103 +88,79 @@ const Register = () => {
             </h3>
           </div>
           <form onSubmit={onSubmit} className="space-y-4">
-            <div style={{ width: '310px' }}>
-              {/* Name Input */}
-              <div>
-                <label className="text-sm text-gray-600 font-bold">Name</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
-                />
-              </div>
-
-              {/* Email Input */}
-              <div>
-                <label className="text-sm text-gray-600 font-bold">Email</label>
-                <input
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
-                />
-              </div>
-
-              {/* Password Input */}
-              <div>
-                <label className="text-sm text-gray-600 font-bold">Password</label>
-                <input
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
-                  disabled={isRegistering}
-                />
-              </div>
-
-              {/* Confirm Password Input */}
-              <div>
-                <label className="text-sm text-gray-600 font-bold">Confirm Password</label>
-                <input
-                  type="password"
-                  autoComplete="off"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
-                  disabled={isRegistering}
-                />
-              </div>
-
-              {/* Role Selection */}
-              <div>
-                <label className="text-sm text-gray-600 font-bold">Select Role</label>
-                <select
-                  value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value)}
-                  className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
-                >
-                  <option value="">Select a role</option>
-                  {roles.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="text-sm text-gray-600 font-bold">Name</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full mt-2 px-3 py-2 text-gray-500 border focus:border-indigo-600 shadow-sm rounded-lg"
+              />
             </div>
-
-            {/* Error Message Display */}
-            {errorMessage && (
-              <span className="text-red-600 font-bold">{errorMessage}</span>
-            )}
-
-            {/* Submit Button */}
+            <div>
+              <label className="text-sm text-gray-600 font-bold">Email</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full mt-2 px-3 py-2 text-gray-500 border focus:border-indigo-600 shadow-sm rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600 font-bold">Password</label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full mt-2 px-3 py-2 text-gray-500 border focus:border-indigo-600 shadow-sm rounded-lg"
+                disabled={isRegistering}
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600 font-bold">Confirm Password</label>
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full mt-2 px-3 py-2 text-gray-500 border focus:border-indigo-600 shadow-sm rounded-lg"
+                disabled={isRegistering}
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600 font-bold">Select Role</label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="w-full mt-2 px-3 py-2 text-gray-500 border focus:border-indigo-600 shadow-sm rounded-lg"
+              >
+                <option value="">Select a role</option>
+                {roles.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errorMessage && <span className="text-red-600">{errorMessage}</span>}
             <button
               type="submit"
               disabled={isRegistering || !selectedRole}
-              className={`w-full px-4 py-2 text-white font-medium rounded-lg ${
-                isRegistering
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl transition duration-300'
+              className={`w-full px-4 py-2 text-white rounded-lg ${
+                isRegistering ? 'bg-gray-300' : 'bg-indigo-600 hover:bg-indigo-700'
               }`}
             >
               {isRegistering ? 'Signing Up...' : 'Sign Up'}
             </button>
-            
-            {/* Redirect to Login */}
-            <div className="text-sm text-center">
-              Already have an account? {'   '}
-              <Link to={'/login'} className="text-center text-sm hover:underline font-bold">
-                Continue
+            <p className="text-center text-sm">
+              Already have an account?{' '}
+              <Link to="/login" className="text-indigo-600 hover:underline">
+                Log in
               </Link>
-            </div>
+            </p>
           </form>
         </div>
       </main>

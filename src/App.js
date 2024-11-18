@@ -18,7 +18,9 @@ import ListPO from "./components/home/admin/ListPO";
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
 import VerifyReport from "./components/home/admin/verifyReport";
+import Comparision from "./components/home/admin/Comparision.js";
 import Baselinenew from "./components/home/admin/Baselinenew.js";
+
 
 function App() {
   const location = useLocation();
@@ -42,7 +44,8 @@ function App() {
     { path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} /> },
     { path: "/admin/listpo", element: <ListPO /> },
     { path: "/admin/VerifyReport", element: <VerifyReport /> },
-    {path: "/admin/baselinenew", element: <Baselinenew/>}
+    {path: "/admin/baselinenew", element: <Baselinenew/>},
+    {path: "/admin/Comparision", element: <Comparision/>}
   ];
 
   const { userLoggedIn } = useAuth();

@@ -46,8 +46,7 @@ function App() {
     { path: "/admin/listpo", element: <ListPO /> },
     { path: "/admin/VerifyReport", element: <VerifyReport /> },
     {path: "/admin/baselinenew", element: <Baselinenew/>},
-    {path: "/admin/SetDeadline", element: <SetDeadline/>}
-    {path: "/admin/baselinenew", element: <Baselinenew/>},
+    {path: "/admin/SetDeadline", element: <SetDeadline/>},
     {path: "/admin/Comparision", element: <Comparision/>}
   ];
 

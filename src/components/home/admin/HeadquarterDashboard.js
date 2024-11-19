@@ -92,6 +92,29 @@ const Dashboard = () => {
     }
   }, [baselineData, additionalData]);
 
+  const calculateScore = (totalValue, baselineValue) => {
+    if (totalValue <= 0 || baselineValue <= 0) {
+      return 0; // Return 0 if baseline or total value is not valid
+    }
+
+    const difference = baselineValue - totalValue;
+    const percentageDifference = (difference / baselineValue) * 100;
+
+    if (percentageDifference >= 50) {
+      return 25; // Max score if total value is 50% or more below baseline
+    } else if (percentageDifference >= 20 && percentageDifference < 50) {
+      // Score between 20-24 for total value 40%-20% below baseline
+      return 20 + ((percentageDifference - 20) / 30) * 4; // Linearly interpolated between 20-24
+    } else if (percentageDifference >= 0 && percentageDifference < 20) {
+      // Score between 17-20 if total value is close (same as or slightly less than baseline)
+      return 17 + (percentageDifference / 20) * 3; // Linearly interpolated between 17-20
+    } else {
+      // Score below 10 for total value greater than baseline
+      const overagePercentage = ((totalValue - baselineValue) / baselineValue) * 100;
+      return Math.max(10 - (overagePercentage / 10), 0); // Decreasing score below 10, but not below 0
+    }
+  };
+
   const compareData = (baseline) => {
     const results = [
       { key: "electricity", label: "Electricity Consumption" },
@@ -104,6 +127,8 @@ const Dashboard = () => {
       const baselineValue = parseFloat(baseline[key]) || 0;
       const totalValue = parseFloat(additionalData[key]) || 0;
 
+      const score = calculateScore(totalValue, baselineValue);
+
       let status = "OK";
       if (baselineValue === 0) {
         status = "Need to Improve";
@@ -111,9 +136,14 @@ const Dashboard = () => {
         status = "Good";
       }
 
-      return { label, baseline: baselineValue, status, total: totalValue };
+      return { label, baseline: baselineValue, status, total: totalValue, score };
     });
   };
+
+  const totalSustainabilityScore = comparisonResults.reduce(
+    (sum, result) => sum + result.score,
+    0
+  );
 
   return (
     <div className="container mx-auto p-4">
@@ -135,6 +165,9 @@ const Dashboard = () => {
               </th>
               <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
                 Total Value
+              </th>
+              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
+                Sustainability Score
               </th>
             </tr>
           </thead>
@@ -159,8 +192,19 @@ const Dashboard = () => {
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {result.total.toFixed(2)}
                 </td>
+                <td className="border border-gray-300 px-4 py-2 text-center">
+                  {result.score.toFixed(2)}
+                </td>
               </tr>
             ))}
+            <tr className="bg-gray-200 font-bold">
+              <td colSpan="4" className="border border-gray-300 px-4 py-2 text-right">
+                Total Sustainability Score:
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {totalSustainabilityScore.toFixed(2)} / 100
+              </td>
+            </tr>
           </tbody>
         </table>
       ) : (

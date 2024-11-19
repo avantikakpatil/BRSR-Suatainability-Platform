@@ -1,14 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaUser,
-  FaChartLine,
-  FaTasks,
-  FaTrophy,
-  FaDatabase,
-  FaFilePdf,
-  FaChartPie,
-} from "react-icons/fa";
+import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf, FaChartPie } from "react-icons/fa";
+import { getDatabase, ref, child, get } from "firebase/database";
+import { getAuth } from "firebase/auth";
 
 const Sidebar = ({
   onLeaderboardClick,
@@ -22,7 +16,44 @@ const Sidebar = ({
   onVerifyReport,
   onPostOfficeReport,
 }) => {
+  const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    if (user) {
+      const db = getDatabase();
+      const userRef = ref(db, 'users/' + user.uid);
+      
+      // Fetch user data (role and profile completion status) from Firebase
+      get(userRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            console.log("Fetched user data:", userData);  // Debugging line
+            setUserRole(userData.role);  // Set role from fetched data
+          } else {
+            console.log("No data available");
+            setUserRole(null);  // Reset if no data
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+          setUserRole(null);  // In case of error, reset the role
+        });
+    } else {
+      console.log("No user is logged in.");
+    }
+  }, [user]);  // Only run when the user changes
+
+  // If no role is found, return loading state
+  if (userRole === null) {
+    return <div>Loading...</div>;  // Show loading until role is fetched
+  }
+
+  // Debugging output for current user role
+  console.log("Current user role:", userRole);
 
   return (
     <div
@@ -46,6 +77,7 @@ const Sidebar = ({
         <h2 className="text-xl font-bold mb-8 text-center">Admin Panel</h2>
 
         <ul className="space-y-3">
+          {/* Dashboard (Visible for all roles) */}
           <li>
             <button
               onClick={() => navigate("/admin/dashboard")}
@@ -55,6 +87,8 @@ const Sidebar = ({
               <span>Dashboard</span>
             </button>
           </li>
+
+          {/* Profile */}
           <li>
             <button
               onClick={() => navigate("/admin/profile")}
@@ -64,105 +98,176 @@ const Sidebar = ({
               <span>Profile</span>
             </button>
           </li>
-          <li>
-            <button
-              onClick={() => navigate("/admin/baseline")}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaChartLine className="text-lg mr-3" />
-              <span>Baseline Parameters</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onInputDataClick}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaDatabase className="text-lg mr-3" />
-              <span>Input Data</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onSetDeadline}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaDatabase className="text-lg mr-3" />
-              <span>Set Deadline</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onChallengesClick}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaTasks className="text-lg mr-3" />
-              <span>Challenges</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onLeaderboardClick}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaTrophy className="text-lg mr-3" />
-              <span>Leaderboard</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onReportClick}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaFilePdf className="text-lg mr-3" />
-              <span>Report</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onVerifyReport}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaFilePdf className="text-lg mr-3" />
-              <span>Verify Report</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onHeadquarterDashboard}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaUser className="text-lg mr-3" />
-              <span>Headquarter Dashboard</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onCreatePO}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaUser className="text-lg mr-3" />
-              <span>Create Post Office Profile</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onListPO}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaUser className="text-lg mr-3" />
-              <span>Post Offices List</span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onPostOfficeReport}
-              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-            >
-              <FaFilePdf className="text-lg mr-3" />
-              <span>Post Office Report</span>
-            </button>
-          </li>
+
+          {/* DoP Headquarters Role */}
+          {userRole === "DoP Headquarters" && (
+            <>
+              {/* Dashboard */}
+              <li>
+                <button
+                  onClick={() => navigate("/admin/dashboard")}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaChartPie className="text-lg mr-3" />
+                  <span>Dashboard</span>
+                </button>
+              </li>
+
+              {/* Create Post Office Profile */}
+              <li>
+                <button
+                  onClick={onCreatePO}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaUser className="text-lg mr-3" />
+                  <span>Create Post Office Profile</span>
+                </button>
+              </li>
+
+              {/* Post Offices List */}
+              <li>
+                <button
+                  onClick={onListPO}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaUser className="text-lg mr-3" />
+                  <span>Post Offices List</span>
+                </button>
+              </li>
+
+              {/* Leaderboard */}
+              <li>
+                <button
+                  onClick={onLeaderboardClick}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaTrophy className="text-lg mr-3" />
+                  <span>Leaderboard</span>
+                </button>
+              </li>
+            </>
+          )}
+
+          {/* Postal Managers (Regional Managers) Role */}
+{userRole === "Postal Managers (Regional Managers)" && (
+  <>
+    {/* Dashboard */}
+    <li>
+      <button
+        onClick={() => navigate("/admin/dashboard")}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaChartPie className="text-lg mr-3" />
+        <span>Dashboard</span>
+      </button>
+    </li>
+
+    {/* Baseline Parameters */}
+    <li>
+      <button
+        onClick={() => navigate("/admin/baseline")}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaChartLine className="text-lg mr-3" />
+        <span>Baseline Parameters</span>
+      </button>
+    </li>
+
+    {/* Input Data */}
+    <li>
+      <button
+        onClick={onInputDataClick}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaDatabase className="text-lg mr-3" />
+        <span>Input Data</span>
+      </button>
+    </li>
+
+    {/* Challenges */}
+    <li>
+      <button
+        onClick={onChallengesClick}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaTasks className="text-lg mr-3" />
+        <span>Challenges</span>
+      </button>
+    </li>
+
+    {/* Leaderboard */}
+    <li>
+      <button
+        onClick={onLeaderboardClick}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaTrophy className="text-lg mr-3" />
+        <span>Leaderboard</span>
+      </button>
+    </li>
+
+    {/* Post Office Report */}
+    <li>
+      <button
+        onClick={onPostOfficeReport}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaFilePdf className="text-lg mr-3" />
+        <span>Post Office Report</span>
+      </button>
+    </li>
+
+    {/* Headquarter Dashboard */}
+    <li>
+      <button
+        onClick={onHeadquarterDashboard}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaUser className="text-lg mr-3" />
+        <span>Headquarter Dashboard</span>
+      </button>
+    </li>
+  </>
+)}
+
+
+          {/* Post Office Heads Role */}
+          {userRole === "Post Office Heads" && (
+            <>
+              {/* Dashboard */}
+              <li>
+                <button
+                  onClick={() => navigate("/admin/dashboard")}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaChartPie className="text-lg mr-3" />
+                  <span>Dashboard</span>
+                </button>
+              </li>
+
+              {/* Verify Report */}
+              <li>
+                <button
+                  onClick={onVerifyReport}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaFilePdf className="text-lg mr-3" />
+                  <span>Verify Report</span>
+                </button>
+              </li>
+
+              {/* Set Deadline */}
+              <li>
+                <button
+                  onClick={onSetDeadline}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaTasks className="text-lg mr-3" />
+                  <span>Set Deadline</span>
+                </button>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </div>

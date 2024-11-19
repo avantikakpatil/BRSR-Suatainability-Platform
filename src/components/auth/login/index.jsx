@@ -17,11 +17,13 @@ const Login = ({ type }) => {
   const [postOfficeEmails, setPostOfficeEmails] = useState([]); // State to store retrieved emails
 
   // Fetch email addresses from Firebase Realtime Database
-  useEffect(() => {
-    const db = getDatabase();
-    const postOfficesRef = ref(db, 'PostOffices'); // Reference the PostOffice node
+useEffect(() => {
+  const db = getDatabase();
+  const headquarterRef = ref(db, 'Headquarter/PostOffices'); // Reference the updated node path
 
-    const unsubscribe = onValue(postOfficesRef, (snapshot) => {
+  const unsubscribe = onValue(
+    headquarterRef,
+    (snapshot) => {
       const data = snapshot.val();
       const emailList = [];
 
@@ -33,46 +35,40 @@ const Login = ({ type }) => {
       }
 
       setPostOfficeEmails(emailList); // Update state with fetched emails
-    }, (error) => {
+    },
+    (error) => {
       console.error("Error fetching email addresses:", error);
-    });
-
-    return () => off(postOfficesRef, unsubscribe); // Cleanup function to detach listener
-  }, []);
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if (!isSigningIn) {
-      setIsSigningIn(true);
-      try {
-        await doSignInWithEmailAndPassword(email, password);
-
-        // Fetch the current user from Firebase after successful login
-        const currentUser = auth.currentUser;
-
-        if (currentUser) {
-          console.log("Current user email:", currentUser.email);
-
-          // **Do not fetch or store user type based on email address**
-          // This approach prioritizes user privacy and avoids potential security risks.
-
-          navigate(
-            type === "regular"
-              ? "/regularSidebar"
-              : type === "divisional"
-                ? "/divisionalSidebar"
-                : "/headquarterSidebar"
-          );
-        } else {
-          console.error("No current user found after login.");
-        }
-      } catch (error) {
-        setErrorMessage(error.message);
-      } finally {
-        setIsSigningIn(false);
-      }
     }
-  };
+  );
+
+  return () => unsubscribe(); // Cleanup function to detach listener
+}, []);
+
+const onSubmit = async (e) => {
+  e.preventDefault();
+  if (!isSigningIn) {
+    setIsSigningIn(true);
+    try {
+      await doSignInWithEmailAndPassword(email, password);
+
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        console.log("Current user email:", currentUser.email);
+        navigate(
+          type === "regular"
+            ? "/regularSidebar"
+            : type === "divisional"
+            ? "/divisionalSidebar"
+            : "/headquarterSidebar"
+        );
+      }
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsSigningIn(false);
+    }
+  }
+};
 
   const onGoogleSignIn = async (e) => {
     e.preventDefault();

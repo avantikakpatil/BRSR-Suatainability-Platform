@@ -150,9 +150,6 @@ const Sidebar = ({
           )}
 
           {/* Postal Managers (Regional Managers) Role */}
-<<<<<<< HEAD
-          {userRole === "Postal Managers (Regional Managers)" && (
-=======
 {userRole === "Postal Managers (Regional Managers)" && (
   <>
     {/* Dashboard */}
@@ -237,7 +234,6 @@ const Sidebar = ({
 
           {/* Post Office Heads Role */}
           {userRole === "Post Office Heads" && (
->>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
             <>
               {/* Dashboard */}
               <li>

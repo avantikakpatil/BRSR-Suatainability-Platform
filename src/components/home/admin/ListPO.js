@@ -10,7 +10,7 @@ const ListPO = () => {
 
   // Fetch data from Firebase
   useEffect(() => {
-    const poRef = ref(db, 'headquarter/postOffices');
+    const poRef = ref(db, 'headquarter/postOffices'); // Update reference path to match your DB structure
     const unsubscribe = onValue(poRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
@@ -38,14 +38,14 @@ const ListPO = () => {
     // Filter all fields dynamically
     const filtered = postOffices.filter((po) => {
       const searchableValues = [
-        po.type,
-        po.details?.name,
-        po.details?.cin,
-        `${po.details?.address?.city}, ${po.details?.address?.state}, ${po.details?.address?.country} - ${po.details?.address?.pincode}`,
-        po.details?.email,
-        po.details?.telephone,
-        po.details?.contactNumber,
-        po.details?.website,
+        po.poCategory,
+        po.details?.postOfficeName,
+        po.details?.corporateId,
+        `${po.details?.location?.city || ''}, ${po.details?.location?.state || ''}, ${po.details?.location?.country || ''} - ${po.details?.location?.pincode || ''}`,
+        po.details?.userEmail,
+        po.details?.contactPhone,
+        po.details?.phone,
+        po.details?.websiteURL,
       ]
         .filter(Boolean) // Remove null or undefined values
         .join(' ')
@@ -94,30 +94,30 @@ const ListPO = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th} onClick={() => handleSort('type')}>Type</th>
-              <th style={styles.th} onClick={() => handleSort('details.name')}>Name</th>
-              <th style={styles.th} onClick={() => handleSort('details.cin')}>CIN</th>
-              <th style={styles.th} onClick={() => handleSort('details.address')}>Address</th>
-              <th style={styles.th} onClick={() => handleSort('details.email')}>Email</th>
-              <th style={styles.th} onClick={() => handleSort('details.telephone')}>Telephone</th>
-              <th style={styles.th} onClick={() => handleSort('details.contactNumber')}>Contact Number</th>
-              <th style={styles.th} onClick={() => handleSort('details.website')}>Website</th>
+              <th style={styles.th} onClick={() => handleSort('poCategory')}>Category</th>
+              <th style={styles.th} onClick={() => handleSort('details.postOfficeName')}>Post Office Name</th>
+              <th style={styles.th} onClick={() => handleSort('details.corporateId')}>Corporate ID</th>
+              <th style={styles.th} onClick={() => handleSort('details.location')}>Location</th>
+              <th style={styles.th} onClick={() => handleSort('details.userEmail')}>User Email</th>
+              <th style={styles.th} onClick={() => handleSort('details.contactPhone')}>Contact Phone</th>
+              <th style={styles.th} onClick={() => handleSort('details.phone')}>Phone</th>
+              <th style={styles.th} onClick={() => handleSort('details.websiteURL')}>Website</th>
             </tr>
           </thead>
           <tbody>
             {filteredData.map((po) => (
               <tr key={po.id}>
-                <td style={styles.td}>{po.type}</td>
-                <td style={styles.td}>{po.details.name}</td>
-                <td style={styles.td}>{po.details.cin}</td>
+                <td style={styles.td}>{po.poCategory}</td>
+                <td style={styles.td}>{po.details.postOfficeName}</td>
+                <td style={styles.td}>{po.details.corporateId}</td>
                 <td style={styles.td}>
-                  {po.details.address.city}, {po.details.address.state}, {po.details.address.country} -{' '}
-                  {po.details.address.pincode}
+                  {po.details.location?.city}, {po.details.location?.state}, {po.details.location?.country} -{' '}
+                  {po.details.location?.pincode}
                 </td>
-                <td style={styles.td}>{po.details.email}</td>
-                <td style={styles.td}>{po.details.telephone}</td>
-                <td style={styles.td}>{po.details.contactNumber}</td>
-                <td style={styles.td}>{po.details.website}</td>
+                <td style={styles.td}>{po.details.userEmail}</td>
+                <td style={styles.td}>{po.details.contactPhone}</td>
+                <td style={styles.td}>{po.details.phone}</td>
+                <td style={styles.td}>{po.details.websiteURL}</td>
               </tr>
             ))}
           </tbody>

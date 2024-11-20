@@ -4,7 +4,10 @@ import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, get, child } from 'firebase/database';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+<<<<<<< HEAD
 import FinalReport from './admin/finalreport'; // Corrected import and component name
+=======
+>>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
 
 // Register Chart.js elements
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -29,9 +32,13 @@ const Home = () => {
   const [baselineScores, setBaselineScores] = useState([]);
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState('');
+<<<<<<< HEAD
   const [reportVisible, setReportVisible] = useState(false);
+=======
+>>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
 
   useEffect(() => {
+    // Fetch user's name from the database
     const fetchUserName = async () => {
       if (!currentUser) return;
 
@@ -41,13 +48,21 @@ const Home = () => {
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
+<<<<<<< HEAD
           setUserName(userData.name || 'User');
+=======
+          setUserName(userData.name || 'User'); // Use the name or default to 'User'
+>>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
         } else {
           setUserName('User');
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+<<<<<<< HEAD
         setUserName('User');
+=======
+        setUserName('User'); // Default if error occurs
+>>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
       }
     };
 
@@ -115,6 +130,7 @@ const Home = () => {
         Welcome, {userName}!
       </h1>
 
+      {/* Existing dashboard content */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-xl font-semibold text-gray-700">Total Energy Saved</h3>
@@ -171,6 +187,7 @@ const Home = () => {
         )}
         {!baselineScores.length && <p>No data available for the current user.</p>}
       </div>
+<<<<<<< HEAD
 
       <div className="flex flex-col items-center mt-8 space-y-4">
         <div className="flex space-x-4">
@@ -194,6 +211,8 @@ const Home = () => {
           <FinalReport postOffice={{}} previewOnly={true} />
         </div>
       )}
+=======
+>>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
     </div>
   );
 };

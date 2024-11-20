@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, off } from "firebase/database";
+import { getDatabase, ref, onValue, set } from "firebase/database"; 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Firebase configuration
@@ -27,10 +27,10 @@ const Dashboard = () => {
   const [userEmail, setUserEmail] = useState("");
 
   const paths = {
-    electricity: `PostalManager/${userEmail}/inputData/electricityData/currentYearElectricity`,
-    fuel: `PostalManager/${userEmail}/inputData/fuelData/fuelConsumption`,
-    waste: `PostalManager/${userEmail}/inputData/wasteData/totalWaste`,
-    water: `PostalManager/${userEmail}/inputData/waterData/totalConsumption`,
+    electricity: "electricityData/currentYearElectricity",
+    fuel: "fuelData/fuelConsumption",
+    waste: "wasteData/totalWaste",
+    water: "waterData/totalConsumption",
   };
 
   useEffect(() => {
@@ -43,30 +43,32 @@ const Dashboard = () => {
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); // Unsubscribing from auth state listener
   }, []);
 
   useEffect(() => {
     if (!userEmail) return;
 
     const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
-    const additionalRefs = Object.entries(paths).reduce((acc, [key, path]) => {
-      acc[key] = ref(db, path);
-      return acc;
-    }, {});
+    const additionalRefs = Object.fromEntries(
+      Object.entries(paths).map(([key, path]) => [
+        key,
+        ref(db, `PostalManager/${userEmail}/inputData/${path}`),
+      ])
+    );
 
     const baselineListener = onValue(baselineRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const latestEntry = Object.values(data).pop();
-        setBaselineData(latestEntry);
+        setBaselineData(latestEntry || {});
       } else {
-        console.log("No baseline data found for user");
+        console.log("No baseline data found");
       }
       setLoading(false);
     });
 
-    const additionalListeners = Object.entries(additionalRefs).map(([key, refPath]) =>
+    const listeners = Object.entries(additionalRefs).map(([key, refPath]) =>
       onValue(refPath, (snapshot) => {
         if (snapshot.exists()) {
           setAdditionalData((prevData) => ({
@@ -74,14 +76,15 @@ const Dashboard = () => {
             [key]: snapshot.val(),
           }));
         } else {
-          console.log(`No ${key} data found`);
+          console.log(`No data found for ${key}`);
         }
       })
     );
 
     return () => {
-      off(baselineRef, baselineListener);
-      additionalListeners.forEach((unsubscribe) => off(unsubscribe));
+      // Cleanup listeners: This ensures no memory leaks or duplicate events
+      baselineListener(); // Cleanup baseline listener manually by invoking the function.
+      listeners.forEach((listener) => listener()); // Cleanup all additional listeners
     };
   }, [userEmail]);
 
@@ -89,55 +92,60 @@ const Dashboard = () => {
     if (Object.keys(baselineData).length) {
       const results = compareData(baselineData);
       setComparisonResults(results);
+
+      // Save the Total Sustainability Score to Firebase
+      const totalScore = results.reduce((sum, result) => sum + result.score, 0);
+      saveTotalSustainabilityScore(totalScore);
     }
   }, [baselineData, additionalData]);
 
   const calculateScore = (totalValue, baselineValue) => {
-    if (totalValue <= 0 || baselineValue <= 0) {
-      return 0; // Return 0 if baseline or total value is not valid
-    }
+    if (totalValue <= 0 || baselineValue <= 0) return 0;
 
     const difference = baselineValue - totalValue;
     const percentageDifference = (difference / baselineValue) * 100;
 
-    if (percentageDifference >= 50) {
-      return 25; // Max score if total value is 50% or more below baseline
-    } else if (percentageDifference >= 20 && percentageDifference < 50) {
-      // Score between 20-24 for total value 40%-20% below baseline
-      return 20 + ((percentageDifference - 20) / 30) * 4; // Linearly interpolated between 20-24
-    } else if (percentageDifference >= 0 && percentageDifference < 20) {
-      // Score between 17-20 if total value is close (same as or slightly less than baseline)
-      return 17 + (percentageDifference / 20) * 3; // Linearly interpolated between 17-20
-    } else {
-      // Score below 10 for total value greater than baseline
-      const overagePercentage = ((totalValue - baselineValue) / baselineValue) * 100;
-      return Math.max(10 - (overagePercentage / 10), 0); // Decreasing score below 10, but not below 0
-    }
+    if (percentageDifference >= 50) return 25;
+    if (percentageDifference >= 20) return 20 + ((percentageDifference - 20) / 30) * 4;
+    if (percentageDifference >= 0) return 17 + (percentageDifference / 20) * 3;
+
+    const overagePercentage = ((totalValue - baselineValue) / baselineValue) * 100;
+    return Math.max(10 - overagePercentage / 10, 0);
   };
 
   const compareData = (baseline) => {
-    const results = [
+    const parameters = [
       { key: "electricity", label: "Electricity Consumption" },
       { key: "fuel", label: "Fuel Consumption" },
       { key: "water", label: "Water Consumption" },
       { key: "waste", label: "Waste Generation" },
     ];
 
-    return results.map(({ key, label }) => {
+    return parameters.map(({ key, label }) => {
       const baselineValue = parseFloat(baseline[key]) || 0;
       const totalValue = parseFloat(additionalData[key]) || 0;
-
       const score = calculateScore(totalValue, baselineValue);
 
-      let status = "OK";
-      if (baselineValue === 0) {
-        status = "Need to Improve";
-      } else if (baselineValue < 5) {
-        status = "Good";
-      }
+      const status = baselineValue === 0
+        ? "Need to Improve"
+        : totalValue <= baselineValue
+        ? "Good"
+        : "OK";
 
-      return { label, baseline: baselineValue, status, total: totalValue, score };
+      return { label, baseline: baselineValue, total: totalValue, score, status };
     });
+  };
+
+  const saveTotalSustainabilityScore = (totalScore) => {
+    if (!userEmail) return;
+
+    const scoreRef = ref(db, `sustainabilityscore/${userEmail}`);
+    set(scoreRef, {
+      email: userEmail,
+      TotalSustainabilityScore: totalScore,
+    })
+      .then(() => console.log("Sustainability score saved successfully"))
+      .catch((error) => console.error("Error saving sustainability score: ", error));
   };
 
   const totalSustainabilityScore = comparisonResults.reduce(
@@ -150,60 +158,36 @@ const Dashboard = () => {
       <h1 className="text-2xl font-bold mb-4">Comparison Dashboard</h1>
       {loading ? (
         <p>Loading data...</p>
-      ) : Object.keys(baselineData).length ? (
+      ) : comparisonResults.length ? (
         <table className="min-w-full border-collapse border border-gray-300 mt-4">
           <thead>
             <tr>
-              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
-                Parameter
-              </th>
-              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
-                Baseline
-              </th>
-              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
-                Sustainability Status
-              </th>
-              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
-                Total Value
-              </th>
-              <th className="border border-gray-300 px-4 py-2 bg-gray-200 text-left">
-                Sustainability Score
-              </th>
+              <th className="border px-4 py-2 bg-gray-200">Parameter</th>
+              <th className="border px-4 py-2 bg-gray-200">Baseline</th>
+              <th className="border px-4 py-2 bg-gray-200">Status</th>
+              <th className="border px-4 py-2 bg-gray-200">Total</th>
+              <th className="border px-4 py-2 bg-gray-200">Score</th>
             </tr>
           </thead>
           <tbody>
             {comparisonResults.map((result, index) => (
               <tr key={index} className="odd:bg-white even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">{result.label}</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {result.baseline}
-                </td>
-                <td
-                  className={`border border-gray-300 px-4 py-2 font-bold ${
-                    result.status === "Good"
-                      ? "text-green-600"
-                      : result.status === "OK"
-                      ? "text-blue-600"
-                      : "text-red-600"
-                  }`}
-                >
+                <td className="border px-4 py-2">{result.label}</td>
+                <td className="border px-4 py-2">{result.baseline}</td>
+                <td className={`border px-4 py-2 font-bold ${
+                    result.status === "Good" ? "text-green-600" : "text-red-600"
+                  }`}>
                   {result.status}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {result.total.toFixed(2)}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {result.score.toFixed(2)}
-                </td>
+                <td className="border px-4 py-2">{result.total.toFixed(2)}</td>
+                <td className="border px-4 py-2">{result.score.toFixed(2)}</td>
               </tr>
             ))}
             <tr className="bg-gray-200 font-bold">
-              <td colSpan="4" className="border border-gray-300 px-4 py-2 text-right">
+              <td colSpan="4" className="border px-4 py-2 text-right">
                 Total Sustainability Score:
               </td>
-              <td className="border border-gray-300 px-4 py-2 text-center">
-                {totalSustainabilityScore.toFixed(2)} / 100
-              </td>
+              <td className="border px-4 py-2">{totalSustainabilityScore.toFixed(2)}</td>
             </tr>
           </tbody>
         </table>

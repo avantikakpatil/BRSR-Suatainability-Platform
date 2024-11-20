@@ -150,7 +150,94 @@ const Sidebar = ({
           )}
 
           {/* Postal Managers (Regional Managers) Role */}
+<<<<<<< HEAD
           {userRole === "Postal Managers (Regional Managers)" && (
+=======
+{userRole === "Postal Managers (Regional Managers)" && (
+  <>
+    {/* Dashboard */}
+    <li>
+      <button
+        onClick={() => navigate("/admin/dashboard")}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaChartPie className="text-lg mr-3" />
+        <span>Dashboard</span>
+      </button>
+    </li>
+
+    {/* Baseline Parameters */}
+    <li>
+      <button
+        onClick={() => navigate("/admin/baseline")}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaChartLine className="text-lg mr-3" />
+        <span>Baseline Parameters</span>
+      </button>
+    </li>
+
+    {/* Input Data */}
+    <li>
+      <button
+        onClick={onInputDataClick}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaDatabase className="text-lg mr-3" />
+        <span>Input Data</span>
+      </button>
+    </li>
+
+    {/* Challenges */}
+    <li>
+      <button
+        onClick={onChallengesClick}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaTasks className="text-lg mr-3" />
+        <span>Challenges</span>
+      </button>
+    </li>
+
+    {/* Leaderboard */}
+    <li>
+      <button
+        onClick={onLeaderboardClick}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaTrophy className="text-lg mr-3" />
+        <span>Leaderboard</span>
+      </button>
+    </li>
+
+    {/* Post Office Report */}
+    <li>
+      <button
+        onClick={onPostOfficeReport}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaFilePdf className="text-lg mr-3" />
+        <span>Post Office Report</span>
+      </button>
+    </li>
+
+    {/* Headquarter Dashboard */}
+    <li>
+      <button
+        onClick={onHeadquarterDashboard}
+        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+      >
+        <FaUser className="text-lg mr-3" />
+        <span>Headquarter Dashboard</span>
+      </button>
+    </li>
+  </>
+)}
+
+
+          {/* Post Office Heads Role */}
+          {userRole === "Post Office Heads" && (
+>>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
             <>
               {/* Dashboard */}
               <li>

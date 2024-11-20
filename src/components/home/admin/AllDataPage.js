@@ -36,18 +36,17 @@ const downloadPDF = (profileData, formData) => {
   yPosition = doc.lastAutoTable.finalY + 10;
 
   // Add Input Data Sections for each parameter
-  doc.text("Input Data:", 14, yPosition);
-  yPosition += 10;
-
   if (formData) {
     Object.entries(formData).forEach(([formName, data]) => {
       doc.text(`${formName} Data:`, 14, yPosition);
       yPosition += 10;
 
-      const formDataTable = Object.entries(data || {}).map(([key, value]) => [
-        key,
-        value || "Not provided",
-      ]);
+      const formDataTable = Array.isArray(data)
+        ? data.map((item, index) => [index + 1, JSON.stringify(item)])
+        : Object.entries(data || {}).map(([key, value]) => [
+            key,
+            value || "Not provided",
+          ]);
 
       doc.autoTable({
         head: [["Label", "Value"]],
@@ -88,36 +87,32 @@ const AllDataPage = () => {
     return () => unsubscribe();
   }, []);
 
-  const sanitizeEmail = (email) => email.replace(/\./g, "_").replace(/@/g, "_");
+  const sanitizeEmail = (email) => email.replace(/[.#$/[\]]/g, "_");
 
   const fetchAllData = async (sanitizedEmail) => {
     const dbRef = ref(db);
     setLoading(true);
     setError(null);
-
+  
     try {
       // Fetch profile data
-      const profileSnapshot = await get(
-        child(dbRef, `PostalManager/profile/${sanitizedEmail}`)
-      );
+      const profilePath = `PostalManager/profile/${sanitizedEmail}`;
+      console.log("Fetching profile data from:", profilePath);
+      const profileSnapshot = await get(child(dbRef, profilePath));
       const profile = profileSnapshot.exists() ? profileSnapshot.val() : null;
-
-      // Fetch input forms data for all 5 parameters
-      const inputDataSnapshot = await get(
-        child(dbRef, `PostalManager/${sanitizedEmail}/inputData`)
-      );
-      const inputData = inputDataSnapshot.exists() ? inputDataSnapshot.val() : {};
-
-      const combinedData = {
-        communityData: inputData.communityData || null,
-        electricityData: inputData.electricityData || null,
-        wasteData: inputData.wasteData || null,
-        waterData: inputData.waterData || null,
-        fuelData: inputData.fuelData || null,
-      };
-
+  
+      // Fetch all input data nodes at once
+      const inputDataPath = `PostalManager/${sanitizedEmail}/inputData`;
+      console.log("Fetching input data from:", inputDataPath);
+      const inputDataSnapshot = await get(child(dbRef, inputDataPath));
+      const inputData = inputDataSnapshot.exists() ? inputDataSnapshot.val() : null;
+  
+      console.log("Fetched profile data:", profile);
+      console.log("Fetched input data:", inputData);
+  
+      // Set states with fetched data
       setProfileData(profile);
-      setFormData(combinedData);
+      setFormData(inputData);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
@@ -125,6 +120,7 @@ const AllDataPage = () => {
       setLoading(false);
     }
   };
+  
 
   // Render Data Sections for Each Parameter
   const renderDataSection = (title, data) => (
@@ -138,15 +134,22 @@ const AllDataPage = () => {
               className="flex justify-between items-center bg-gray-50 p-4 rounded border shadow-sm"
             >
               <span className="font-semibold text-gray-700">{key}:</span>
-              <span className="text-gray-600">{value || "Not provided"}</span>
+              <span className="text-gray-600">
+                {Array.isArray(value)
+                  ? value.map((item, idx) => (
+                      <span key={idx}>{JSON.stringify(item)}</span>
+                    ))
+                  : value || "Not provided"}
+              </span>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-gray-600">No data available.</p>
+        <p className="text-gray-600">No data available for {title.toLowerCase()}.</p>
       )}
     </div>
   );
+  
 
   if (loading) {
     return (

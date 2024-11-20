@@ -4,10 +4,6 @@ import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, get, child } from 'firebase/database';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-<<<<<<< HEAD
-import FinalReport from './admin/finalreport'; // Corrected import and component name
-=======
->>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
 
 // Register Chart.js elements
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -32,10 +28,6 @@ const Home = () => {
   const [baselineScores, setBaselineScores] = useState([]);
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState('');
-<<<<<<< HEAD
-  const [reportVisible, setReportVisible] = useState(false);
-=======
->>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
 
   useEffect(() => {
     // Fetch user's name from the database
@@ -48,21 +40,13 @@ const Home = () => {
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
-<<<<<<< HEAD
-          setUserName(userData.name || 'User');
-=======
           setUserName(userData.name || 'User'); // Use the name or default to 'User'
->>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
         } else {
           setUserName('User');
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-<<<<<<< HEAD
-        setUserName('User');
-=======
         setUserName('User'); // Default if error occurs
->>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
       }
     };
 
@@ -187,32 +171,6 @@ const Home = () => {
         )}
         {!baselineScores.length && <p>No data available for the current user.</p>}
       </div>
-<<<<<<< HEAD
-
-      <div className="flex flex-col items-center mt-8 space-y-4">
-        <div className="flex space-x-4">
-          <button
-            onClick={handleViewReport}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-          >
-            View Report
-          </button>
-          <button
-            onClick={handleDownloadReport}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-          >
-            Download Report
-          </button>
-        </div>
-      </div>
-
-      {reportVisible && (
-        <div className="mt-8">
-          <FinalReport postOffice={{}} previewOnly={true} />
-        </div>
-      )}
-=======
->>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
     </div>
   );
 };

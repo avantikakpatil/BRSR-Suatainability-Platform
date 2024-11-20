@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf, FaChartPie } from "react-icons/fa";
 import { getDatabase, ref, child, get } from "firebase/database";
@@ -15,6 +15,7 @@ const Sidebar = ({
   onSetDeadline,
   onVerifyReport,
   onPostOfficeReport,
+  onAllDataPageClick, // Added the callback for All Data Page
 }) => {
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Sidebar = ({
     if (user) {
       const db = getDatabase();
       const userRef = ref(db, 'users/' + user.uid);
-      
+
       // Fetch user data (role and profile completion status) from Firebase
       get(userRef)
         .then((snapshot) => {
@@ -45,7 +46,7 @@ const Sidebar = ({
     } else {
       console.log("No user is logged in.");
     }
-  }, [user]);  // Only run when the user changes
+  }, [user]);
 
   // If no role is found, return loading state
   if (userRole === null) {
@@ -149,82 +150,7 @@ const Sidebar = ({
           )}
 
           {/* Postal Managers (Regional Managers) Role */}
-{userRole === "Postal Managers (Regional Managers)" && (
-  <>
-    {/* Dashboard */}
-    <li>
-      <button
-        onClick={() => navigate("/admin/dashboard")}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaChartPie className="text-lg mr-3" />
-        <span>Dashboard</span>
-      </button>
-    </li>
-
-    {/* Baseline Parameters */}
-    <li>
-      <button
-        onClick={() => navigate("/admin/baseline")}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaChartLine className="text-lg mr-3" />
-        <span>Baseline Parameters</span>
-      </button>
-    </li>
-
-    {/* Input Data */}
-    <li>
-      <button
-        onClick={onInputDataClick}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaDatabase className="text-lg mr-3" />
-        <span>Input Data</span>
-      </button>
-    </li>
-
-    {/* Challenges */}
-    <li>
-      <button
-        onClick={onChallengesClick}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaTasks className="text-lg mr-3" />
-        <span>Challenges</span>
-      </button>
-    </li>
-
-    {/* Leaderboard */}
-    <li>
-      <button
-        onClick={onLeaderboardClick}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaTrophy className="text-lg mr-3" />
-        <span>Leaderboard</span>
-      </button>
-    </li>
-
-    {/* Post Office Report */}
-    <li>
-      <button
-        onClick={onPostOfficeReport}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaFilePdf className="text-lg mr-3" />
-        <span>Post Office Report</span>
-      </button>
-    </li>
-
-    {/* Headquarter Dashboard */}
-    
-  </>
-)}
-
-
-          {/* Post Office Heads Role */}
-          {userRole === "Post Office Heads" && (
+          {userRole === "Postal Managers (Regional Managers)" && (
             <>
               {/* Dashboard */}
               <li>
@@ -237,29 +163,73 @@ const Sidebar = ({
                 </button>
               </li>
 
-              {/* Verify Report */}
+              {/* Baseline Parameters */}
               <li>
                 <button
-                  onClick={onVerifyReport}
+                  onClick={() => navigate("/admin/baseline")}
                   className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
                 >
-                  <FaFilePdf className="text-lg mr-3" />
-                  <span>Verify Report</span>
+                  <FaChartLine className="text-lg mr-3" />
+                  <span>Baseline Parameters</span>
                 </button>
               </li>
 
-              {/* Set Deadline */}
+              {/* Input Data */}
               <li>
                 <button
-                  onClick={onSetDeadline}
+                  onClick={onInputDataClick}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaDatabase className="text-lg mr-3" />
+                  <span>Input Data</span>
+                </button>
+              </li>
+
+              {/* Challenges */}
+              <li>
+                <button
+                  onClick={onChallengesClick}
                   className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
                 >
                   <FaTasks className="text-lg mr-3" />
-                  <span>Set Deadline</span>
+                  <span>Challenges</span>
+                </button>
+              </li>
+
+              {/* Leaderboard */}
+              <li>
+                <button
+                  onClick={onLeaderboardClick}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaTrophy className="text-lg mr-3" />
+                  <span>Leaderboard</span>
+                </button>
+              </li>
+
+              {/* Post Office Report */}
+              <li>
+                <button
+                  onClick={onPostOfficeReport}
+                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+                >
+                  <FaFilePdf className="text-lg mr-3" />
+                  <span>Post Office Report</span>
                 </button>
               </li>
             </>
           )}
+
+          {/* Add the All Data Page option for all roles */}
+          <li>
+            <button
+              onClick={onAllDataPageClick}
+              className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
+            >
+              <FaDatabase className="text-lg mr-3" />
+              <span>All Data Page</span>
+            </button>
+          </li>
         </ul>
       </div>
     </div>

@@ -1,7 +1,6 @@
-// Report.js
-import jsPDF from "jspdf";
+import jsPDF from 'jspdf';
 
-const FinalReport = ({ postOffice, previewOnly = false }) => {
+const finalreport = ({ postOffice, previewOnly = false }) => {
   const generatePDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -37,4 +36,4 @@ const FinalReport = ({ postOffice, previewOnly = false }) => {
   );
 };
 
-export default FinalReport;
+export default finalreport;

@@ -15,14 +15,14 @@ import HeadquarterDashboard from "./components/home/admin/HeadquarterDashboard.j
 import CreatePO from "./components/home/admin/CreatePO.js";
 import ResourceUsageForm from "./components/home/admin/ResourceUsageForm.js";
 import ListPO from "./components/home/admin/ListPO";
-import PostOfficeReport from "./components/home/admin/PostOfficeReport"; // Import the new file
+import PostOfficeReport from "./components/home/admin/PostOfficeReport";
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import CumulativeExpenditure from "./components/home/admin/CumulativeExpenditure.js";
 import VerifyReport from "./components/home/admin/verifyReport";
 import Comparision from "./components/home/admin/Comparision.js";
 import Baselinenew from "./components/home/admin/Baselinenew.js";
 import SetDeadline from "./components/home/admin/setdeadline.js";
-
+import AllDataPage from "./components/home/admin/AllDataPage";  // Import the All Data Page component
 
 function App() {
   const location = useLocation();
@@ -47,10 +47,11 @@ function App() {
     { path: "/admin/listpo", element: <ListPO /> },
     { path: "/admin/VerifyReport", element: <VerifyReport /> },
     { path: "/admin/baselinenew", element: <Baselinenew /> },
-    { path: "/admin/postofficereport", element: <PostOfficeReport /> }, // Add the route for PostOfficeReport
-    {path: "/admin/baselinenew", element: <Baselinenew/>},
-    {path: "/admin/SetDeadline", element: <SetDeadline/>},
-    {path: "/admin/Comparision", element: <Comparision/>}
+    { path: "/admin/postofficereport", element: <PostOfficeReport /> },
+    { path: "/admin/baselinenew", element: <Baselinenew /> },
+    { path: "/admin/SetDeadline", element: <SetDeadline /> },
+    { path: "/admin/Comparision", element: <Comparision /> },
+    { path: "/admin/all-data", element: <AllDataPage /> }  // Add the route for AllDataPage
   ];
 
   const { userLoggedIn } = useAuth();
@@ -73,8 +74,9 @@ function App() {
           onCreatePO={() => navigate("/admin/createpo")}
           onListPO={() => navigate("/admin/listpo")}
           onVerifyReport={() => navigate("/admin/verifyreport")}
-          onPostOfficeReport={() => navigate("/admin/postofficereport")} // Add this callback for navigation
+          onPostOfficeReport={() => navigate("/admin/postofficereport")}
           onSetDeadline={() => navigate("/admin/SetDeadline")}
+          onAllDataPageClick={() => navigate("/admin/all-data")}  // Add this callback for navigation
         />
       )}
       <div className={`content flex-grow p-4 ${isAuthPage ? "mt-0" : "mt-16"}`}>

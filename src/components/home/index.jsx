@@ -28,6 +28,7 @@ const Home = () => {
   const [baselineScores, setBaselineScores] = useState([]);
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState('');
+  const [reportVisible, setReportVisible] = useState(false);  // Added state for report visibility
 
   useEffect(() => {
     // Fetch user's name from the database
@@ -35,12 +36,13 @@ const Home = () => {
       if (!currentUser) return;
 
       try {
+        // Fixed template literal syntax
         const userRef = ref(db, `users/${currentUser.uid}`);
         const snapshot = await get(userRef);
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
-          setUserName(userData.name || 'User'); // Use the name or default to 'User'
+          setUserName(userData.name || 'User');
         } else {
           setUserName('User');
         }
@@ -100,11 +102,11 @@ const Home = () => {
   });
 
   const handleViewReport = () => {
-    setReportVisible(true);
+    setReportVisible(true);  // Toggle visibility
   };
 
   const handleDownloadReport = () => {
-    // For now, a placeholder. You can integrate report download functionality here.
+    // Placeholder for downloading functionality
     alert('Downloading report...');
   };
 
@@ -114,7 +116,7 @@ const Home = () => {
         Welcome, {userName}!
       </h1>
 
-      {/* Existing dashboard content */}
+      {/* Dashboard content */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-xl font-semibold text-gray-700">Total Energy Saved</h3>
@@ -170,6 +172,27 @@ const Home = () => {
           </>
         )}
         {!baselineScores.length && <p>No data available for the current user.</p>}
+      </div>
+
+      {/* Report visibility toggle */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={handleViewReport}
+          className="bg-blue-500 text-white p-2 rounded-md"
+        >
+          View Report
+        </button>
+
+        {reportVisible && (
+          <div className="mt-4">
+            <button
+              onClick={handleDownloadReport}
+              className="bg-green-500 text-white p-2 rounded-md"
+            >
+              Download Report
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

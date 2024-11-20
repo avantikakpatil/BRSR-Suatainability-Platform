@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set } from 'firebase/database';
+import { getStorage, uploadBytes, getDownloadURL, ref as storageRef } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 
 // Firebase Configuration
@@ -17,10 +18,11 @@ const firebaseConfig = {
 // Initialize Firebase app and services
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+const storage = getStorage(app);
 const auth = getAuth();
 
 // Function to sanitize email for Firebase
-const sanitizeEmail = (email) => email.replace(/\./g, '_');
+const sanitizeEmail = (email) => email.replace(/[.#$/[\]]/g, '_');
 
 const FuelConsumptionForm = ({ goBack }) => {
   const [formData, setFormData] = useState({
@@ -28,6 +30,8 @@ const FuelConsumptionForm = ({ goBack }) => {
     energyIntensity: '',
     billFile: null,
   });
+
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,7 +48,7 @@ const FuelConsumptionForm = ({ goBack }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const user = auth.currentUser;
@@ -52,19 +56,36 @@ const FuelConsumptionForm = ({ goBack }) => {
       const sanitizedEmail = sanitizeEmail(user.email);
       const fuelDataPath = ref(database, `PostalManager/${sanitizedEmail}/inputData/fuelData`);
 
-      // Prepare data to store
-      const dataToStore = { ...formData };
-      delete dataToStore.billFile; // Handle file uploads separately
+      try {
+        let fileUrl = '';
+        if (formData.billFile) {
+          setIsUploading(true);
 
-      // Store or update data
-      set(fuelDataPath, dataToStore)
-        .then(() => {
-          alert('Fuel data submitted successfully!');
-        })
-        .catch((error) => {
-          console.error('Error submitting fuel data:', error);
-          alert('Error submitting fuel data: ' + error.message);
-        });
+          // Upload file to Firebase Storage
+          const fileRef = storageRef(storage, `PostalManager/${sanitizedEmail}/files/${formData.billFile.name}`);
+          await uploadBytes(fileRef, formData.billFile);
+
+          // Get file URL
+          fileUrl = await getDownloadURL(fileRef);
+        }
+
+        // Prepare data to store
+        const dataToStore = {
+          ...formData,
+          billFile: fileUrl, // Add file URL to the database
+        };
+        delete dataToStore.billFile;
+
+        // Store or update data
+        await set(fuelDataPath, dataToStore);
+
+        alert('Fuel data submitted successfully!');
+      } catch (error) {
+        console.error('Error submitting fuel data:', error);
+        alert('Error submitting fuel data: ' + error.message);
+      } finally {
+        setIsUploading(false);
+      }
     } else {
       alert('No user is logged in');
     }
@@ -87,7 +108,7 @@ const FuelConsumptionForm = ({ goBack }) => {
             </tr>
           </thead>
           <tbody>
-            {[
+            {[ 
               { label: 'Total fuel consumption (B)', key: 'fuelConsumption' },
               { label: 'Energy intensity per rupee of turnover (Total energy consumption / turnover in rupees)', key: 'energyIntensity' },
             ].map((item) => (
@@ -113,8 +134,8 @@ const FuelConsumptionForm = ({ goBack }) => {
           <input type="file" onChange={handleFileChange} style={styles.fileInput} />
         </div>
 
-        <button type="submit" style={styles.submitButton}>
-          Submit
+        <button type="submit" style={styles.submitButton} disabled={isUploading}>
+          {isUploading ? 'Uploading...' : 'Submit'}
         </button>
       </form>
 

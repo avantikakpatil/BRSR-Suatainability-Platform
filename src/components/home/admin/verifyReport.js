@@ -27,11 +27,16 @@ const VerifyReport = () => {
         const postOfficesData = [];
         snapshot.forEach((childSnapshot) => {
           const data = childSnapshot.val();
+
+          // Check if 'details' and 'address' fields exist before accessing them
+          const details = data.details || {};
+          const address = details.address || {};
+
           postOfficesData.push({
             id: childSnapshot.key,
-            postOffice: data.details.name,
-            city: data.details.address.city,
-            type: data.type,
+            postOffice: details.name || "N/A", // Default to "N/A" if name doesn't exist
+            city: address.city || "N/A", // Default to "N/A" if city doesn't exist
+            type: data.type || "Unknown", // Default to "Unknown" if type doesn't exist
             year: new Date().getFullYear(),
             isVerified: data.isVerified || false,
             suggestion: data.suggestion || "",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue } from "firebase/database"; 
+import { getDatabase, ref, onValue, set } from "firebase/database"; 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Firebase configuration
@@ -92,6 +92,10 @@ const Dashboard = () => {
     if (Object.keys(baselineData).length) {
       const results = compareData(baselineData);
       setComparisonResults(results);
+
+      // Save the Total Sustainability Score to Firebase
+      const totalScore = results.reduce((sum, result) => sum + result.score, 0);
+      saveTotalSustainabilityScore(totalScore);
     }
   }, [baselineData, additionalData]);
 
@@ -130,6 +134,18 @@ const Dashboard = () => {
 
       return { label, baseline: baselineValue, total: totalValue, score, status };
     });
+  };
+
+  const saveTotalSustainabilityScore = (totalScore) => {
+    if (!userEmail) return;
+
+    const scoreRef = ref(db, `sustainabilityscore/${userEmail}`);
+    set(scoreRef, {
+      email: userEmail,
+      TotalSustainabilityScore: totalScore,
+    })
+      .then(() => console.log("Sustainability score saved successfully"))
+      .catch((error) => console.error("Error saving sustainability score: ", error));
   };
 
   const totalSustainabilityScore = comparisonResults.reduce(

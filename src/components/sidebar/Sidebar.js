@@ -218,15 +218,7 @@ const Sidebar = ({
     </li>
 
     {/* Headquarter Dashboard */}
-    <li>
-      <button
-        onClick={onHeadquarterDashboard}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaUser className="text-lg mr-3" />
-        <span>Generate Score</span>
-      </button>
-    </li>
+    
   </>
 )}
 

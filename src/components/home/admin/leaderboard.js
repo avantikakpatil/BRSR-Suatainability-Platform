@@ -1,20 +1,52 @@
 import React, { useState, useEffect } from "react";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { initializeApp } from "firebase/app";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC8XobgVqF5bqK6sFiL3mqKNB3PHedZwQA",
+  authDomain: "brsr-9b56a.firebaseapp.com",
+  projectId: "brsr-9b56a",
+  storageBucket: "brsr-9b56a.appspot.com",
+  messagingSenderId: "548279958491",
+  appId: "1:548279958491:web:19199e42e0d796ad4185fe",
+  measurementId: "G-7SYPSVZR9H",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
 
-  // Dummy data with emojis and scores
-  const dummyData = [
-    { email: "post_office1@example.com", score: 95, city: "New York 🌆", badge: "🥇" },
-    { email: "post_office2@example.com", score: 75, city: "Los Angeles 🌴", badge: "🥈" },
-    { email: "post_office3@example.com", score: 60, city: "Chicago 🌃", badge: "🥈" },
-    { email: "post_office4@example.com", score: 40, city: "Houston 🚀", badge: "🥉" },
-    { email: "post_office5@example.com", score: 30, city: "Phoenix 🌞", badge: "🥉" },
-  ];
-
-  // Set dummy data for demonstration
   useEffect(() => {
-    setLeaderboardData(dummyData);
+    const leaderboardRef = ref(db, 'sustainabilityscore'); // Path where the scores are stored
+
+    // Fetch leaderboard data from Firebase Realtime Database
+    onValue(leaderboardRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const entries = Object.entries(data).map(([email, details]) => ({
+          email,
+          totalSustainabilityScore: details.TotalSustainabilityScore || 0,
+        }));
+
+        // Sort leaderboard by TotalSustainabilityScore (descending order)
+        const sortedEntries = entries.sort((a, b) => b.totalSustainabilityScore - a.totalSustainabilityScore);
+
+        // Assign badges based on score
+        const leaderboardWithBadges = sortedEntries.map((entry, index) => {
+          let badge = "🥉"; // Default badge (Bronze)
+          if (index === 0) badge = "🥇"; // Gold for top scorer
+          else if (index === 1) badge = "🥈"; // Silver for second place
+
+          return { ...entry, badge };
+        });
+
+        setLeaderboardData(leaderboardWithBadges);
+      }
+    });
   }, []);
 
   return (
@@ -25,8 +57,7 @@ const Leaderboard = () => {
           <tr>
             <th>Rank</th>
             <th>Email</th>
-            <th>City</th>
-            <th>Score</th>
+            <th>Total Sustainability Score</th>
             <th>Badge</th>
           </tr>
         </thead>
@@ -36,8 +67,7 @@ const Leaderboard = () => {
               <tr key={index} className="table-row">
                 <td>{index + 1}</td>
                 <td>{entry.email}</td>
-                <td>{entry.city}</td>
-                <td>{entry.score}</td>
+                <td>{entry.totalSustainabilityScore}</td>
                 <td>
                   <span className={`badge badge-${entry.badge === "🥇" ? "gold" : entry.badge === "🥈" ? "silver" : "bronze"}`}>
                     {entry.badge}
@@ -47,7 +77,7 @@ const Leaderboard = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5">No data available</td>
+              <td colSpan="4">No data available</td>
             </tr>
           )}
         </tbody>

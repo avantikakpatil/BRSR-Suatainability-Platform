@@ -28,6 +28,7 @@ const Home = () => {
   const [baselineScores, setBaselineScores] = useState([]);
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState('');
+  const [reportVisible, setReportVisible] = useState(false);  // Added state for report visibility
 
   useEffect(() => {
     // Fetch user's name from the database
@@ -41,7 +42,7 @@ const Home = () => {
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
-          setUserName(userData.name || 'User'); // Use the name or default to 'User'
+          setUserName(userData.name || 'User');
         } else {
           setUserName('User');
         }
@@ -101,12 +102,11 @@ const Home = () => {
   });
 
   const handleViewReport = () => {
-    // Placeholder for future implementation
-    alert('Viewing report...');
+    setReportVisible(true);  // Toggle visibility
   };
 
   const handleDownloadReport = () => {
-    // Placeholder for future implementation
+    // Placeholder for downloading functionality
     alert('Downloading report...');
   };
 
@@ -172,6 +172,27 @@ const Home = () => {
           </>
         )}
         {!baselineScores.length && <p>No data available for the current user.</p>}
+      </div>
+
+      {/* Report visibility toggle */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={handleViewReport}
+          className="bg-blue-500 text-white p-2 rounded-md"
+        >
+          View Report
+        </button>
+
+        {reportVisible && (
+          <div className="mt-4">
+            <button
+              onClick={handleDownloadReport}
+              className="bg-green-500 text-white p-2 rounded-md"
+            >
+              Download Report
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

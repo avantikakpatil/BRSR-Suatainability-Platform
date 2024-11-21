@@ -28,6 +28,10 @@ const Home = () => {
   const [baselineScores, setBaselineScores] = useState([]);
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState('');
+<<<<<<< HEAD
+=======
+  const [reportVisible, setReportVisible] = useState(false);  // Added state for report visibility
+>>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
 
   useEffect(() => {
     // Fetch user's name from the database
@@ -35,13 +39,21 @@ const Home = () => {
       if (!currentUser) return;
 
       try {
+<<<<<<< HEAD
         // Corrected template literal usage
+=======
+        // Fixed template literal syntax
+>>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
         const userRef = ref(db, `users/${currentUser.uid}`);
         const snapshot = await get(userRef);
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
+<<<<<<< HEAD
           setUserName(userData.name || 'User'); // Use the name or default to 'User'
+=======
+          setUserName(userData.name || 'User');
+>>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
         } else {
           setUserName('User');
         }
@@ -101,12 +113,20 @@ const Home = () => {
   });
 
   const handleViewReport = () => {
+<<<<<<< HEAD
     // Placeholder for future implementation
     alert('Viewing report...');
   };
 
   const handleDownloadReport = () => {
     // Placeholder for future implementation
+=======
+    setReportVisible(true);  // Toggle visibility
+  };
+
+  const handleDownloadReport = () => {
+    // Placeholder for downloading functionality
+>>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
     alert('Downloading report...');
   };
 
@@ -173,6 +193,30 @@ const Home = () => {
         )}
         {!baselineScores.length && <p>No data available for the current user.</p>}
       </div>
+<<<<<<< HEAD
+=======
+
+      {/* Report visibility toggle */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={handleViewReport}
+          className="bg-blue-500 text-white p-2 rounded-md"
+        >
+          View Report
+        </button>
+
+        {reportVisible && (
+          <div className="mt-4">
+            <button
+              onClick={handleDownloadReport}
+              className="bg-green-500 text-white p-2 rounded-md"
+            >
+              Download Report
+            </button>
+          </div>
+        )}
+      </div>
+>>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
     </div>
   );
 };

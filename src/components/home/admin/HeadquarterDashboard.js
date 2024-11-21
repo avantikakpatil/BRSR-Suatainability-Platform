@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database"; 
+import { getDatabase, ref, onValue, set } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Firebase configuration
@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [baselineData, setBaselineData] = useState({});
   const [comparisonResults, setComparisonResults] = useState([]);
   const [additionalData, setAdditionalData] = useState({});
+  const [sustainabilityScore, setSustainabilityScore] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
 
@@ -43,12 +44,13 @@ const Dashboard = () => {
       }
     });
 
-    return () => unsubscribe(); // Unsubscribing from auth state listener
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!userEmail) return;
 
+    // Fetch baseline scores
     const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
     const additionalRefs = Object.fromEntries(
       Object.entries(paths).map(([key, path]) => [
@@ -57,6 +59,17 @@ const Dashboard = () => {
       ])
     );
 
+    // Fetch sustainability score
+    const scoreRef = ref(db, `sustainabilityscore/${userEmail}`);
+    const scoreListener = onValue(scoreRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setSustainabilityScore(snapshot.val().TotalSustainabilityScore);
+      } else {
+        console.log("No sustainability score found");
+      }
+    });
+
+    // Fetch baseline data
     const baselineListener = onValue(baselineRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
@@ -68,6 +81,7 @@ const Dashboard = () => {
       setLoading(false);
     });
 
+    // Fetch additional data
     const listeners = Object.entries(additionalRefs).map(([key, refPath]) =>
       onValue(refPath, (snapshot) => {
         if (snapshot.exists()) {
@@ -82,9 +96,9 @@ const Dashboard = () => {
     );
 
     return () => {
-      // Cleanup listeners: This ensures no memory leaks or duplicate events
-      baselineListener(); // Cleanup baseline listener manually by invoking the function.
-      listeners.forEach((listener) => listener()); // Cleanup all additional listeners
+      baselineListener();
+      scoreListener();
+      listeners.forEach((listener) => listener());
     };
   }, [userEmail]);
 
@@ -93,7 +107,6 @@ const Dashboard = () => {
       const results = compareData(baselineData);
       setComparisonResults(results);
 
-      // Save the Total Sustainability Score to Firebase
       const totalScore = results.reduce((sum, result) => sum + result.score, 0);
       saveTotalSustainabilityScore(totalScore);
     }
@@ -148,49 +161,54 @@ const Dashboard = () => {
       .catch((error) => console.error("Error saving sustainability score: ", error));
   };
 
-  const totalSustainabilityScore = comparisonResults.reduce(
-    (sum, result) => sum + result.score,
-    0
-  );
-
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-6 max-w-6xl">
       <h1 className="text-2xl font-bold mb-4">Comparison Dashboard</h1>
+
+      <div className="bg-green-100 p-4 rounded-md shadow-md mb-6">
+        <h2 className="text-xl font-semibold text-green-800">Sustainability Score</h2>
+        {sustainabilityScore !== null ? (
+          <p className="text-3xl font-bold text-green-900">
+            {sustainabilityScore.toFixed(2)}
+          </p>
+        ) : (
+          <p className="text-red-500">Sustainability score not available.</p>
+        )}
+      </div>
+
       {loading ? (
         <p>Loading data...</p>
       ) : comparisonResults.length ? (
-        <table className="min-w-full border-collapse border border-gray-300 mt-4">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2 bg-gray-200">Parameter</th>
-              <th className="border px-4 py-2 bg-gray-200">Baseline</th>
-              <th className="border px-4 py-2 bg-gray-200">Status</th>
-              <th className="border px-4 py-2 bg-gray-200">Total</th>
-              <th className="border px-4 py-2 bg-gray-200">Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {comparisonResults.map((result, index) => (
-              <tr key={index} className="odd:bg-white even:bg-gray-50">
-                <td className="border px-4 py-2">{result.label}</td>
-                <td className="border px-4 py-2">{result.baseline}</td>
-                <td className={`border px-4 py-2 font-bold ${
-                    result.status === "Good" ? "text-green-600" : "text-red-600"
-                  }`}>
-                  {result.status}
-                </td>
-                <td className="border px-4 py-2">{result.total.toFixed(2)}</td>
-                <td className="border px-4 py-2">{result.score.toFixed(2)}</td>
+        <div className="overflow-auto">
+          <table className="min-w-full border-collapse border border-gray-300 mt-4">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2 bg-gray-200">Parameter</th>
+                <th className="border px-4 py-2 bg-gray-200">Baseline</th>
+                <th className="border px-4 py-2 bg-gray-200">Status</th>
+                <th className="border px-4 py-2 bg-gray-200">Total</th>
+                <th className="border px-4 py-2 bg-gray-200">Score</th>
               </tr>
-            ))}
-            <tr className="bg-gray-200 font-bold">
-              <td colSpan="4" className="border px-4 py-2 text-right">
-                Total Sustainability Score:
-              </td>
-              <td className="border px-4 py-2">{totalSustainabilityScore.toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {comparisonResults.map((result, index) => (
+                <tr key={index} className="odd:bg-white even:bg-gray-50">
+                  <td className="border px-4 py-2">{result.label}</td>
+                  <td className="border px-4 py-2">{result.baseline}</td>
+                  <td
+                    className={`border px-4 py-2 font-bold ${
+                      result.status === "Good" ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {result.status}
+                  </td>
+                  <td className="border px-4 py-2">{result.total.toFixed(2)}</td>
+                  <td className="border px-4 py-2">{result.score.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p>No data available for the current user.</p>
       )}

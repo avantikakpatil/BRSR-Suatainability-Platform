@@ -40,7 +40,7 @@ const AdminForm = () => {
     return () => unsubscribe();
   }, []);
 
-  const sanitizeEmail = (email) => email.replace(/\./g, '_').replace(/@/g, '_');
+  const sanitizeEmail = (email) => email.replace(/[.#$/[\]]/g, "_");
 
   const fetchProfileData = async (sanitizedEmail) => {
     const dbRef = ref(db);

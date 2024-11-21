@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaChartLine, FaTasks, FaTrophy, FaDatabase, FaFilePdf, FaChartPie } from "react-icons/fa";
-import { getDatabase, ref, child, get } from "firebase/database";
+import { getDatabase, ref, get } from "firebase/database";
 import { getAuth } from "firebase/auth";
 
 const Sidebar = ({
@@ -25,54 +25,50 @@ const Sidebar = ({
   useEffect(() => {
     if (user) {
       const db = getDatabase();
-      const userRef = ref(db, 'users/' + user.uid);
+      const userRef = ref(db, `users/${user.uid}`);
 
       // Fetch user data (role and profile completion status) from Firebase
       get(userRef)
         .then((snapshot) => {
           if (snapshot.exists()) {
             const userData = snapshot.val();
-            console.log("Fetched user data:", userData);  // Debugging line
-            setUserRole(userData.role);  // Set role from fetched data
+            console.log("Fetched user data:", userData);
+            setUserRole(userData.role); // Set role from fetched data
           } else {
             console.log("No data available");
-            setUserRole(null);  // Reset if no data
+            setUserRole(null); // Reset if no data
           }
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
-          setUserRole(null);  // In case of error, reset the role
+          setUserRole(null); // Reset the role in case of error
         });
     } else {
       console.log("No user is logged in.");
     }
   }, [user]);
 
-  // If no role is found, return loading state
   if (userRole === null) {
-    return <div>Loading...</div>;  // Show loading until role is fetched
+    return <div>Loading...</div>; // Show loading until role is fetched
   }
-
-  // Debugging output for current user role
-  console.log("Current user role:", userRole);
 
   return (
     <div
       className="sidebar text-white w-64 h-full h-[calc(100vh-2rem)] m-4 p-4 rounded-xl shadow-lg flex flex-col"
       style={{
-        background: "rgba(0, 0, 0, 0)", // Fully transparent background
-        height: "670px", // Sidebar height adjustment
+        background: "rgba(0, 0, 0, 0)", // Transparent background
+        height: "670px",
       }}
     >
       <div
         className="sidebar bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white w-64 h-full p-4 rounded-xl shadow-lg flex flex-col overflow-y-auto"
         style={{
-          position: "fixed", // Fix sidebar on the page
-          top: "0", // Stick to top
-          left: "0", // Stick to left
+          position: "fixed",
+          top: "0",
+          left: "0",
           width: "17%",
-          height: "100vh", // Full viewport height
-          zIndex: "1000", // Stay above other content
+          height: "100vh",
+          zIndex: "1000",
         }}
       >
         <h2 className="text-xl font-bold mb-8 text-center">Admin Panel</h2>
@@ -103,18 +99,6 @@ const Sidebar = ({
           {/* DoP Headquarters Role */}
           {userRole === "DoP Headquarters" && (
             <>
-              {/* Dashboard */}
-              <li>
-                <button
-                  onClick={() => navigate("/admin/dashboard")}
-                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-                >
-                  <FaChartPie className="text-lg mr-3" />
-                  <span>Dashboard</span>
-                </button>
-              </li>
-
-              {/* Create Post Office Profile */}
               <li>
                 <button
                   onClick={onCreatePO}
@@ -125,7 +109,6 @@ const Sidebar = ({
                 </button>
               </li>
 
-              {/* Post Offices List */}
               <li>
                 <button
                   onClick={onListPO}
@@ -136,7 +119,6 @@ const Sidebar = ({
                 </button>
               </li>
 
-              {/* Leaderboard */}
               <li>
                 <button
                   onClick={onLeaderboardClick}
@@ -150,107 +132,8 @@ const Sidebar = ({
           )}
 
           {/* Postal Managers (Regional Managers) Role */}
-<<<<<<< HEAD
           {userRole === "Postal Managers (Regional Managers)" && (
-=======
-{userRole === "Postal Managers (Regional Managers)" && (
-  <>
-    {/* Dashboard */}
-    <li>
-      <button
-        onClick={() => navigate("/admin/dashboard")}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaChartPie className="text-lg mr-3" />
-        <span>Dashboard</span>
-      </button>
-    </li>
-
-    {/* Baseline Parameters */}
-    <li>
-      <button
-        onClick={() => navigate("/admin/baseline")}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaChartLine className="text-lg mr-3" />
-        <span>Baseline Parameters</span>
-      </button>
-    </li>
-
-    {/* Input Data */}
-    <li>
-      <button
-        onClick={onInputDataClick}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaDatabase className="text-lg mr-3" />
-        <span>Input Data</span>
-      </button>
-    </li>
-
-    {/* Challenges */}
-    <li>
-      <button
-        onClick={onChallengesClick}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaTasks className="text-lg mr-3" />
-        <span>Challenges</span>
-      </button>
-    </li>
-
-    {/* Leaderboard */}
-    <li>
-      <button
-        onClick={onLeaderboardClick}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaTrophy className="text-lg mr-3" />
-        <span>Leaderboard</span>
-      </button>
-    </li>
-
-    {/* Post Office Report */}
-    <li>
-      <button
-        onClick={onPostOfficeReport}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaFilePdf className="text-lg mr-3" />
-        <span>Post Office Report</span>
-      </button>
-    </li>
-
-    {/* Headquarter Dashboard */}
-    <li>
-      <button
-        onClick={onHeadquarterDashboard}
-        className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-      >
-        <FaUser className="text-lg mr-3" />
-        <span>Headquarter Dashboard</span>
-      </button>
-    </li>
-  </>
-)}
-
-
-          {/* Post Office Heads Role */}
-          {userRole === "Post Office Heads" && (
->>>>>>> a22aa41358303cb4f9f6b269b9a91fa92df0d142
             <>
-              {/* Dashboard */}
-              <li>
-                <button
-                  onClick={() => navigate("/admin/dashboard")}
-                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-                >
-                  <FaChartPie className="text-lg mr-3" />
-                  <span>Dashboard</span>
-                </button>
-              </li>
-
-              {/* Baseline Parameters */}
               <li>
                 <button
                   onClick={() => navigate("/admin/baseline")}
@@ -261,7 +144,6 @@ const Sidebar = ({
                 </button>
               </li>
 
-              {/* Input Data */}
               <li>
                 <button
                   onClick={onInputDataClick}
@@ -272,7 +154,6 @@ const Sidebar = ({
                 </button>
               </li>
 
-              {/* Challenges */}
               <li>
                 <button
                   onClick={onChallengesClick}
@@ -283,18 +164,6 @@ const Sidebar = ({
                 </button>
               </li>
 
-              {/* Leaderboard */}
-              <li>
-                <button
-                  onClick={onLeaderboardClick}
-                  className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
-                >
-                  <FaTrophy className="text-lg mr-3" />
-                  <span>Leaderboard</span>
-                </button>
-              </li>
-
-              {/* Post Office Report */}
               <li>
                 <button
                   onClick={onPostOfficeReport}
@@ -307,7 +176,7 @@ const Sidebar = ({
             </>
           )}
 
-          {/* Add the All Data Page option for all roles */}
+          {/* Add All Data Page */}
           <li>
             <button
               onClick={onAllDataPageClick}

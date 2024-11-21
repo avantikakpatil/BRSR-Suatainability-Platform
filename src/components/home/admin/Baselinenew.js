@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-
-import { db, ref, set, auth} from '../../../firebaseConfig'; // Adjust the import path as necessary
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { db, ref, set, auth } from "../../../firebaseConfig"; // Adjust the import path as necessary
 
 function BaselineCalculator() {
   const [currentForm, setCurrentForm] = useState(1);
+  const navigate = useNavigate(); // Initialize navigate
 
   // Form 1: Electricity
   const [electricityInputs, setElectricityInputs] = useState({
@@ -150,16 +151,14 @@ function BaselineCalculator() {
     );
   };
 
- // Function to sanitize email for Firebase
-const sanitizeEmail = (email) => {
-  return email.replace(/\./g, '_');
-};
+  const sanitizeEmail = (email) => {
+    return email.replace(/\./g, "_");
+  };
 
-  
   const saveDataToFirebase = () => {
     const user = auth.currentUser;
     if (user) {
-      const sanitizedEmail = sanitizeEmail(user.email); // Use the updated sanitizeEmail function
+      const sanitizedEmail = sanitizeEmail(user.email);
       const data = {
         electricity: baselineElectricity,
         water: baselineWater,
@@ -167,12 +166,16 @@ const sanitizeEmail = (email) => {
         waste: totalWaste,
         timestamp: Date.now(),
       };
-  
-      const dataRef = ref(db, `PostalManager/${sanitizedEmail}/BaselineScores/${data.timestamp}`);
-      
+
+      const dataRef = ref(
+        db,
+        `PostalManager/${sanitizedEmail}/BaselineScores/${data.timestamp}`
+      );
+
       set(dataRef, data)
         .then(() => {
           console.log("Data saved successfully!");
+          navigate("/admin/SustainabilityScore"); // Redirect to SustainabilityScore page
         })
         .catch((error) => {
           console.error("Error saving data: ", error);
@@ -181,11 +184,9 @@ const sanitizeEmail = (email) => {
       console.log("No user is authenticated");
     }
   };
-  
 
   const renderFormButtons = () => (
     <div className="flex justify-between mt-6">
-      {/* Previous Button */}
       <button
         type="button"
         disabled={currentForm === 1}
@@ -198,8 +199,7 @@ const sanitizeEmail = (email) => {
       >
         Previous
       </button>
-  
-      {/* Conditionally render Next or Submit button */}
+
       {currentForm === 4 ? (
         <button
           type="button"
@@ -219,8 +219,7 @@ const sanitizeEmail = (email) => {
       )}
     </div>
   );
-  
-  // Form rendering logic
+
   const renderForm = () => {
     switch (currentForm) {
       case 1:
@@ -279,7 +278,10 @@ const sanitizeEmail = (email) => {
               Calculate Electricity Baseline
             </button>
             {baselineElectricity && (
-              <div>Baseline Electricity: {baselineElectricity} kWh</div>
+              <div className="mt-4 bg-green-100 p-4 rounded">
+                <h2>Electricity Baseline:</h2>
+                <p>{baselineElectricity} kWh</p>
+              </div>
             )}
           </>
         );
@@ -287,22 +289,16 @@ const sanitizeEmail = (email) => {
         return (
           <>
             <h1 className="text-3xl font-bold text-green-600 mb-6">
-              Provide Water Usage Data
+              Provide Water Usage
             </h1>
-            <div className="bg-green-100 p-4 rounded mb-6">
-              <p>
-                <b>Get Your Baseline:</b> Please fill in the information below
-                to calculate your water baseline usage.
-              </p>
-            </div>
             {Object.keys(waterInputs).map((key) => (
               <div key={key} className="mb-4">
                 <label className="block mb-2 font-medium">
-                  {key.toUpperCase()} Usage (Liters per Hour):
+                  {key.toUpperCase()} Usage (liters/hour):
                 </label>
                 <input
                   type="number"
-                  placeholder={`Usage for ${key}`}
+                  placeholder={`Enter ${key} usage`}
                   value={waterInputs[key] || ""}
                   onChange={(e) =>
                     setWaterInputs({
@@ -320,28 +316,28 @@ const sanitizeEmail = (email) => {
             >
               Calculate Water Baseline
             </button>
-            {baselineWater && <div>Baseline Water: {baselineWater} KL</div>}
+            {baselineWater && (
+              <div className="mt-4 bg-green-100 p-4 rounded">
+                <h2>Water Baseline:</h2>
+                <p>{baselineWater} kL</p>
+              </div>
+            )}
           </>
         );
       case 3:
         return (
           <>
             <h1 className="text-3xl font-bold text-green-600 mb-6">
-              Provide Fuel Usage Data
+              Provide Fuel Usage
             </h1>
-            <div className="bg-green-100 p-4 rounded mb-6">
-              <p>
-                <b>Get Your Baseline:</b> Please fill in the information below
-                to calculate your fuel baseline usage.
-              </p>
-            </div>
             {Object.keys(fuelInputs).map((key) => (
               <div key={key} className="mb-4">
                 <label className="block mb-2 font-medium">
-                  {key.toUpperCase()} (Liters per day):
+                  {key.toUpperCase()} Usage (liters/day):
                 </label>
                 <input
                   type="number"
+                  placeholder={`Enter ${key} usage`}
                   value={fuelInputs[key] || ""}
                   onChange={(e) =>
                     setFuelInputs({
@@ -359,28 +355,28 @@ const sanitizeEmail = (email) => {
             >
               Calculate Fuel Baseline
             </button>
-            {baselineFuel && <div>Baseline Fuel: {baselineFuel} Liters</div>}
+            {baselineFuel && (
+              <div className="mt-4 bg-green-100 p-4 rounded">
+                <h2>Fuel Baseline:</h2>
+                <p>{baselineFuel} liters</p>
+              </div>
+            )}
           </>
         );
       case 4:
         return (
           <>
             <h1 className="text-3xl font-bold text-green-600 mb-6">
-              Provide Waste Data
+              Provide Waste Information
             </h1>
-            <div className="bg-green-100 p-4 rounded mb-6">
-              <p>
-                <b>Get Your Baseline:</b> Please fill in the information below
-                to calculate your waste baseline.
-              </p>
-            </div>
             {Object.keys(wasteInputs).map((key) => (
               <div key={key} className="mb-4">
                 <label className="block mb-2 font-medium">
-                  {key.toUpperCase()} (Kg per month):
+                  {key.toUpperCase()} (kg/month):
                 </label>
                 <input
                   type="number"
+                  placeholder={`Enter ${key} amount`}
                   value={wasteInputs[key] || ""}
                   onChange={(e) =>
                     setWasteInputs({
@@ -398,24 +394,28 @@ const sanitizeEmail = (email) => {
             >
               Calculate Waste Baseline
             </button>
-            {totalWaste && <div>Total Waste: {totalWaste} Metric Tons</div>}
+            {totalWaste && (
+              <div className="mt-4 bg-green-100 p-4 rounded">
+                <h2>Total Waste Baseline:</h2>
+                <p>{totalWaste} kg</p>
+              </div>
+            )}
           </>
         );
       default:
         return null;
     }
   };
-  
+
   return (
     <div className="flex justify-center items-start p-6 space-x-6">
       {renderTimeline()}
       <div className="w-3/4">
-        {renderForm()} {/* Render the current form */}
-        {renderFormButtons()} {/* Render the form buttons */}
+        {renderForm()}
+        {renderFormButtons()}
       </div>
     </div>
   );
-  
 }
 
 export default BaselineCalculator;

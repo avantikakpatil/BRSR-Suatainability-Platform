@@ -9,7 +9,7 @@ const Sidebar = ({
   onChallengesClick,
   onInputDataClick,
   onReportClick,
-  onHeadquarterDashboard,
+  onSustainabilityScore,
   onCreatePO,
   onListPO,
   onSetDeadline,
@@ -211,11 +211,11 @@ const Sidebar = ({
 
               <li>
       <button
-        onClick={onHeadquarterDashboard}
+        onClick={onSustainabilityScore}
         className="flex items-center p-3 w-full text-left rounded-lg transition-all bg-gray-800 hover:bg-blue-500 hover:shadow-md"
       >
         <FaUser className="text-lg mr-3" />
-        <span>Headquarter Dashboard</span>
+        <span>SustainabilityScore</span>
       </button>
     </li>
               

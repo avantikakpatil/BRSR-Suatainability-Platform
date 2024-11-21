@@ -11,7 +11,7 @@ import Report from "./components/home/admin/report";
 import AdminPanel from "./components/home/admin/AdminPanel";
 import BaselineParametersForm from "./components/home/admin/BaselineParametersForm";
 import AdminForm from "./components/home/admin/AdminForm";
-import HeadquarterDashboard from "./components/home/admin/HeadquarterDashboard.js";
+import SustainabilityScore from "./components/home/admin/SustainabilityScore.js";
 import CreatePO from "./components/home/admin/CreatePO.js";
 import ResourceUsageForm from "./components/home/admin/ResourceUsageForm.js";
 import ListPO from "./components/home/admin/ListPO";
@@ -40,7 +40,7 @@ function App() {
     { path: "/admin/baseline", element: <BaselineParametersForm /> },
     { path: "/admin/profile", element: <AdminForm /> },
     { path: "/admin/report", element: <Report /> },
-    { path: "/admin/headquarterdashboard", element: <HeadquarterDashboard /> },
+    { path: "/admin/SustainabilityScore", element: <SustainabilityScore /> },
     { path: "/admin/createpo", element: <CreatePO /> },
     { path: "/admin/ResourceUsageForm", element: <ResourceUsageForm setFormData={setFormData} /> },
     { path: "/admin/CumulativeExpenditure", element: <CumulativeExpenditure formData={formData} /> },
@@ -70,7 +70,7 @@ function App() {
           onBaselineClick={() => navigate("/admin/baseline")}
           onProfileClick={() => navigate("/admin/profile")}
           onReportClick={() => navigate("/admin/report")}
-          onHeadquarterDashboard={() => navigate("/admin/headquarterdashboard")}
+          onSustainabilityScore={() => navigate("/admin/SustainabilityScore")}
           onCreatePO={() => navigate("/admin/createpo")}
           onListPO={() => navigate("/admin/listpo")}
           onVerifyReport={() => navigate("/admin/verifyreport")}

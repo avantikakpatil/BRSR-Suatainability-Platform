@@ -5,7 +5,6 @@ import {
   ref,
   set,
   get,
-  update,
 } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
@@ -93,41 +92,40 @@ const WasteForm = ({ goBack }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     const user = auth.currentUser;
     if (user) {
       // Use sanitized email as a unique identifier
-      const sanitizedEmail = user.email.replace(/[.#$/[\]]/g, '_');
+      const sanitizedEmail = user.email.replace(/[.#$/[\]]/g, "_");
       // Store data in a consistent node under the user's data
       const wasteDataRef = ref(database, `PostalManager/${sanitizedEmail}/inputData/wasteData`);
-  
+
       // Upload the form data
       set(wasteDataRef, { ...formData })
         .then(() => {
-          alert('Data submitted successfully! Existing data has been overwritten.');
+          alert("Data submitted successfully! Existing data has been overwritten.");
           setFormData({
-            currentPlasticWaste: '',
-            currentEWaste: '',
-            currentBioMedicalWaste: '',
-            currentConstructionWaste: '',
-            currentBatteryWaste: '',
-            currentRadioactiveWaste: '',
-            otherHazardousWaste: '',
-            otherNonHazardousWaste: '',
-            externalAssessment: '',
-            externalAgencyName: '',
+            currentPlasticWaste: "",
+            currentEWaste: "",
+            currentBioMedicalWaste: "",
+            currentConstructionWaste: "",
+            currentBatteryWaste: "",
+            currentRadioactiveWaste: "",
+            otherHazardousWaste: "",
+            otherNonHazardousWaste: "",
+            externalAssessment: "",
+            externalAgencyName: "",
             billFile: null,
             totalWaste: 0,
           });
         })
         .catch((error) => {
-          alert('Error submitting data: ' + error.message);
+          alert("Error submitting data: " + error.message);
         });
     } else {
-      alert('No user is logged in.');
+      alert("No user is logged in.");
     }
   };
-  
 
   return (
     <div style={styles.container}>
@@ -153,17 +151,11 @@ const WasteForm = ({ goBack }) => {
               { label: "Plastic Waste", name: "currentPlasticWaste" },
               { label: "e-Waste", name: "currentEWaste" },
               { label: "Bio-Medical Waste", name: "currentBioMedicalWaste" },
-              {
-                label: "Construction and Demolition Waste",
-                name: "currentConstructionWaste",
-              },
+              { label: "Construction and Demolition Waste", name: "currentConstructionWaste" },
               { label: "Battery Waste", name: "currentBatteryWaste" },
               { label: "Radioactive Waste", name: "currentRadioactiveWaste" },
               { label: "Other Hazardous Waste", name: "otherHazardousWaste" },
-              {
-                label: "Other Non-Hazardous Waste",
-                name: "otherNonHazardousWaste",
-              },
+              { label: "Other Non-Hazardous Waste", name: "otherNonHazardousWaste" },
             ].map((item) => (
               <tr key={item.name}>
                 <td style={styles.td}>{item.label}</td>
@@ -195,30 +187,32 @@ const WasteForm = ({ goBack }) => {
         </div>
 
         <div style={styles.additionalInputs}>
-  <label>
-    External Assessment (Y/N):<br />
-    <input
-      type="text"
-      name="externalAssessment"
-      value={formData.externalAssessment || ""}
-      onChange={handleChange}
-      style={styles.input}
-    />
-  </label>
-  {formData.externalAssessment?.toLowerCase() === "y" && (
-    <label>
-      Name of External Agency:<br />
-      <input
-        type="text"
-        name="externalAgencyName"
-        value={formData.externalAgencyName || ""}
-        onChange={handleChange}
-        style={styles.input}
-      />
-    </label>
-  )}
-</div>
-
+          <label>
+            External Assessment (Y/N):<br />
+            <select
+              name="externalAssessment"
+              value={formData.externalAssessment || ""}
+              onChange={handleChange}
+              style={styles.dropdown}
+            >
+              <option value="">Select</option>
+              <option value="Y">Yes</option>
+              <option value="N">No</option>
+            </select>
+          </label>
+          {formData.externalAssessment?.toLowerCase() === "y" && (
+            <label>
+              Name of External Agency:<br />
+              <input
+                type="text"
+                name="externalAgencyName"
+                value={formData.externalAgencyName || ""}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </label>
+          )}
+        </div>
 
         <div style={styles.uploadSection}>
           <label>
@@ -242,73 +236,78 @@ const WasteForm = ({ goBack }) => {
 
 const styles = {
   container: {
-    width: '100%',
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '10px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '10px',
+    width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "10px",
+    backgroundColor: "#f9f9f9",
+    borderRadius: "10px",
   },
   goBackButton: {
-    marginBottom: '20px',
-    padding: '10px 20px',
-    backgroundColor: '#e74c3c',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '16px',
+    marginBottom: "20px",
+    padding: "10px 20px",
+    backgroundColor: "#e74c3c",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "16px",
   },
   heading: {
-    textAlign: 'center',
-    fontSize: '24px',
-    marginBottom: '10px',
+    textAlign: "center",
+    fontSize: "24px",
+    marginBottom: "10px",
   },
   form: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
   },
   table: {
-    width: '100%',
-    borderCollapse: 'collapse',
+    width: "100%",
+    borderCollapse: "collapse",
   },
   th: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    padding: '8px',
-    textAlign: 'center',
-    fontSize: '14px',
+    backgroundColor: "#4CAF50",
+    color: "white",
+    padding: "8px",
+    textAlign: "center",
+    fontSize: "14px",
   },
   td: {
-    border: '1px solid #ccc',
-    padding: '8px',
-    textAlign: 'center',
-    fontSize: '14px',
+    border: "1px solid #ccc",
+    padding: "8px",
+    textAlign: "center",
+    fontSize: "14px",
   },
   input: {
-    width: '100%',
-    padding: '4px',
-    fontSize: '14px',
+    width: "100%",
+    padding: "4px",
+    fontSize: "14px",
+  },
+  dropdown: {
+    width: "100%",
+    padding: "4px",
+    fontSize: "14px",
   },
   additionalInputs: {
-    marginTop: '20px',
+    marginTop: "20px",
   },
   uploadSection: {
-    marginTop: '20px',
+    marginTop: "20px",
   },
   fileInput: {
-    marginTop: '10px',
-    fontSize: '14px',
+    marginTop: "10px",
+    fontSize: "14px",
   },
   button: {
-    marginTop: '20px',
-    padding: '10px 20px',
-    backgroundColor: '#4CAF50',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
+    marginTop: "20px",
+    padding: "10px 20px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    fontSize: "16px",
+    cursor: "pointer",
   },
 };
 

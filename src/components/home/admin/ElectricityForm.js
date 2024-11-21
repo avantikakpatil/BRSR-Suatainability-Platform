@@ -81,7 +81,7 @@ const ElectricityForm = ({ goBack }) => {
           <thead>
             <tr>
               <th style={styles.th}>Parameter</th>
-              <th style={styles.th}>FY ____ (Current Financial Year)</th>
+              <th style={styles.th}>FY ____ (Current Financial Year)in Wattage</th>
             </tr>
           </thead>
           <tbody>

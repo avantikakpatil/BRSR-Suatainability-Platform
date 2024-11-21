@@ -43,24 +43,51 @@ const downloadPDF = (profileData, formData, sustainabilityScore) => {
   // Input Data Section
   if (formData) {
     Object.entries(formData).forEach(([formName, data]) => {
-      doc.text(`${formName} Data:`, 14, yPosition);
+      if (formName !== "communityData") {
+        doc.text(`${formName} Data:`, 14, yPosition);
+        yPosition += 10;
+
+        const formDataTable = Object.entries(data).map(([key, value]) => [
+          key,
+          value || "Not provided",
+        ]);
+
+        doc.autoTable({
+          head: [["Parameter", "Value"]],
+          body: formDataTable,
+          startY: yPosition,
+          theme: "grid",
+          headStyles: { fillColor: [72, 133, 237], textColor: [255, 255, 255] },
+        });
+
+        yPosition = doc.lastAutoTable.finalY + 10;
+      }
+    });
+
+    // Add Community Data
+    if (formData.communityData?.challenges) {
+      doc.text("Community Data", 14, yPosition);
       yPosition += 10;
 
-      const formDataTable = Object.entries(data).map(([key, value]) => [
-        key,
-        value || "Not provided",
-      ]);
+      const communityTableData = formData.communityData.challenges.map(
+        (challenge) => [
+          challenge.title || "Not provided",
+          challenge.description || "Not provided",
+          challenge.startDate || "Not provided",
+          challenge.endDate || "Not provided",
+        ]
+      );
 
       doc.autoTable({
-        head: [["Parameter", "Value"]],
-        body: formDataTable,
+        head: [["Title", "Description", "Start Date", "End Date"]],
+        body: communityTableData,
         startY: yPosition,
         theme: "grid",
         headStyles: { fillColor: [72, 133, 237], textColor: [255, 255, 255] },
       });
 
       yPosition = doc.lastAutoTable.finalY + 10;
-    });
+    }
   } else {
     doc.text("No input data available.", 14, yPosition);
   }
@@ -130,6 +157,11 @@ const AllDataPage = () => {
       setProfileData(profile);
       setFormData(inputData);
       setSustainabilityScore(sustainability);
+
+      // Log communityData for debugging
+      if (inputData?.communityData) {
+        console.log("Community Data:", inputData.communityData);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch data. Please try again later.");
@@ -137,6 +169,25 @@ const AllDataPage = () => {
       setLoading(false);
     }
   };
+
+  const renderCommunityData = (challenges) => (
+    <div className="mb-8">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">Community Data</h2>
+      <div className="grid grid-cols-1 gap-4 bg-white p-6 rounded-lg shadow-md">
+        {challenges.map((challenge, index) => (
+          <div
+            key={index}
+            className="bg-gray-50 p-4 rounded border shadow-sm"
+          >
+            <p><span className="font-semibold">Title:</span> {challenge.title || "Not provided"}</p>
+            <p><span className="font-semibold">Description:</span> {challenge.description || "Not provided"}</p>
+            <p><span className="font-semibold">Start Date:</span> {challenge.startDate || "Not provided"}</p>
+            <p><span className="font-semibold">End Date:</span> {challenge.endDate || "Not provided"}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   const renderDataSection = (title, data) => (
     <div className="mb-8">
@@ -149,7 +200,9 @@ const AllDataPage = () => {
               className="flex justify-between items-center bg-gray-50 p-4 rounded border shadow-sm"
             >
               <span className="font-semibold text-gray-700">{key}:</span>
-              <span className="text-gray-600">{value || "Not provided"}</span>
+              <span className="text-gray-600">
+                {typeof value === "object" ? JSON.stringify(value) : value || "Not provided"}
+              </span>
             </div>
           ))}
         </div>
@@ -177,7 +230,9 @@ const AllDataPage = () => {
 
       {formData &&
         Object.entries(formData).map(([key, value]) =>
-          renderDataSection(`${key} Data`, value)
+          key !== "communityData"
+            ? renderDataSection(`${key} Data`, value)
+            : renderCommunityData(value.challenges)
         )}
 
       {sustainabilityScore !== null && (
@@ -192,9 +247,7 @@ const AllDataPage = () => {
 
       <div className="mt-8 flex justify-center">
         <button
-          onClick={() =>
-            downloadPDF(profileData, formData, sustainabilityScore)
-          }
+          onClick={() => downloadPDF(profileData, formData, sustainabilityScore)}
           className="bg-green-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-green-600"
         >
           Download Report (PDF)

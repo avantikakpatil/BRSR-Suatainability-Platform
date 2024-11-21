@@ -41,7 +41,7 @@ const Header = () => {
 
   return (
     <nav
-      className="flex justify-between items-center bg-transparent text-white px-4 py-3 fixed w-[calc(100%-200px)] z-20 shadow-md backdrop-blur-lg"
+      className="flex justify-between items-center text-white px-4 py-3 fixed w-[calc(100%-200px)] z-20 shadow-md backdrop-blur-lg bg-white"
       style={{ height: '70px', marginLeft: '270px', width: '82%' }}
     >
       {/* Left Side - Logo and Title */}

@@ -168,7 +168,7 @@ const sanitizeEmail = (email) => {
         timestamp: Date.now(),
       };
   
-      const dataRef = ref(db, `PostalManager/${sanitizedEmail}/BaselineScores/${data.timestamp}`);
+      const dataRef = ref(db, `PostalManager/${sanitizedEmail}/BaselineScores`);
       
       set(dataRef, data)
         .then(() => {

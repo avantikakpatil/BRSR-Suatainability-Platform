@@ -65,7 +65,7 @@ const Sidebar = ({
       }}
     >
       <div
-        className="sidebar bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white w-64 h-full p-4 rounded-xl shadow-lg flex flex-col overflow-y-auto"
+        className="sidebar bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white w-64 h-full p-4 shadow-lg flex flex-col overflow-y-auto"
         style={{
           position: "fixed", // Fix sidebar on the page
           top: "0", // Stick to top

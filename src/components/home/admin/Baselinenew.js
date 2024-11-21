@@ -166,12 +166,9 @@ function BaselineCalculator() {
         waste: totalWaste,
         timestamp: Date.now(),
       };
-
-      const dataRef = ref(
-        db,
-        `PostalManager/${sanitizedEmail}/BaselineScores/${data.timestamp}`
-      );
-
+  
+      const dataRef = ref(db, `PostalManager/${sanitizedEmail}/BaselineScores`);
+      
       set(dataRef, data)
         .then(() => {
           console.log("Data saved successfully!");

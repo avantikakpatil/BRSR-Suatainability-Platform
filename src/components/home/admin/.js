@@ -35,6 +35,14 @@ const Dashboard = () => {
     water: "waterData/totalConsumption",
   };
 
+  // Define additionalRefs for data fetching
+  const additionalRefs = {
+    electricity: ref(db, paths.electricity),
+    fuel: ref(db, paths.fuel),
+    waste: ref(db, paths.waste),
+    water: ref(db, paths.water),
+  };
+
   // Authentication check to set userEmail
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -49,8 +57,11 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // Fetch baseline data
-  const fetchBaselineData = (userEmail) => {
+  // Fetch data from Firebase
+  useEffect(() => {
+    if (!userEmail) return;
+
+    // Fetch baseline scores
     const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
     const baselineListener = onValue(baselineRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -63,51 +74,46 @@ const Dashboard = () => {
       }
       setLoading(false); // Update loading state
     });
-  };
 
-  // Fetch additional data for each category (electricity, fuel, waste, water)
-  const fetchAdditionalData = (userEmail) => {
-    const additionalRefs = Object.fromEntries(
-      Object.entries(paths).map(([key, path]) => [
-        key,
-        ref(db, `PostalManager/${userEmail}/inputData/${path}`),
-      ])
-    );
+    // Fetch sustainability score
+    const scoreRef = ref(db, `sustainabilityscore/${userEmail}`);
+    const scoreListener = onValue(scoreRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setSustainabilityScore(snapshot.val().TotalSustainabilityScore);
+      } else {
+        console.log("No sustainability score found");
+      }
+    });
 
     // Fetch additional data for each category
-    Object.entries(additionalRefs).forEach(([key, refPath]) =>
+    const listeners = Object.entries(additionalRefs).map(([key, refPath]) =>
       onValue(refPath, (snapshot) => {
         if (snapshot.exists()) {
+          console.log(`${key} data:`, snapshot.val()); // Debugging line
           setAdditionalData((prevData) => ({
             ...prevData,
-            [key]: snapshot.val(), // Update additional data state
+            [key]: snapshot.val(),
           }));
         } else {
           console.log(`No data found for ${key}`);
         }
       })
     );
-  };
 
-  // Fetch data from Firebase
-  useEffect(() => {
-    if (!userEmail) return;
-
-    setLoading(true); // Set loading true while data is being fetched
-
-    // Fetch baseline and additional data
-    fetchBaselineData(userEmail);
-    fetchAdditionalData(userEmail);
+    return () => {
+      baselineListener();
+      scoreListener();
+      listeners.forEach((listener) => listener());
+    };
   }, [userEmail]);
 
   // Compare baseline and additional data, calculate scores
   useEffect(() => {
-    if (Object.keys(baselineData).length && Object.keys(additionalData).length) {
+    if (Object.keys(baselineData).length) {
       const results = compareData(baselineData);
       setComparisonResults(results);
 
       const totalScore = results.reduce((sum, result) => sum + result.score, 0);
-      setSustainabilityScore(totalScore); // Set sustainability score
       saveTotalSustainabilityScore(totalScore);
     }
   }, [baselineData, additionalData]);

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { db, auth } from "../../../firebaseConfig"; // Ensure correct Firebase configuration
+import { db, auth } from "../../../firebaseConfig"; 
 import { ref, get, child } from "firebase/database";
 import { onAuthStateChanged } from "firebase/auth";
-import { jsPDF } from "jspdf"; // Import jsPDF library
-import "jspdf-autotable"; // Import jsPDF autoTable plugin
+import { jsPDF } from "jspdf"; 
+import "jspdf-autotable"; 
 
 // Helper function to generate and download the PDF report
 const downloadPDF = (profileData, formData) => {
@@ -11,15 +11,16 @@ const downloadPDF = (profileData, formData) => {
 
   // Add title
   doc.setFontSize(18);
-  doc.text("Data Report", 14, 20);
+  doc.text("Business Responsibility and Sustainability Report", 14, 20);
 
   let yPosition = 30;
 
   // Add Profile Data Section
-  doc.setFontSize(12);
-  doc.text("Profile Data:", 14, yPosition);
+  doc.setFontSize(14);
+  doc.text("Profile Data", 14, yPosition);
   yPosition += 10;
 
+  // Format Profile Data in a table
   const profileTableData = Object.entries(profileData || {}).map(([key, value]) => [
     key,
     value || "Not provided",
@@ -33,6 +34,7 @@ const downloadPDF = (profileData, formData) => {
     headStyles: { fillColor: [72, 133, 237], textColor: [255, 255, 255] },
   });
 
+  // Update yPosition after profile data table
   yPosition = doc.lastAutoTable.finalY + 10;
 
   // Add Input Data Sections for each parameter
@@ -41,6 +43,7 @@ const downloadPDF = (profileData, formData) => {
       doc.text(`${formName} Data:`, 14, yPosition);
       yPosition += 10;
 
+      // Format form data in a table
       const formDataTable = Array.isArray(data)
         ? data.map((item, index) => [index + 1, JSON.stringify(item)])
         : Object.entries(data || {}).map(([key, value]) => [
@@ -56,6 +59,7 @@ const downloadPDF = (profileData, formData) => {
         headStyles: { fillColor: [72, 133, 237], textColor: [255, 255, 255] },
       });
 
+      // Update yPosition after form data table
       yPosition = doc.lastAutoTable.finalY + 10;
     });
   } else {
@@ -63,7 +67,7 @@ const downloadPDF = (profileData, formData) => {
   }
 
   // Save the document as a PDF
-  doc.save("report.pdf");
+  doc.save("Business_Responsibility_Report.pdf");
 };
 
 const AllDataPage = () => {
@@ -93,24 +97,16 @@ const AllDataPage = () => {
     const dbRef = ref(db);
     setLoading(true);
     setError(null);
-  
+
     try {
-      // Fetch profile data
       const profilePath = `PostalManager/profile/${sanitizedEmail}`;
-      console.log("Fetching profile data from:", profilePath);
       const profileSnapshot = await get(child(dbRef, profilePath));
       const profile = profileSnapshot.exists() ? profileSnapshot.val() : null;
-  
-      // Fetch all input data nodes at once
+
       const inputDataPath = `PostalManager/${sanitizedEmail}/inputData`;
-      console.log("Fetching input data from:", inputDataPath);
       const inputDataSnapshot = await get(child(dbRef, inputDataPath));
       const inputData = inputDataSnapshot.exists() ? inputDataSnapshot.val() : null;
-  
-      console.log("Fetched profile data:", profile);
-      console.log("Fetched input data:", inputData);
-  
-      // Set states with fetched data
+
       setProfileData(profile);
       setFormData(inputData);
     } catch (error) {
@@ -120,9 +116,7 @@ const AllDataPage = () => {
       setLoading(false);
     }
   };
-  
 
-  // Render Data Sections for Each Parameter
   const renderDataSection = (title, data) => (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
@@ -149,7 +143,6 @@ const AllDataPage = () => {
       )}
     </div>
   );
-  
 
   if (loading) {
     return (
@@ -165,21 +158,17 @@ const AllDataPage = () => {
 
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Render Profile Data */}
       {profileData && renderDataSection("Profile Data", profileData)}
 
-      {/* Render Input Data for Each Parameter */}
       {formData &&
         Object.entries(formData).map(([key, value]) =>
           renderDataSection(`${key} Data`, value)
         )}
 
-      {/* Download Report Button */}
       <div className="mt-8 flex justify-center">
         <button
           onClick={() => downloadPDF(profileData, formData)}
           className="bg-green-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-green-600"
-          disabled={!profileData && !Object.values(formData || {}).some((data) => data)}
         >
           Download Report (PDF)
         </button>

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/authContext';
-import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, get, child } from 'firebase/database';
-import { Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/authContext";
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, get, child } from "firebase/database";
+import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 // Register Chart.js elements
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -26,47 +26,32 @@ const db = getDatabase(app);
 const Home = () => {
   const { currentUser } = useAuth();
   const [baselineScores, setBaselineScores] = useState([]);
-  const [error, setError] = useState(null);
-  const [userName, setUserName] = useState('');
-<<<<<<< HEAD
-=======
-  const [reportVisible, setReportVisible] = useState(false);  // Added state for report visibility
->>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Fetch user's name from the database
     const fetchUserName = async () => {
       if (!currentUser) return;
 
       try {
-<<<<<<< HEAD
-        // Corrected template literal usage
-=======
-        // Fixed template literal syntax
->>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
         const userRef = ref(db, `users/${currentUser.uid}`);
         const snapshot = await get(userRef);
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
-<<<<<<< HEAD
-          setUserName(userData.name || 'User'); // Use the name or default to 'User'
-=======
-          setUserName(userData.name || 'User');
->>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
+          setUserName(userData.name || "User");
         } else {
-          setUserName('User');
+          setUserName("User");
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setUserName('User'); // Default if error occurs
+        setUserName("User");
       }
     };
 
     fetchUserName();
   }, [currentUser]);
 
-  const userEmail = currentUser?.email?.replace(/\./g, '_');
+  const userEmail = currentUser?.email?.replace(/\./g, "_");
 
   useEffect(() => {
     const fetchBaselineScores = async () => {
@@ -92,7 +77,7 @@ const Home = () => {
           setBaselineScores([]);
         }
       } catch (error) {
-        setError("Failed to fetch data. Please try again.");
+        console.error("Failed to fetch data:", error);
       }
     };
 
@@ -100,43 +85,22 @@ const Home = () => {
   }, [userEmail]);
 
   const createChartData = (label, value) => ({
-    labels: [`${label} Usage`, 'Remaining'],
+    labels: [`${label} Usage`, "Remaining"],
     datasets: [
       {
         data: [value, 100 - value],
-        backgroundColor: ['#4CAF50', '#E0E0E0'],
-        hoverBackgroundColor: ['#45A049', '#C0C0C0'],
+        backgroundColor: ["#4CAF50", "#E0E0E0"],
+        hoverBackgroundColor: ["#45A049", "#C0C0C0"],
         borderWidth: 1,
-        cutout: '70%',
+        cutout: "70%",
       },
     ],
   });
 
-  const handleViewReport = () => {
-<<<<<<< HEAD
-    // Placeholder for future implementation
-    alert('Viewing report...');
-  };
-
-  const handleDownloadReport = () => {
-    // Placeholder for future implementation
-=======
-    setReportVisible(true);  // Toggle visibility
-  };
-
-  const handleDownloadReport = () => {
-    // Placeholder for downloading functionality
->>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
-    alert('Downloading report...');
-  };
-
   return (
     <div className="bg-gray-100 min-h-screen p-8">
-      <h1 className="text-2xl font-bold mb-4">
-        Welcome, {userName}!
-      </h1>
+      <h1 className="text-2xl font-bold mb-4">Welcome, {userName}!</h1>
 
-      {/* Dashboard content */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-xl font-semibold text-gray-700">Total Energy Saved</h3>
@@ -172,51 +136,39 @@ const Home = () => {
           <>
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Electricity Usage</h3>
-              <Doughnut data={createChartData('Electricity', baselineScores[0].electricity)} options={{ rotation: -90, circumference: 180 }} />
+              <Doughnut
+                data={createChartData("Electricity", baselineScores[0].electricity)}
+                options={{ rotation: -90, circumference: 180 }}
+              />
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Fuel Usage</h3>
-              <Doughnut data={createChartData('Fuel', baselineScores[0].fuel)} options={{ rotation: -90, circumference: 180 }} />
+              <Doughnut
+                data={createChartData("Fuel", baselineScores[0].fuel)}
+                options={{ rotation: -90, circumference: 180 }}
+              />
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Waste Usage</h3>
-              <Doughnut data={createChartData('Waste', baselineScores[0].waste)} options={{ rotation: -90, circumference: 180 }} />
+              <Doughnut
+                data={createChartData("Waste", baselineScores[0].waste)}
+                options={{ rotation: -90, circumference: 180 }}
+              />
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Water Usage</h3>
-              <Doughnut data={createChartData('Water', baselineScores[0].water)} options={{ rotation: -90, circumference: 180 }} />
+              <Doughnut
+                data={createChartData("Water", baselineScores[0].water)}
+                options={{ rotation: -90, circumference: 180 }}
+              />
             </div>
           </>
         )}
         {!baselineScores.length && <p>No data available for the current user.</p>}
       </div>
-<<<<<<< HEAD
-=======
-
-      {/* Report visibility toggle */}
-      <div className="mt-8 text-center">
-        <button
-          onClick={handleViewReport}
-          className="bg-blue-500 text-white p-2 rounded-md"
-        >
-          View Report
-        </button>
-
-        {reportVisible && (
-          <div className="mt-4">
-            <button
-              onClick={handleDownloadReport}
-              className="bg-green-500 text-white p-2 rounded-md"
-            >
-              Download Report
-            </button>
-          </div>
-        )}
-      </div>
->>>>>>> d1c9549c3cd7f2c55676fbe86f7b284b7e60c778
     </div>
   );
 };

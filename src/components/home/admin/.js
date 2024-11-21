@@ -27,6 +27,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
 
+  // Firebase paths for each parameter
   const paths = {
     electricity: "electricityData/currentYearElectricity",
     fuel: "fuelData/fuelConsumption",
@@ -34,6 +35,15 @@ const Dashboard = () => {
     water: "waterData/totalConsumption",
   };
 
+  // Define additionalRefs for data fetching
+  const additionalRefs = {
+    electricity: ref(db, paths.electricity),
+    fuel: ref(db, paths.fuel),
+    waste: ref(db, paths.waste),
+    water: ref(db, paths.water),
+  };
+
+  // Authentication check to set userEmail
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -47,17 +57,23 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, []);
 
+  // Fetch data from Firebase
   useEffect(() => {
     if (!userEmail) return;
 
     // Fetch baseline scores
     const baselineRef = ref(db, `PostalManager/${userEmail}/BaselineScores`);
-    const additionalRefs = Object.fromEntries(
-      Object.entries(paths).map(([key, path]) => [
-        key,
-        ref(db, `PostalManager/${userEmail}/inputData/${path}`),
-      ])
-    );
+    const baselineListener = onValue(baselineRef, (snapshot) => {
+      if (snapshot.exists()) {
+        console.log("Baseline data:", snapshot.val()); // Debugging line
+        const data = snapshot.val();
+        setBaselineData(data);
+      } else {
+        console.log("No baseline data found");
+        setBaselineData({});
+      }
+      setLoading(false); // Update loading state
+    });
 
     // Fetch sustainability score
     const scoreRef = ref(db, `sustainabilityscore/${userEmail}`);
@@ -69,22 +85,11 @@ const Dashboard = () => {
       }
     });
 
-    // Fetch baseline data
-    const baselineListener = onValue(baselineRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const latestEntry = Object.values(data).pop();
-        setBaselineData(latestEntry || {});
-      } else {
-        console.log("No baseline data found");
-      }
-      setLoading(false);
-    });
-
-    // Fetch additional data
+    // Fetch additional data for each category
     const listeners = Object.entries(additionalRefs).map(([key, refPath]) =>
       onValue(refPath, (snapshot) => {
         if (snapshot.exists()) {
+          console.log(`${key} data:`, snapshot.val()); // Debugging line
           setAdditionalData((prevData) => ({
             ...prevData,
             [key]: snapshot.val(),
@@ -102,6 +107,7 @@ const Dashboard = () => {
     };
   }, [userEmail]);
 
+  // Compare baseline and additional data, calculate scores
   useEffect(() => {
     if (Object.keys(baselineData).length) {
       const results = compareData(baselineData);
@@ -112,6 +118,7 @@ const Dashboard = () => {
     }
   }, [baselineData, additionalData]);
 
+  // Score calculation logic
   const calculateScore = (totalValue, baselineValue) => {
     if (totalValue <= 0 || baselineValue <= 0) return 0;
 
@@ -126,6 +133,7 @@ const Dashboard = () => {
     return Math.max(10 - overagePercentage / 10, 0);
   };
 
+  // Compare data between baseline and additional data
   const compareData = (baseline) => {
     const parameters = [
       { key: "electricity", label: "Electricity Consumption" },
@@ -149,6 +157,7 @@ const Dashboard = () => {
     });
   };
 
+  // Save the calculated sustainability score
   const saveTotalSustainabilityScore = (totalScore) => {
     if (!userEmail) return;
 
@@ -196,21 +205,19 @@ const Dashboard = () => {
                   <td className="border px-4 py-2">{result.label}</td>
                   <td className="border px-4 py-2">{result.baseline}</td>
                   <td
-                    className={`border px-4 py-2 font-bold ${
-                      result.status === "Good" ? "text-green-600" : "text-red-600"
-                    }`}
+                    className={`border px-4 py-2 font-bold ${result.status === "Good" ? "text-green-600" : "text-red-600"}`}
                   >
                     {result.status}
                   </td>
-                  <td className="border px-4 py-2">{result.total.toFixed(2)}</td>
-                  <td className="border px-4 py-2">{result.score.toFixed(2)}</td>
+                  <td className="border px-4 py-2">{result.total}</td>
+                  <td className="border px-4 py-2">{result.score}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       ) : (
-        <p>No data available for the current user.</p>
+        <p>No comparison data available</p>
       )}
     </div>
   );

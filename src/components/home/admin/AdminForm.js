@@ -6,7 +6,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 const AdminForm = () => {
   const [formData, setFormData] = useState({
     profile: {
-      cin: '',
+      cin: '',//Corporate Identity Number
       name: '',
       yearOfIncorporation: '',
       registeredOffice: '',

@@ -1,155 +1,202 @@
 import React, { useState, useEffect } from "react";
 import { Button, Table, Form } from "react-bootstrap";
 import { db, auth } from "../../../firebaseConfig";
-import { ref, onValue, update } from "firebase/database";
+import { ref, onValue, update, push } from "firebase/database";
 import { onAuthStateChanged } from "firebase/auth";
-import FinalReport from "./finalreport";
+import { getStorage, ref as storageRef, getDownloadURL } from "firebase/storage";
 import "./VerifyReport.css";
 
 const VerifyReport = () => {
-  const [postOffices, setPostOffices] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [reports, setReports] = useState([]);
+  const [regularPostOffices, setRegularPostOffices] = useState([]);
+  const [emailsInput, setEmailsInput] = useState("");
   const [searchText, setSearchText] = useState("");
 
-  // Fetch data from the headquarter/postOffices node
+  // Fetch current user and regular post office emails
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);
+        fetchRegularPostOffices(user.email);
       } else {
         console.log("No user is signed in.");
-      }
-    });
-
-    const postOfficesRef = ref(db, "headquarter/postOffices");
-    const postOfficesListener = onValue(postOfficesRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const postOfficesData = [];
-        snapshot.forEach((childSnapshot) => {
-          const data = childSnapshot.val();
-
-          // Check if 'details' and 'address' fields exist before accessing them
-          const details = data.details || {};
-          const address = details.address || {};
-
-          postOfficesData.push({
-            id: childSnapshot.key,
-            postOffice: details.name || "N/A", // Default to "N/A" if name doesn't exist
-            city: address.city || "N/A", // Default to "N/A" if city doesn't exist
-            type: data.type || "Unknown", // Default to "Unknown" if type doesn't exist
-            year: new Date().getFullYear(),
-            isVerified: data.isVerified || false,
-            suggestion: data.suggestion || "",
-          });
-        });
-        setPostOffices(postOfficesData);
+        setReports([]);
+        setRegularPostOffices([]);
       }
     });
 
     return () => {
       unsubscribe();
-      postOfficesListener();
     };
   }, []);
 
-  const filteredPostOffices = searchText
-    ? postOffices.filter((office) => {
+  const fetchRegularPostOffices = (email) => {
+    const userKey = email.replace(/\./g, "_");
+
+    const regularPostOfficesRef = ref(db, `report/${userKey}/regularPostOffices`);
+    onValue(regularPostOfficesRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const emails = [];
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          if (data.emails) {
+            emails.push(...data.emails);
+          }
+        });
+        setRegularPostOffices(emails);
+        fetchReportsByEmails(emails);
+      } else {
+        setRegularPostOffices([]);
+        setReports([]);
+      }
+    });
+  };
+
+  const fetchReportsByEmails = (emails) => {
+    const fetchedReports = [];
+
+    emails.forEach((email) => {
+      const emailKey = email.replace(/\./g, "_");
+      const reportRef = ref(db, `reports/${emailKey}`);
+
+      onValue(reportRef, async (snapshot) => {
+        if (snapshot.exists()) {
+          const reportData = snapshot.val();
+          // Fetch the PDF URL from Firebase Storage if available
+          if (reportData.reportFileUrl) {
+            try {
+              const storage = getStorage();
+              const fileRef = storageRef(storage, reportData.reportFileUrl);
+              const fileUrl = await getDownloadURL(fileRef);
+
+              // Add the file URL to the report data
+              fetchedReports.push({
+                email,
+                ...reportData,
+                pdfUrl: fileUrl, // Store the PDF URL
+              });
+            } catch (error) {
+              console.error("Error fetching file URL: ", error);
+            }
+          } else {
+            fetchedReports.push({ email, ...reportData });
+          }
+        }
+
+        // Update state after fetching all reports
+        if (fetchedReports.length === emails.length) {
+          setReports(fetchedReports);
+        }
+      });
+    });
+  };
+
+  const saveRegularPostOffices = async () => {
+    if (!currentUser) {
+      alert("Please log in to save regular post offices.");
+      return;
+    }
+
+    const emails = emailsInput
+      .split(",")
+      .map((email) => email.trim())
+      .filter((email) => email !== ""); // Remove empty entries
+
+    if (emails.length === 0) {
+      alert("Please enter at least one valid email address.");
+      return;
+    }
+
+    const userKey = currentUser.email.replace(/\./g, "_");
+    const userReportRef = ref(db, `report/${userKey}/regularPostOffices`);
+
+    try {
+      const newEmailsRef = push(userReportRef);
+      await update(newEmailsRef, {
+        emails,
+        timestamp: new Date().toISOString(), // Add a timestamp for tracking
+      });
+
+      setRegularPostOffices((prev) => [...prev, ...emails]);
+      setEmailsInput(""); // Clear input field
+      alert("Regular post offices saved successfully!");
+    } catch (error) {
+      console.error("Error saving regular post offices:", error);
+      alert("Failed to save post offices. Please try again.");
+    }
+  };
+
+  const filteredReports = searchText
+    ? reports.filter((report) => {
         const searchLower = searchText.toLowerCase();
         return (
-          String(office.year).toLowerCase().includes(searchLower) ||
-          office.postOffice.toLowerCase().includes(searchLower) ||
-          office.city.toLowerCase().includes(searchLower) ||
-          office.type.toLowerCase().includes(searchLower)
+          (report.postOfficeName || "").toLowerCase().includes(searchLower) ||
+          (report.branch || "").toLowerCase().includes(searchLower) ||
+          (report.pinCode || "").toLowerCase().includes(searchLower)
         );
       })
-    : postOffices;
-
-  const verifyReport = async (postOfficeId) => {
-    try {
-      await update(ref(db, `headquarter/postOffices/${postOfficeId}`), {
-        isVerified: true,
-      });
-      setPostOffices((prev) =>
-        prev.map((office) =>
-          office.id === postOfficeId ? { ...office, isVerified: true } : office
-        )
-      );
-      alert("Report verified successfully!");
-    } catch (error) {
-      console.error("Error verifying report:", error);
-    }
-  };
-
-  const handleSuggestionChange = async (postOfficeId, suggestion) => {
-    try {
-      await update(ref(db, `headquarter/postOffices/${postOfficeId}`), { suggestion });
-      setPostOffices((prev) =>
-        prev.map((office) =>
-          office.id === postOfficeId ? { ...office, suggestion } : office
-        )
-      );
-      alert("Suggestion updated successfully!");
-    } catch (error) {
-      console.error("Error updating suggestion:", error);
-    }
-  };
+    : reports;
 
   return (
     <div>
+      {/* Add regular post offices field */}
+      <div className="add-post-office-container">
+        <input
+          style={{
+            height: "50px",
+            marginBottom: "10px",
+            width: "400px",
+          }}
+          type="text"
+          placeholder="Enter regular post office emails (comma-separated)"
+          value={emailsInput}
+          onChange={(e) => setEmailsInput(e.target.value)}
+          className="email-input"
+        />
+        <Button onClick={saveRegularPostOffices} style={{ marginLeft: "10px" }}>
+          Save Emails
+        </Button>
+      </div>
+
       <div className="table-container">
+        <input
+          style={{ height: "50px", marginBottom: "10px", width: "400px" }}
+          type="text"
+          placeholder="Search by Post Office, Branch, or PIN Code"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          className="search-input"
+        />
         <Table striped bordered hover responsive="lg">
           <thead>
             <tr>
               <th>Sr No.</th>
-              <th>Post Office</th>
-              <th>City</th>
-              <th>Type</th>
-              <th>Year</th>
-              <th>Verified</th>
-              <th>View</th>
-              <th>Download</th>
-              <th>Verify</th>
-              <th>Suggestion</th>
+              <th>Email</th>
+              <th>Post Office Name</th>
+              <th>Branch</th>
+              <th>PIN Code</th>
+              <th>Timestamp</th>
+              <th>PDF Report</th>
             </tr>
           </thead>
           <tbody>
-            {filteredPostOffices.map((postOffice, index) => (
-              <tr key={postOffice.id}>
+            {filteredReports.map((report, index) => (
+              <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{postOffice.postOffice}</td>
-                <td>{postOffice.city}</td>
-                <td>{postOffice.type}</td>
-                <td>{postOffice.year}</td>
-                <td>{postOffice.isVerified ? "Yes" : "No"}</td>
+                <td>{report.email}</td>
+                <td>{report.postOfficeName || "N/A"}</td>
+                <td>{report.branch || "N/A"}</td>
+                <td>{report.pinCode || "N/A"}</td>
+                <td>{new Date(report.timestamp).toLocaleString()}</td>
                 <td>
-                  <FinalReport postOffice={postOffice} previewOnly={true} />
-                </td>
-                <td>
-                  <FinalReport postOffice={postOffice} previewOnly={false} />
-                </td>
-                <td>
-                  {!postOffice.isVerified && (
-                    <Button onClick={() => verifyReport(postOffice.id)} style={{ color: "black" }}>
-                      Verify
-                    </Button>
+                  {report.pdfUrl ? (
+                    <a href={report.pdfUrl} target="_blank" rel="noopener noreferrer">
+                      View PDF
+                    </a>
+                  ) : (
+                    "No PDF Available"
                   )}
-                </td>
-                <td>
-                  <Form.Select
-                    value={postOffice.suggestion}
-                    onChange={(e) =>
-                      handleSuggestionChange(postOffice.id, e.target.value)
-                    }
-                  >
-                    <option value="">Select suggestion</option>
-                    <option value="All good">All good</option>
-                    <option value="Re-check energy data">Re-check Energy data</option>
-                    <option value="Re-check Water details">Re-check Water data</option>
-                    <option value="Re-check waste details">Re-check Waste data</option>
-                    <option value="Re-check address details">Re-check Address data</option>
-                    <option value="Re-check financial records">Re-check financial records</option>
-                    <option value="Incomplete data submission">Incomplete data submission</option>
-                  </Form.Select>
                 </td>
               </tr>
             ))}

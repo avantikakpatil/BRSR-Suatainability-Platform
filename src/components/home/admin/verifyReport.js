@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Button, Table } from "react-bootstrap";
 import { db } from "../../../firebaseConfig"; // Replace with your Firebase config path
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, remove, update } from "firebase/database";
 import "./VerifyReport.css";
 
 const VerifyReport = () => {
   const [reports, setReports] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [suggestions, setSuggestions] = useState({}); // Tracks suggestions for each report
 
-  // Fetch reports from the 'reports' node in Firebase
+  // Fetch reports from Firebase
   const fetchReports = () => {
     const reportsRef = ref(db, "reports");
 
@@ -53,6 +54,34 @@ const VerifyReport = () => {
     window.open(blobUrl, "_blank");
   };
 
+  // Handle verifying a report
+  const handleVerify = (email) => {
+    const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
+    const reportRef = ref(db, `reports/${emailKey}`);
+    update(reportRef, { verified: true })
+      .then(() => alert("Report marked as verified."))
+      .catch((error) => alert("Error verifying report: " + error.message));
+  };
+
+  // Handle deleting a report
+  const handleDelete = (email) => {
+    const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
+    const reportRef = ref(db, `reports/${emailKey}`);
+    remove(reportRef)
+      .then(() => alert("Report deleted successfully."))
+      .catch((error) => alert("Error deleting report: " + error.message));
+  };
+
+  // Handle saving a suggestion
+  const handleSaveSuggestion = (email) => {
+    const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
+    const reportRef = ref(db, `reports/${emailKey}`);
+    const suggestion = suggestions[email] || "";
+    update(reportRef, { suggestion })
+      .then(() => alert("Suggestion saved successfully."))
+      .catch((error) => alert("Error saving suggestion: " + error.message));
+  };
+
   // Filter reports based on search text
   const filteredReports = searchText
     ? reports.filter((report) => {
@@ -90,6 +119,7 @@ const VerifyReport = () => {
               <th>Branch</th>
               <th>PIN Code</th>
               <th>Actions</th>
+              <th>Suggestion</th>
             </tr>
           </thead>
           <tbody>
@@ -105,8 +135,43 @@ const VerifyReport = () => {
                     variant="primary"
                     onClick={() => handleViewReport(report.reportFileBase64)}
                     disabled={!report.reportFileBase64}
+                    style={{background:"grey"}}
                   >
                     View Report
+                  </Button>{" "}
+                  <Button
+                    variant="success"
+                    onClick={() => handleVerify(report.email)}
+                    style={{background:"blue"}}
+                  >
+                    Verify
+                  </Button>{" "}
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(report.email)}
+                    style={{background:"red"}}
+                  >
+                    Delete
+                  </Button>
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    placeholder="Enter suggestion"
+                    value={suggestions[report.email] || ""}
+                    onChange={(e) =>
+                      setSuggestions({
+                        ...suggestions,
+                        [report.email]: e.target.value,
+                      })
+                    }
+                  />
+                  <Button
+                    variant="info"
+                    onClick={() => handleSaveSuggestion(report.email)}
+                    style={{ marginTop: "5px" }}
+                  >
+                    Save
                   </Button>
                 </td>
               </tr>

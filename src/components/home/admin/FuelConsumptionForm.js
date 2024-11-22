@@ -29,6 +29,8 @@ const FuelConsumptionForm = ({ goBack }) => {
     fuelConsumption: '',
     energyIntensity: '',
     billFile: null,
+    externalAssessment: '',
+    externalAssessmentName: '',
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -108,8 +110,8 @@ const FuelConsumptionForm = ({ goBack }) => {
             </tr>
           </thead>
           <tbody>
-            {[ 
-              { label: 'Total fuel consumption (B)', key: 'fuelConsumption' },
+            {[
+              { label: 'Total fuel consumption (B) in liters', key: 'fuelConsumption' },
               { label: 'Energy intensity per rupee of turnover (Total energy consumption / turnover in rupees)', key: 'energyIntensity' },
             ].map((item) => (
               <tr key={item.key}>
@@ -134,15 +136,40 @@ const FuelConsumptionForm = ({ goBack }) => {
           <input type="file" onChange={handleFileChange} style={styles.fileInput} />
         </div>
 
+        {/* External Assessment Section */}
+        <div style={styles.uploadSection}>
+          <label style={styles.label}>External Assessment</label>
+          <select
+            name="externalAssessment"
+            value={formData.externalAssessment}
+            onChange={handleChange}
+            style={styles.select}
+          >
+            <option value="">Select</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        {/* Conditional Input for External Assessment Name */}
+        {formData.externalAssessment === 'Yes' && (
+          <div style={styles.uploadSection}>
+            <label style={styles.label}>External Assessment Name</label>
+            <input
+              type="text"
+              name="externalAssessmentName"
+              value={formData.externalAssessmentName}
+              onChange={handleChange}
+              placeholder="Enter External Assessment Name"
+              style={styles.input}
+            />
+          </div>
+        )}
+
         <button type="submit" style={styles.submitButton} disabled={isUploading}>
           {isUploading ? 'Uploading...' : 'Submit'}
         </button>
       </form>
-
-      <p style={styles.note}>
-        <strong>Note:</strong> Indicate if any independent assessment/evaluation/assurance has been carried out by an
-        external agency? (Y/N) If yes, name the external agency.
-      </p>
     </div>
   );
 };
@@ -214,6 +241,13 @@ const styles = {
     border: '1px solid #ccc',
     borderRadius: '4px',
   },
+  select: {
+    width: '100%',
+    padding: '8px',
+    fontSize: '14px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+  },
   submitButton: {
     padding: '10px 20px',
     backgroundColor: '#4CAF50',
@@ -221,11 +255,6 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-  },
-  note: {
-    marginTop: '20px',
-    fontSize: '14px',
-    color: '#666',
   },
 };
 

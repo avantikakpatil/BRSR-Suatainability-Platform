@@ -59,7 +59,14 @@ const VerifyReport = () => {
     const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
     const reportRef = ref(db, `reports/${emailKey}`);
     update(reportRef, { verified: true })
-      .then(() => alert("Report marked as verified."))
+      .then(() => {
+        setReports((prevReports) =>
+          prevReports.map((report) =>
+            report.email === email ? { ...report, verified: true } : report
+          )
+        );
+        alert("Report marked as verified.");
+      })
       .catch((error) => alert("Error verifying report: " + error.message));
   };
 
@@ -68,7 +75,12 @@ const VerifyReport = () => {
     const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
     const reportRef = ref(db, `reports/${emailKey}`);
     remove(reportRef)
-      .then(() => alert("Report deleted successfully."))
+      .then(() => {
+        setReports((prevReports) =>
+          prevReports.filter((report) => report.email !== email)
+        );
+        alert("Report deleted successfully.");
+      })
       .catch((error) => alert("Error deleting report: " + error.message));
   };
 
@@ -130,30 +142,50 @@ const VerifyReport = () => {
                 <td>{report.postOfficeName || "N/A"}</td>
                 <td>{report.branch || "N/A"}</td>
                 <td>{report.pinCode || "N/A"}</td>
-                <td>
+                <td style={{ display: "flex", justifyContent: "space-evenly", alignItems: "center", gap: "10px" }}>
                   <Button
-                    variant="primary"
                     onClick={() => handleViewReport(report.reportFileBase64)}
                     disabled={!report.reportFileBase64}
-                    style={{background:"grey"}}
+                    style={{
+                      backgroundColor: "#6c63ff", // Elegant purple
+                      color: "#fff",
+                      border: "none",
+                      padding: "10px 20px",
+                      borderRadius: "5px",
+                      width: "120px", // Ensures equal width
+                    }}
                   >
                     View Report
-                  </Button>{" "}
+                  </Button>
                   <Button
-                    variant="success"
                     onClick={() => handleVerify(report.email)}
-                    style={{background:"blue"}}
+                    disabled={report.verified}
+                    style={{
+                      backgroundColor: report.verified ? "#28a745" : "#007bff", // Green if verified
+                      color: "#fff",
+                      border: "none",
+                      padding: "10px 20px",
+                      borderRadius: "5px",
+                      width: "120px", // Ensures equal width
+                    }}
                   >
-                    Verify
-                  </Button>{" "}
+                    {report.verified ? "Verified" : "Verify"}
+                  </Button>
                   <Button
-                    variant="danger"
                     onClick={() => handleDelete(report.email)}
-                    style={{background:"red"}}
+                    style={{
+                      backgroundColor: "#dc3545", // Bold red
+                      color: "#fff",
+                      border: "none",
+                      padding: "10px 20px",
+                      borderRadius: "5px",
+                      width: "120px", // Ensures equal width
+                    }}
                   >
                     Delete
                   </Button>
                 </td>
+
                 <td>
                   <input
                     type="text"
@@ -166,10 +198,10 @@ const VerifyReport = () => {
                       })
                     }
                   />
-                  <Button
+                  <Button                 
                     variant="info"
                     onClick={() => handleSaveSuggestion(report.email)}
-                    style={{ marginTop: "5px" }}
+                    style={{ marginTop: "5px",background:"blue" }}
                   >
                     Save
                   </Button>

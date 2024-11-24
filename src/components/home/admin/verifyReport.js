@@ -1,37 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, Form } from "react-bootstrap";
-import { db, auth } from "../../../firebaseConfig";
-import { ref, onValue, update, push } from "firebase/database";
-import { onAuthStateChanged } from "firebase/auth";
-import { getStorage, ref as storageRef, getDownloadURL } from "firebase/storage";
+import { Button, Table } from "react-bootstrap";
+import { db } from "../../../firebaseConfig"; // Replace with your Firebase config path
+import { ref, onValue, remove, update } from "firebase/database";
 import "./VerifyReport.css";
 
 const VerifyReport = () => {
   const [reports, setReports] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [suggestions, setSuggestions] = useState({}); // Tracks suggestions for each report
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
-        fetchRegularPostOffices(user.email);
-      } else {
-        console.log("No user is signed in.");
-        setReports([]);
-        setRegularPostOffices([]);
-      }
-    });
+  // Fetch reports from Firebase
+  const fetchReports = () => {
+    const reportsRef = ref(db, "reports");
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  const fetchRegularPostOffices = (email) => {
-    const userKey = email.replace(/\./g, "_");
-
-    const regularPostOfficesRef = ref(db, `report/${userKey}/regularPostOffices`);
-    onValue(regularPostOfficesRef, (snapshot) => {
+    onValue(reportsRef, (snapshot) => {
       if (snapshot.exists()) {
         const fetchedReports = [];
         snapshot.forEach((childSnapshot) => {
@@ -48,93 +30,56 @@ const VerifyReport = () => {
     });
   };
 
-  const fetchReportsByEmails = (emails) => {
-    const fetchedReports = [];
+  useEffect(() => {
+    fetchReports();
+  }, []);
 
-    emails.forEach((email) => {
-      const emailKey = email.replace(/\./g, "_");
-      const reportRef = ref(db, `reports/${emailKey}`);
-
-      onValue(reportRef, async (snapshot) => {
-        if (snapshot.exists()) {
-          const reportData = snapshot.val();
-          if (reportData.reportFileUrl) {
-            try {
-              const storage = getStorage();
-              const fileRef = storageRef(storage, reportData.reportFileUrl);
-              const fileUrl = await getDownloadURL(fileRef);
-
-              fetchedReports.push({
-                email,
-                ...reportData,
-                pdfUrl: fileUrl,
-              });
-            } catch (error) {
-              console.error("Error fetching file URL: ", error);
-            }
-          } else {
-            fetchedReports.push({ email, ...reportData });
-          }
-        }
-
-        if (fetchedReports.length === emails.length) {
-          setReports(fetchedReports);
-        }
-      });
-    });
-  };
-
-  const saveRegularPostOffices = async () => {
-    if (!currentUser) {
-      alert("Please log in to save regular post offices.");
+  // Handle viewing the report PDF
+  const handleViewReport = (base64Data) => {
+    if (!base64Data) {
+      alert("No report available.");
       return;
     }
 
-    const emails = emailsInput
-      .split(",")
-      .map((email) => email.trim())
-      .filter((email) => email !== "");
+    // Convert Base64 to Blob
+    const byteCharacters = atob(base64Data.split(",")[1]); // Decode Base64
+    const byteNumbers = Array.from(byteCharacters, (char) => char.charCodeAt(0));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "application/pdf" });
 
-    if (emails.length === 0) {
-      alert("Please enter at least one valid email address.");
-      return;
-    }
+    // Generate Blob URL
+    const blobUrl = URL.createObjectURL(blob);
 
-    const userKey = currentUser.email.replace(/\./g, "_");
-    const userReportRef = ref(db, `report/${userKey}/regularPostOffices`);
-
-    try {
-      const newEmailsRef = push(userReportRef);
-      await update(newEmailsRef, {
-        emails,
-        timestamp: new Date().toISOString(),
-      });
-
-      setRegularPostOffices((prev) => [...prev, ...emails]);
-      setEmailsInput("");
-      alert("Regular post offices saved successfully!");
-    } catch (error) {
-      console.error("Error saving regular post offices:", error);
-      alert("Failed to save post offices. Please try again.");
-    }
+    // Open Blob URL in a new tab
+    window.open(blobUrl, "_blank");
   };
 
+  // Handle verifying a report
   const handleVerify = (email) => {
-    const emailKey = email.replace(/\./g, "_");
+    const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
     const reportRef = ref(db, `reports/${emailKey}`);
-
     update(reportRef, { verified: true })
-      .then(() => alert("Report marked as verified!"))
-      .catch((error) => console.error("Error verifying report:", error));
+      .then(() => alert("Report marked as verified."))
+      .catch((error) => alert("Error verifying report: " + error.message));
   };
 
-  const handleSuggestionsChange = (email, suggestions) => {
-    const emailKey = email.replace(/\./g, "_");
+  // Handle deleting a report
+  const handleDelete = (email) => {
+    const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
     const reportRef = ref(db, `reports/${emailKey}`);
+    remove(reportRef)
+      .then(() => alert("Report deleted successfully."))
+      .catch((error) => alert("Error deleting report: " + error.message));
+  };
 
-    update(reportRef, { suggestions })
-      .then(() => console.log("Suggestions saved!"))
-      .catch((error) => console.error("Error saving suggestions:", error));
+  // Handle saving a suggestion
+  const handleSaveSuggestion = (email) => {
+    const emailKey = email.replace(/\./g, "_"); // Convert email back to Firebase-safe key
+    const reportRef = ref(db, `reports/${emailKey}`);
+    const suggestion = suggestions[email] || "";
+    update(reportRef, { suggestion })
+      .then(() => alert("Suggestion saved successfully."))
+      .catch((error) => alert("Error saving suggestion: " + error.message));
   };
 
   // Filter reports based on search text
@@ -153,26 +98,6 @@ const VerifyReport = () => {
     <div className="verify-report-container">
       {/* Search Bar */}
       <div className="search-bar">
-    <div>
-      <div className="add-post-office-container">
-        <input
-          style={{
-            height: "50px",
-            marginBottom: "10px",
-            width: "400px",
-          }}
-          type="text"
-          placeholder="Enter regular post office emails (comma-separated)"
-          value={emailsInput}
-          onChange={(e) => setEmailsInput(e.target.value)}
-          className="email-input"
-        />
-        <Button onClick={saveRegularPostOffices} style={{ marginLeft: "10px" }}>
-          Save Emails
-        </Button>
-      </div>
-
-      <div className="table-container">
         <input
           style={{ height: "50px", marginBottom: "10px", width: "400px" }}
           type="text"
@@ -193,10 +118,8 @@ const VerifyReport = () => {
               <th>Post Office Name</th>
               <th>Branch</th>
               <th>PIN Code</th>
-              <th>Timestamp</th>
-              <th>PDF Report</th>
-              <th>Verify</th>
-              <th>Suggestions</th>
+              <th>Actions</th>
+              <th>Suggestion</th>
             </tr>
           </thead>
           <tbody>
@@ -207,33 +130,49 @@ const VerifyReport = () => {
                 <td>{report.postOfficeName || "N/A"}</td>
                 <td>{report.branch || "N/A"}</td>
                 <td>{report.pinCode || "N/A"}</td>
-                <td>{new Date(report.timestamp).toLocaleString()}</td>
                 <td>
-                  {report.pdfUrl ? (
-                    <a href={report.pdfUrl} target="_blank" rel="noopener noreferrer">
-                      View PDF
-                    </a>
-                  ) : (
-                    "No PDF Available"
-                  )}
-                </td>
-                <td>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleViewReport(report.reportFileBase64)}
+                    disabled={!report.reportFileBase64}
+                    style={{background:"grey"}}
+                  >
+                    View Report
+                  </Button>{" "}
                   <Button
                     variant="success"
                     onClick={() => handleVerify(report.email)}
+                    style={{background:"blue"}}
                   >
                     Verify
+                  </Button>{" "}
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(report.email)}
+                    style={{background:"red"}}
+                  >
+                    Delete
                   </Button>
                 </td>
                 <td>
-                  <Form.Control
+                  <input
                     type="text"
-                    placeholder="Enter suggestions"
-                    defaultValue={report.suggestions || ""}
+                    placeholder="Enter suggestion"
+                    value={suggestions[report.email] || ""}
                     onChange={(e) =>
-                      handleSuggestionsChange(report.email, e.target.value)
+                      setSuggestions({
+                        ...suggestions,
+                        [report.email]: e.target.value,
+                      })
                     }
                   />
+                  <Button
+                    variant="info"
+                    onClick={() => handleSaveSuggestion(report.email)}
+                    style={{ marginTop: "5px" }}
+                  >
+                    Save
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -245,4 +184,3 @@ const VerifyReport = () => {
 };
 
 export default VerifyReport;
-

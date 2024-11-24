@@ -7,10 +7,7 @@ import { getStorage, ref as storageRef, getDownloadURL } from "firebase/storage"
 import "./VerifyReport.css";
 
 const VerifyReport = () => {
-  const [currentUser, setCurrentUser] = useState(null);
   const [reports, setReports] = useState([]);
-  const [regularPostOffices, setRegularPostOffices] = useState([]);
-  const [emailsInput, setEmailsInput] = useState("");
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
@@ -36,18 +33,17 @@ const VerifyReport = () => {
     const regularPostOfficesRef = ref(db, `report/${userKey}/regularPostOffices`);
     onValue(regularPostOfficesRef, (snapshot) => {
       if (snapshot.exists()) {
-        const emails = [];
+        const fetchedReports = [];
         snapshot.forEach((childSnapshot) => {
           const data = childSnapshot.val();
-          if (data.emails) {
-            emails.push(...data.emails);
-          }
+          fetchedReports.push({
+            email: childSnapshot.key.replace(/_/g, "."), // Convert Firebase-safe key back to email
+            ...data,
+          });
         });
-        setRegularPostOffices(emails);
-        fetchReportsByEmails(emails);
+        setReports(fetchedReports);
       } else {
-        setRegularPostOffices([]);
-        setReports([]);
+        console.log("No reports found.");
       }
     });
   };
@@ -141,6 +137,7 @@ const VerifyReport = () => {
       .catch((error) => console.error("Error saving suggestions:", error));
   };
 
+  // Filter reports based on search text
   const filteredReports = searchText
     ? reports.filter((report) => {
         const searchLower = searchText.toLowerCase();
@@ -153,6 +150,9 @@ const VerifyReport = () => {
     : reports;
 
   return (
+    <div className="verify-report-container">
+      {/* Search Bar */}
+      <div className="search-bar">
     <div>
       <div className="add-post-office-container">
         <input
@@ -181,6 +181,10 @@ const VerifyReport = () => {
           onChange={(e) => setSearchText(e.target.value)}
           className="search-input"
         />
+      </div>
+
+      {/* Reports Table */}
+      <div className="table-container">
         <Table striped bordered hover responsive="lg">
           <thead>
             <tr>
@@ -241,3 +245,4 @@ const VerifyReport = () => {
 };
 
 export default VerifyReport;
+
